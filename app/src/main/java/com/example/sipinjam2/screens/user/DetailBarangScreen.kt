@@ -1,4 +1,4 @@
-package com.example.sipinjam2.ui.screens
+package com.example.sipinjam.ui.screens.user
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -9,8 +9,10 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Book
 import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -19,16 +21,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.sipinjam2.ui.theme.BackgroundGray
-import com.example.sipinjam2.ui.theme.CardWhite
-import com.example.sipinjam2.ui.theme.InputBg
-import com.example.sipinjam2.ui.theme.SipinjamBlue
-import com.example.sipinjam2.ui.theme.StatusGreen
-import com.example.sipinjam2.ui.theme.StatusGreenBg
-import com.example.sipinjam2.ui.theme.StatusOrange
-import com.example.sipinjam2.ui.theme.StatusOrangeBg
-import com.example.sipinjam2.ui.theme.TextPrimary
-import com.example.sipinjam2.ui.theme.TextSecondary
+import com.example.sipinjam.ui.theme.*
 
 data class DetailBarang(
     val nama: String,
@@ -44,7 +37,7 @@ data class DetailBarang(
 )
 
 @Composable
-fun DetailScreen(
+fun DetailBarangScreen(
     barang: DetailBarang = DetailBarang(
         nama = "MacBook Pro M2 14-inch Space Gray",
         kategori = "ELEKTRONIK",
@@ -60,15 +53,44 @@ fun DetailScreen(
     onShareClick: () -> Unit = {},
     onAjukanPeminjaman: () -> Unit = {},
 ) {
-    var deskripsiExpanded by remember { mutableStateOf(true) }
+    var deskripsiExpanded by rememberSaveable { mutableStateOf(true) }
 
     Scaffold(
         containerColor = BackgroundGray,
         topBar = {
-            TopBarDetailBarang(
-                onBackClick = onBackClick,
-                onShareClick = onShareClick,
-            )
+            Surface(
+                color = CardWhite,
+                shadowElevation = 2.dp
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 8.dp, vertical = 12.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    IconButton(onClick = onBackClick) {
+                        Icon(
+                            imageVector = Icons.Filled.ArrowBack,
+                            contentDescription = "Kembali",
+                            tint = TextPrimary
+                        )
+                    }
+                    Text(
+                        text = "Detail Barang",
+                        color = TextPrimary,
+                        fontSize = 17.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        modifier = Modifier.weight(1f)
+                    )
+                    IconButton(onClick = onShareClick) {
+                        Icon(
+                            imageVector = Icons.Filled.Share,
+                            contentDescription = "Bagikan",
+                            tint = TextSecondary
+                        )
+                    }
+                }
+            }
         },
         bottomBar = {
             Surface(
@@ -83,7 +105,7 @@ fun DetailScreen(
                         .padding(horizontal = 20.dp, vertical = 16.dp)
                         .height(52.dp),
                     shape = RoundedCornerShape(14.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = SipinjamBlue)
+                    colors = ButtonDefaults.buttonColors(containerColor = SiPinjamBlue)
                 ) {
                     Text(
                         text = "Ajukan Peminjaman",
@@ -101,12 +123,11 @@ fun DetailScreen(
                 .padding(innerPadding)
                 .verticalScroll(rememberScrollState())
         ) {
-            // Placeholder gambar barang
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(220.dp)
-                    .background(Color(0xFF1A1A2E)),
+                    .background(DarkImageBg),
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
@@ -123,7 +144,6 @@ fun DetailScreen(
                     .padding(horizontal = 20.dp, vertical = 20.dp),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                // Badge row
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                     verticalAlignment = Alignment.CenterVertically
@@ -131,7 +151,7 @@ fun DetailScreen(
                     Box(
                         modifier = Modifier
                             .clip(RoundedCornerShape(6.dp))
-                            .background(SipinjamBlue)
+                            .background(SiPinjamBlue)
                             .padding(horizontal = 10.dp, vertical = 4.dp)
                     ) {
                         Text(
@@ -183,7 +203,6 @@ fun DetailScreen(
                     }
                 }
 
-                // Nama barang
                 Text(
                     text = barang.nama,
                     color = TextPrimary,
@@ -192,7 +211,6 @@ fun DetailScreen(
                     lineHeight = 30.sp
                 )
 
-                // Card spesifikasi
                 Card(
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(14.dp),
@@ -236,7 +254,6 @@ fun DetailScreen(
                     }
                 }
 
-                // Card deskripsi
                 Card(
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(14.dp),
@@ -275,12 +292,11 @@ fun DetailScreen(
                     }
                 }
 
-                // Info box
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
                         .clip(RoundedCornerShape(12.dp))
-                        .background(Color(0xFFFFF7ED))
+                        .background(InfoOrangeBg)
                         .padding(14.dp),
                     verticalAlignment = Alignment.Top,
                     horizontalArrangement = Arrangement.spacedBy(10.dp)
@@ -299,39 +315,6 @@ fun DetailScreen(
                     )
                 }
             }
-        }
-    }
-}
-
-@Composable
-private fun TopBarDetailBarang(
-    onBackClick: () -> Unit,
-    onShareClick: () -> Unit,
-) {
-    Surface(
-        color = CardWhite,
-        shadowElevation = 2.dp
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 8.dp, vertical = 12.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            IconButton(onClick = onBackClick) {
-                Icon(
-                    imageVector = Icons.Filled.ArrowBack,
-                    contentDescription = "Kembali",
-                    tint = TextPrimary
-                )
-            }
-            Text(
-                text = "Detail Barang",
-                color = TextPrimary,
-                fontSize = 17.sp,
-                fontWeight = FontWeight.SemiBold,
-                modifier = Modifier.weight(1f)
-            )
         }
     }
 }
@@ -360,8 +343,8 @@ private fun SpekItem(
 
 @Preview(showBackground = true, widthDp = 390, heightDp = 844)
 @Composable
-fun DetailScreenPreview() {
+fun DetailBarangScreenPreview() {
     MaterialTheme {
-        DetailScreen()
+        DetailBarangScreen()
     }
 }

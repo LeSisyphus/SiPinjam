@@ -16,39 +16,29 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.*
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.sipinjam.R
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.sipinjam.ui.theme.*
 
 @Composable
 fun LoginScreen(
-    onLoginClick: (email: String, password: String) -> Unit = { _, _ -> },
+    viewModel: LoginViewModel = viewModel(),
+    onLoginSuccess: (isAdmin: Boolean) -> Unit = {},
     onRegisterClick: () -> Unit = {},
     onForgotPasswordClick: () -> Unit = {},
 ) {
-    val sipinjamBlue   = colorResource(R.color.sipinjam_blue)
-    val backgroundGray = colorResource(R.color.background_gray)
-    val cardWhite      = colorResource(R.color.card_white)
-    val inputBg        = colorResource(R.color.input_bg)
-    val textPrimary    = colorResource(R.color.text_primary)
-    val textSecondary  = colorResource(R.color.text_secondary)
-    val dividerColor   = colorResource(R.color.divider_color)
-    val toggleBg       = colorResource(R.color.toggle_bg)
-
-    var email           by remember { mutableStateOf("") }
-    var password        by remember { mutableStateOf("") }
-    var passwordVisible by remember { mutableStateOf(false) }
-    var selectedLang    by remember { mutableStateOf("ID") }
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(backgroundGray)
+            .background(BackgroundGray)
     ) {
         Column(
             modifier = Modifier
@@ -61,7 +51,7 @@ fun LoginScreen(
 
             Text(
                 text = "SiPinjam",
-                color = sipinjamBlue,
+                color = SiPinjamBlue,
                 fontSize = 22.sp,
                 fontWeight = FontWeight.Bold,
                 letterSpacing = 0.5.sp
@@ -71,7 +61,7 @@ fun LoginScreen(
 
             Text(
                 text = "Selamat Datang",
-                color = textPrimary,
+                color = TextPrimary,
                 fontSize = 30.sp,
                 fontWeight = FontWeight.ExtraBold
             )
@@ -80,7 +70,7 @@ fun LoginScreen(
 
             Text(
                 text = "Sistem informasi peminjaman barang\ninventaris kampus ULM.",
-                color = textSecondary,
+                color = TextSecondary,
                 fontSize = 14.sp,
                 textAlign = TextAlign.Center,
                 lineHeight = 20.sp
@@ -91,7 +81,7 @@ fun LoginScreen(
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(20.dp),
-                colors = CardDefaults.cardColors(containerColor = cardWhite),
+                colors = CardDefaults.cardColors(containerColor = CardWhite),
                 elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
             ) {
                 Column(
@@ -105,17 +95,17 @@ fun LoginScreen(
                             text = "EMAIL",
                             fontSize = 11.sp,
                             fontWeight = FontWeight.SemiBold,
-                            color = textSecondary,
+                            color = TextSecondary,
                             letterSpacing = 0.8.sp
                         )
                         OutlinedTextField(
-                            value = email,
-                            onValueChange = { email = it },
+                            value = uiState.email,
+                            onValueChange = { viewModel.onEmailChange(it) },
                             modifier = Modifier.fillMaxWidth(),
                             placeholder = {
                                 Text(
                                     "nama@mhs.ulm.ac.id",
-                                    color = textSecondary.copy(alpha = 0.6f),
+                                    color = TextSecondary.copy(alpha = 0.6f),
                                     fontSize = 14.sp
                                 )
                             },
@@ -123,10 +113,10 @@ fun LoginScreen(
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
                             shape = RoundedCornerShape(12.dp),
                             colors = OutlinedTextFieldDefaults.colors(
-                                unfocusedBorderColor    = Color.Transparent,
-                                focusedBorderColor      = sipinjamBlue,
-                                unfocusedContainerColor = inputBg,
-                                focusedContainerColor   = inputBg,
+                                unfocusedBorderColor = Color.Transparent,
+                                focusedBorderColor = SiPinjamBlue,
+                                unfocusedContainerColor = InputBg,
+                                focusedContainerColor = InputBg,
                             ),
                             textStyle = LocalTextStyle.current.copy(fontSize = 14.sp)
                         )
@@ -137,40 +127,37 @@ fun LoginScreen(
                             text = "PASSWORD",
                             fontSize = 11.sp,
                             fontWeight = FontWeight.SemiBold,
-                            color = textSecondary,
+                            color = TextSecondary,
                             letterSpacing = 0.8.sp
                         )
                         OutlinedTextField(
-                            value = password,
-                            onValueChange = { password = it },
+                            value = uiState.password,
+                            onValueChange = { viewModel.onPasswordChange(it) },
                             modifier = Modifier.fillMaxWidth(),
                             singleLine = true,
-                            visualTransformation = if (passwordVisible)
+                            visualTransformation = if (uiState.passwordVisible)
                                 VisualTransformation.None
                             else
                                 PasswordVisualTransformation(),
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                             trailingIcon = {
-                                IconButton(onClick = { passwordVisible = !passwordVisible }) {
+                                IconButton(onClick = { viewModel.onTogglePasswordVisibility() }) {
                                     Icon(
-                                        imageVector = if (passwordVisible)
+                                        imageVector = if (uiState.passwordVisible)
                                             Icons.Filled.Visibility
                                         else
                                             Icons.Filled.VisibilityOff,
-                                        contentDescription = if (passwordVisible)
-                                            "Sembunyikan password"
-                                        else
-                                            "Tampilkan password",
-                                        tint = textSecondary
+                                        contentDescription = null,
+                                        tint = TextSecondary
                                     )
                                 }
                             },
                             shape = RoundedCornerShape(12.dp),
                             colors = OutlinedTextFieldDefaults.colors(
-                                unfocusedBorderColor    = Color.Transparent,
-                                focusedBorderColor      = sipinjamBlue,
-                                unfocusedContainerColor = inputBg,
-                                focusedContainerColor   = inputBg,
+                                unfocusedBorderColor = Color.Transparent,
+                                focusedBorderColor = SiPinjamBlue,
+                                unfocusedContainerColor = InputBg,
+                                focusedContainerColor = InputBg,
                             ),
                             textStyle = LocalTextStyle.current.copy(fontSize = 14.sp)
                         )
@@ -182,29 +169,46 @@ fun LoginScreen(
                     ) {
                         Text(
                             text = "Lupa Password?",
-                            color = sipinjamBlue,
+                            color = SiPinjamBlue,
                             fontSize = 13.sp,
                             fontWeight = FontWeight.Medium,
                             modifier = Modifier.clickable { onForgotPasswordClick() }
                         )
                     }
 
+                    if (uiState.errorMessage != null) {
+                        Text(
+                            text = uiState.errorMessage!!,
+                            color = StatusRed,
+                            fontSize = 13.sp
+                        )
+                    }
+
                     Spacer(Modifier.height(4.dp))
 
                     Button(
-                        onClick = { onLoginClick(email, password) },
+                        onClick = { viewModel.onLoginClick(onSuccess = onLoginSuccess) },
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(52.dp),
                         shape = RoundedCornerShape(14.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = sipinjamBlue)
+                        colors = ButtonDefaults.buttonColors(containerColor = SiPinjamBlue),
+                        enabled = !uiState.isLoading
                     ) {
-                        Text(
-                            text = "Masuk",
-                            fontSize = 16.sp,
-                            fontWeight = FontWeight.SemiBold,
-                            color = cardWhite
-                        )
+                        if (uiState.isLoading) {
+                            CircularProgressIndicator(
+                                color = CardWhite,
+                                modifier = Modifier.size(20.dp),
+                                strokeWidth = 2.dp
+                            )
+                        } else {
+                            Text(
+                                text = "Masuk",
+                                fontSize = 16.sp,
+                                fontWeight = FontWeight.SemiBold,
+                                color = CardWhite
+                            )
+                        }
                     }
 
                     Row(
@@ -212,25 +216,23 @@ fun LoginScreen(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
-                        HorizontalDivider(modifier = Modifier.weight(1f), color = dividerColor)
+                        HorizontalDivider(modifier = Modifier.weight(1f), color = DividerColor)
                         Text(
                             text = "ATAU",
-                            color = textSecondary,
+                            color = TextSecondary,
                             fontSize = 11.sp,
                             letterSpacing = 0.8.sp
                         )
-                        HorizontalDivider(modifier = Modifier.weight(1f), color = dividerColor)
+                        HorizontalDivider(modifier = Modifier.weight(1f), color = DividerColor)
                     }
 
                     OutlinedButton(
-                        onClick = { onRegisterClick() },
+                        onClick = onRegisterClick,
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(52.dp),
                         shape = RoundedCornerShape(14.dp),
-                        colors = ButtonDefaults.outlinedButtonColors(
-                            contentColor = sipinjamBlue
-                        )
+                        colors = ButtonDefaults.outlinedButtonColors(contentColor = SiPinjamBlue)
                     ) {
                         Text(
                             text = "Daftar Akun",
@@ -244,11 +246,8 @@ fun LoginScreen(
             Spacer(Modifier.height(32.dp))
 
             LanguageToggle(
-                selected = selectedLang,
-                onSelect = { selectedLang = it },
-                toggleBgColor      = toggleBg,
-                textPrimaryColor   = textPrimary,
-                textSecondaryColor = textSecondary
+                selected = uiState.selectedLang,
+                onSelect = { viewModel.onLangChange(it) }
             )
 
             Spacer(Modifier.height(32.dp))
@@ -260,15 +259,11 @@ fun LoginScreen(
 private fun LanguageToggle(
     selected: String,
     onSelect: (String) -> Unit,
-    toggleBgColor: Color,
-    textPrimaryColor: Color,
-    textSecondaryColor: Color,
 ) {
-    val cardWhite = colorResource(R.color.card_white)
     Row(
         modifier = Modifier
             .clip(RoundedCornerShape(50))
-            .background(toggleBgColor)
+            .background(ToggleBg)
             .padding(4.dp),
         horizontalArrangement = Arrangement.spacedBy(4.dp)
     ) {
@@ -277,7 +272,7 @@ private fun LanguageToggle(
             Box(
                 modifier = Modifier
                     .clip(RoundedCornerShape(50))
-                    .background(if (isSelected) cardWhite else Color.Transparent)
+                    .background(if (isSelected) CardWhite else Color.Transparent)
                     .clickable { onSelect(lang) }
                     .padding(horizontal = 20.dp, vertical = 6.dp),
                 contentAlignment = Alignment.Center
@@ -286,7 +281,7 @@ private fun LanguageToggle(
                     text = lang,
                     fontSize = 13.sp,
                     fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Normal,
-                    color = if (isSelected) textPrimaryColor else textSecondaryColor
+                    color = if (isSelected) TextPrimary else TextSecondary
                 )
             }
         }
@@ -296,7 +291,5 @@ private fun LanguageToggle(
 @Preview(showBackground = true, widthDp = 390, heightDp = 844)
 @Composable
 fun LoginScreenPreview() {
-    MaterialTheme {
-        LoginScreen()
-    }
+    MaterialTheme { LoginScreen() }
 }

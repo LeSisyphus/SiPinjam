@@ -7,21 +7,21 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.Book
+import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.sipinjam.R
+import com.example.sipinjam.ui.theme.*
 
 @Composable
 fun PeminjamanScreen(
@@ -31,24 +31,15 @@ fun PeminjamanScreen(
     onBackClick: () -> Unit = {},
     onKirimPermohonan: (tanggalPinjam: String, tanggalKembali: String, keperluan: String) -> Unit = { _, _, _ -> },
 ) {
-    val sipinjamBlue   = colorResource(R.color.sipinjam_blue)
-    val backgroundGray = colorResource(R.color.background_gray)
-    val cardWhite      = colorResource(R.color.card_white)
-    val inputBg        = colorResource(R.color.input_bg)
-    val textPrimary    = colorResource(R.color.text_primary)
-    val textSecondary  = colorResource(R.color.text_secondary)
-    val statusGreen    = colorResource(R.color.status_green)
-    val statusGreenBg  = colorResource(R.color.status_green_bg)
-
-    var tanggalPinjam   by remember { mutableStateOf("12 Oct 2024") }
-    var tanggalKembali  by remember { mutableStateOf("15 Oct 2024") }
-    var keperluan       by remember { mutableStateOf("") }
+    var tanggalPinjam  by rememberSaveable { mutableStateOf("12 Oct 2024") }
+    var tanggalKembali by rememberSaveable { mutableStateOf("15 Oct 2024") }
+    var keperluan      by rememberSaveable { mutableStateOf("") }
 
     Scaffold(
-        containerColor = backgroundGray,
+        containerColor = BackgroundGray,
         topBar = {
             Surface(
-                color = cardWhite,
+                color = CardWhite,
                 shadowElevation = 2.dp
             ) {
                 Row(
@@ -61,12 +52,12 @@ fun PeminjamanScreen(
                         Icon(
                             imageVector = Icons.Filled.ArrowBack,
                             contentDescription = "Kembali",
-                            tint = textPrimary
+                            tint = TextPrimary
                         )
                     }
                     Text(
                         text = "Ajukan Peminjaman",
-                        color = textPrimary,
+                        color = TextPrimary,
                         fontSize = 17.sp,
                         fontWeight = FontWeight.SemiBold
                     )
@@ -76,7 +67,7 @@ fun PeminjamanScreen(
         bottomBar = {
             Surface(
                 modifier = Modifier.fillMaxWidth(),
-                color = cardWhite,
+                color = CardWhite,
                 shadowElevation = 8.dp
             ) {
                 Column(
@@ -89,7 +80,7 @@ fun PeminjamanScreen(
                             .fillMaxWidth()
                             .height(52.dp),
                         shape = RoundedCornerShape(14.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = sipinjamBlue)
+                        colors = ButtonDefaults.buttonColors(containerColor = SiPinjamBlue)
                     ) {
                         Text(
                             text = "Kirim Permohonan",
@@ -101,7 +92,7 @@ fun PeminjamanScreen(
                     Spacer(Modifier.height(10.dp))
                     Text(
                         text = "Permohonan akan diproses oleh admin dalam 1×24 jam. Pastikan data yang anda masukkan sudah benar.",
-                        color = textSecondary,
+                        color = TextSecondary,
                         fontSize = 12.sp,
                         textAlign = TextAlign.Center,
                         lineHeight = 18.sp
@@ -121,7 +112,7 @@ fun PeminjamanScreen(
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(16.dp),
-                colors = CardDefaults.cardColors(containerColor = cardWhite),
+                colors = CardDefaults.cardColors(containerColor = CardWhite),
                 elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
             ) {
                 Row(
@@ -133,7 +124,7 @@ fun PeminjamanScreen(
                         modifier = Modifier
                             .size(64.dp)
                             .clip(RoundedCornerShape(12.dp))
-                            .background(Color(0xFF1A1A2E)),
+                            .background(DarkImageBg),
                         contentAlignment = Alignment.Center
                     ) {
                         Icon(
@@ -149,7 +140,7 @@ fun PeminjamanScreen(
                             Box(
                                 modifier = Modifier
                                     .clip(RoundedCornerShape(4.dp))
-                                    .background(sipinjamBlue)
+                                    .background(SiPinjamBlue)
                                     .padding(horizontal = 8.dp, vertical = 3.dp)
                             ) {
                                 Text(
@@ -163,12 +154,12 @@ fun PeminjamanScreen(
                             Box(
                                 modifier = Modifier
                                     .clip(RoundedCornerShape(4.dp))
-                                    .background(statusGreenBg)
+                                    .background(StatusGreenBg)
                                     .padding(horizontal = 8.dp, vertical = 3.dp)
                             ) {
                                 Text(
                                     text = statusBarang,
-                                    color = statusGreen,
+                                    color = StatusGreen,
                                     fontSize = 10.sp,
                                     fontWeight = FontWeight.Bold,
                                     letterSpacing = 0.3.sp
@@ -177,7 +168,7 @@ fun PeminjamanScreen(
                         }
                         Text(
                             text = namaBarang,
-                            color = textPrimary,
+                            color = TextPrimary,
                             fontSize = 15.sp,
                             fontWeight = FontWeight.SemiBold
                         )
@@ -188,7 +179,7 @@ fun PeminjamanScreen(
             Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
                 Text(
                     text = "Tanggal Pinjam",
-                    color = textPrimary,
+                    color = TextPrimary,
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Medium
                 )
@@ -200,20 +191,20 @@ fun PeminjamanScreen(
                         Icon(
                             imageVector = Icons.Filled.CalendarMonth,
                             contentDescription = "Pilih tanggal",
-                            tint = sipinjamBlue
+                            tint = SiPinjamBlue
                         )
                     },
                     singleLine = true,
                     shape = RoundedCornerShape(12.dp),
                     colors = OutlinedTextFieldDefaults.colors(
                         unfocusedBorderColor = Color.Transparent,
-                        focusedBorderColor = sipinjamBlue,
-                        unfocusedContainerColor = cardWhite,
-                        focusedContainerColor = cardWhite,
+                        focusedBorderColor = SiPinjamBlue,
+                        unfocusedContainerColor = CardWhite,
+                        focusedContainerColor = CardWhite,
                     ),
                     textStyle = LocalTextStyle.current.copy(
                         fontSize = 14.sp,
-                        color = textPrimary
+                        color = TextPrimary
                     )
                 )
             }
@@ -221,7 +212,7 @@ fun PeminjamanScreen(
             Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
                 Text(
                     text = "Tanggal Kembali",
-                    color = textPrimary,
+                    color = TextPrimary,
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Medium
                 )
@@ -233,20 +224,20 @@ fun PeminjamanScreen(
                         Icon(
                             imageVector = Icons.Filled.CalendarMonth,
                             contentDescription = "Pilih tanggal",
-                            tint = sipinjamBlue
+                            tint = SiPinjamBlue
                         )
                     },
                     singleLine = true,
                     shape = RoundedCornerShape(12.dp),
                     colors = OutlinedTextFieldDefaults.colors(
                         unfocusedBorderColor = Color.Transparent,
-                        focusedBorderColor = sipinjamBlue,
-                        unfocusedContainerColor = cardWhite,
-                        focusedContainerColor = cardWhite,
+                        focusedBorderColor = SiPinjamBlue,
+                        unfocusedContainerColor = CardWhite,
+                        focusedContainerColor = CardWhite,
                     ),
                     textStyle = LocalTextStyle.current.copy(
                         fontSize = 14.sp,
-                        color = textPrimary
+                        color = TextPrimary
                     )
                 )
             }
@@ -254,7 +245,7 @@ fun PeminjamanScreen(
             Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
                 Text(
                     text = "Keperluan/Alasan",
-                    color = textPrimary,
+                    color = TextPrimary,
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Medium
                 )
@@ -267,7 +258,7 @@ fun PeminjamanScreen(
                     placeholder = {
                         Text(
                             text = "Tulis alasan peminjaman...",
-                            color = textSecondary.copy(alpha = 0.6f),
+                            color = TextSecondary.copy(alpha = 0.6f),
                             fontSize = 14.sp
                         )
                     },
@@ -275,13 +266,13 @@ fun PeminjamanScreen(
                     shape = RoundedCornerShape(12.dp),
                     colors = OutlinedTextFieldDefaults.colors(
                         unfocusedBorderColor = Color.Transparent,
-                        focusedBorderColor = sipinjamBlue,
-                        unfocusedContainerColor = inputBg,
-                        focusedContainerColor = inputBg,
+                        focusedBorderColor = SiPinjamBlue,
+                        unfocusedContainerColor = InputBg,
+                        focusedContainerColor = InputBg,
                     ),
                     textStyle = LocalTextStyle.current.copy(
                         fontSize = 14.sp,
-                        color = textPrimary
+                        color = TextPrimary
                     )
                 )
                 Box(
@@ -290,7 +281,7 @@ fun PeminjamanScreen(
                 ) {
                     Text(
                         text = "${keperluan.length}/200",
-                        color = textSecondary,
+                        color = TextSecondary,
                         fontSize = 12.sp
                     )
                 }

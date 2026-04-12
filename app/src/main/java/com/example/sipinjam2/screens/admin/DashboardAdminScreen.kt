@@ -1,11 +1,11 @@
-package com.example.sipinjam2.ui.screens
+package com.example.sipinjam2.ui.screens.admin
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Book
 import androidx.compose.material.icons.filled.CheckCircle
@@ -16,6 +16,7 @@ import androidx.compose.material.icons.filled.RequestPage
 import androidx.compose.material.icons.filled.Timer
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -25,17 +26,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.sipinjam2.ui.theme.BackgroundGray
-import com.example.sipinjam2.ui.theme.CardWhite
-import com.example.sipinjam2.ui.theme.InputBg
-import com.example.sipinjam2.ui.theme.SipinjamBlue
-import com.example.sipinjam2.ui.theme.StatusGreen
-import com.example.sipinjam2.ui.theme.StatusGreenBg
-import com.example.sipinjam2.ui.theme.StatusOrange
-import com.example.sipinjam2.ui.theme.StatusOrangeBg
-import com.example.sipinjam2.ui.theme.TextPrimary
-import com.example.sipinjam2.ui.theme.TextSecondary
-
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.sipinjam.ui.theme.*
 
 data class PermintaanItem(
     val nama: String,
@@ -45,15 +38,7 @@ data class PermintaanItem(
 
 @Composable
 fun DashboardAdminScreen(
-    jumlahPermintaanMasuk: Int = 12,
-    jumlahTersedia: Int = 84,
-    jumlahDipinjam: Int = 5,
-    permintaanTerbaru: List<PermintaanItem> = listOf(
-        PermintaanItem("Budi Darmawan", "Proyektor Epson X500", "Today, 09:15 AM"),
-        PermintaanItem("Siti Aminah", "Kamera Sony Alpha A7", "Today, 08:30 AM"),
-        PermintaanItem("Andi Wijaya", "Pointer Wireless R400", "Yesterday, 04:45 PM"),
-        PermintaanItem("Andi Wijaya", "Pointer Wireless R400", "Yesterday, 04:45 PM"),
-    ),
+    viewModel: DashboardAdminViewModel = viewModel(),
     onLihatSemua: () -> Unit = {},
     onTinjau: (PermintaanItem) -> Unit = {},
     onDashboardClick: () -> Unit = {},
@@ -61,7 +46,8 @@ fun DashboardAdminScreen(
     onPermintaanClick: () -> Unit = {},
     onProfilClick: () -> Unit = {},
 ) {
-    var selectedNav by remember { mutableStateOf(0) }
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    var selectedNav by rememberSaveable { mutableIntStateOf(0) }
 
     Scaffold(
         containerColor = BackgroundGray,
@@ -75,148 +61,148 @@ fun DashboardAdminScreen(
             )
         }
     ) { innerPadding ->
-        Column(
+        LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(innerPadding)
-                .verticalScroll(rememberScrollState())
+                .padding(innerPadding),
+            contentPadding = PaddingValues(bottom = 16.dp)
         ) {
-            // Header
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 20.dp, vertical = 20.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Icon(
-                    imageVector = Icons.Filled.Book,
-                    contentDescription = null,
-                    tint = SipinjamBlue,
-                    modifier = Modifier.size(26.dp)
-                )
-                Spacer(Modifier.width(8.dp))
-                Text(
-                    text = "SiPinjam",
-                    color = SipinjamBlue,
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.Bold
-                )
-            }
-
-            // Card Permintaan Masuk
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 20.dp),
-                shape = RoundedCornerShape(16.dp),
-                colors = CardDefaults.cardColors(containerColor = CardWhite),
-                elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
-            ) {
+            item {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(20.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween
+                        .padding(horizontal = 20.dp, vertical = 20.dp),
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                        Text(
-                            text = "Permintaan Masuk",
-                            color = TextSecondary,
-                            fontSize = 14.sp
-                        )
-                        Text(
-                            text = jumlahPermintaanMasuk.toString(),
-                            color = TextPrimary,
-                            fontSize = 36.sp,
-                            fontWeight = FontWeight.ExtraBold
-                        )
-                    }
-                    Box(
-                        modifier = Modifier
-                            .size(48.dp)
-                            .clip(RoundedCornerShape(12.dp))
-                            .background(InputBg),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Icon(
-                            imageVector = Icons.Filled.RequestPage,
-                            contentDescription = null,
-                            tint = SipinjamBlue,
-                            modifier = Modifier.size(26.dp)
-                        )
-                    }
-                }
-            }
-
-            Spacer(Modifier.height(12.dp))
-
-            // Card Tersedia & Dipinjam
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 20.dp),
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                StatusCard(
-                    label = "TERSEDIA",
-                    jumlah = jumlahTersedia,
-                    icon = Icons.Filled.CheckCircle,
-                    iconColor = StatusGreen,
-                    iconBgColor = StatusGreenBg,
-                    modifier = Modifier.weight(1f)
-                )
-                StatusCard(
-                    label = "DIPINJAM",
-                    jumlah = jumlahDipinjam,
-                    icon = Icons.Filled.Timer,
-                    iconColor = StatusOrange,
-                    iconBgColor = StatusOrangeBg,
-                    modifier = Modifier.weight(1f)
-                )
-            }
-
-            Spacer(Modifier.height(24.dp))
-
-            // Header Permintaan Terbaru
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 20.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = "Permintaan Terbaru",
-                    color = TextPrimary,
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Bold
-                )
-                Text(
-                    text = "Lihat Semua",
-                    color = SipinjamBlue,
-                    fontSize = 13.sp,
-                    fontWeight = FontWeight.Medium,
-                    modifier = Modifier.clickable { onLihatSemua() }
-                )
-            }
-
-            Spacer(Modifier.height(12.dp))
-
-            // List Permintaan
-            Column(
-                modifier = Modifier.padding(horizontal = 20.dp),
-                verticalArrangement = Arrangement.spacedBy(10.dp)
-            ) {
-                permintaanTerbaru.forEach { item ->
-                    PermintaanCard(
-                        item = item,
-                        onTinjau = { onTinjau(item) }
+                    Icon(
+                        imageVector = Icons.Filled.Book,
+                        contentDescription = null,
+                        tint = SiPinjamBlue,
+                        modifier = Modifier.size(26.dp)
+                    )
+                    Spacer(Modifier.width(8.dp))
+                    Text(
+                        text = "SiPinjam",
+                        color = SiPinjamBlue,
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.Bold
                     )
                 }
             }
 
-            Spacer(Modifier.height(16.dp))
+            item {
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 20.dp),
+                    shape = RoundedCornerShape(16.dp),
+                    colors = CardDefaults.cardColors(containerColor = CardWhite),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(20.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                            Text(
+                                text = "Permintaan Masuk",
+                                color = TextSecondary,
+                                fontSize = 14.sp
+                            )
+                            Text(
+                                text = uiState.jumlahPermintaanMasuk.toString(),
+                                color = TextPrimary,
+                                fontSize = 36.sp,
+                                fontWeight = FontWeight.ExtraBold
+                            )
+                        }
+                        Box(
+                            modifier = Modifier
+                                .size(48.dp)
+                                .clip(RoundedCornerShape(12.dp))
+                                .background(InputBg),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Icon(
+                                imageVector = Icons.Filled.RequestPage,
+                                contentDescription = null,
+                                tint = SiPinjamBlue,
+                                modifier = Modifier.size(26.dp)
+                            )
+                        }
+                    }
+                }
+            }
+
+            item { Spacer(Modifier.height(12.dp)) }
+
+            item {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 20.dp),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    StatusCard(
+                        label = "TERSEDIA",
+                        jumlah = uiState.jumlahTersedia,
+                        icon = Icons.Filled.CheckCircle,
+                        iconColor = StatusGreen,
+                        iconBgColor = StatusGreenBg,
+                        modifier = Modifier.weight(1f)
+                    )
+                    StatusCard(
+                        label = "DIPINJAM",
+                        jumlah = uiState.jumlahDipinjam,
+                        icon = Icons.Filled.Timer,
+                        iconColor = StatusOrange,
+                        iconBgColor = StatusOrangeBg,
+                        modifier = Modifier.weight(1f)
+                    )
+                }
+            }
+
+            item { Spacer(Modifier.height(24.dp)) }
+
+            item {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 20.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = "Permintaan Terbaru",
+                        color = TextPrimary,
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Text(
+                        text = "Lihat Semua",
+                        color = SiPinjamBlue,
+                        fontSize = 13.sp,
+                        fontWeight = FontWeight.Medium,
+                        modifier = Modifier.clickable { onLihatSemua() }
+                    )
+                }
+            }
+
+            item { Spacer(Modifier.height(12.dp)) }
+
+            items(uiState.permintaanTerbaru) { item ->
+                PermintaanCard(
+                    item = item,
+                    onTinjau = {
+                        viewModel.onTinjau(item)
+                        onTinjau(item)
+                    },
+                    modifier = Modifier.padding(horizontal = 20.dp, vertical = 5.dp)
+                )
+            }
         }
     }
 }
@@ -275,9 +261,10 @@ private fun StatusCard(
 private fun PermintaanCard(
     item: PermintaanItem,
     onTinjau: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     Row(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(14.dp))
             .background(CardWhite)
@@ -307,22 +294,14 @@ private fun PermintaanCard(
                 fontSize = 14.sp,
                 fontWeight = FontWeight.SemiBold
             )
-            Text(
-                text = item.namaBarang,
-                color = TextSecondary,
-                fontSize = 12.sp
-            )
-            Text(
-                text = item.waktu,
-                color = TextSecondary,
-                fontSize = 11.sp
-            )
+            Text(text = item.namaBarang, color = TextSecondary, fontSize = 12.sp)
+            Text(text = item.waktu, color = TextSecondary, fontSize = 11.sp)
         }
 
         Box(
             modifier = Modifier
                 .clip(RoundedCornerShape(8.dp))
-                .background(SipinjamBlue)
+                .background(SiPinjamBlue)
                 .clickable { onTinjau() }
                 .padding(horizontal = 14.dp, vertical = 7.dp)
         ) {
@@ -354,11 +333,11 @@ private fun AdminBottomNavBar(
             icon = { Icon(Icons.Filled.Dashboard, contentDescription = null) },
             label = { Text("DASHBOARD", fontSize = 10.sp) },
             colors = NavigationBarItemDefaults.colors(
-                selectedIconColor   = SipinjamBlue,
-                selectedTextColor   = SipinjamBlue,
+                selectedIconColor = SiPinjamBlue,
+                selectedTextColor = SiPinjamBlue,
                 unselectedIconColor = TextSecondary,
                 unselectedTextColor = TextSecondary,
-                indicatorColor      = CardWhite
+                indicatorColor = CardWhite
             )
         )
         NavigationBarItem(
@@ -367,11 +346,11 @@ private fun AdminBottomNavBar(
             icon = { Icon(Icons.Filled.Inventory, contentDescription = null) },
             label = { Text("BARANG", fontSize = 10.sp) },
             colors = NavigationBarItemDefaults.colors(
-                selectedIconColor   = SipinjamBlue,
-                selectedTextColor   = SipinjamBlue,
+                selectedIconColor = SiPinjamBlue,
+                selectedTextColor = SiPinjamBlue,
                 unselectedIconColor = TextSecondary,
                 unselectedTextColor = TextSecondary,
-                indicatorColor      = CardWhite
+                indicatorColor = CardWhite
             )
         )
         NavigationBarItem(
@@ -380,11 +359,11 @@ private fun AdminBottomNavBar(
             icon = { Icon(Icons.Filled.RequestPage, contentDescription = null) },
             label = { Text("PERMINTAAN", fontSize = 10.sp) },
             colors = NavigationBarItemDefaults.colors(
-                selectedIconColor   = SipinjamBlue,
-                selectedTextColor   = SipinjamBlue,
+                selectedIconColor = SiPinjamBlue,
+                selectedTextColor = SiPinjamBlue,
                 unselectedIconColor = TextSecondary,
                 unselectedTextColor = TextSecondary,
-                indicatorColor      = CardWhite
+                indicatorColor = CardWhite
             )
         )
         NavigationBarItem(
@@ -393,11 +372,11 @@ private fun AdminBottomNavBar(
             icon = { Icon(Icons.Filled.Person, contentDescription = null) },
             label = { Text("PROFIL", fontSize = 10.sp) },
             colors = NavigationBarItemDefaults.colors(
-                selectedIconColor   = SipinjamBlue,
-                selectedTextColor   = SipinjamBlue,
+                selectedIconColor = SiPinjamBlue,
+                selectedTextColor = SiPinjamBlue,
                 unselectedIconColor = TextSecondary,
                 unselectedTextColor = TextSecondary,
-                indicatorColor      = CardWhite
+                indicatorColor = CardWhite
             )
         )
     }
@@ -406,7 +385,5 @@ private fun AdminBottomNavBar(
 @Preview(showBackground = true, widthDp = 390, heightDp = 844)
 @Composable
 fun DashboardAdminScreenPreview() {
-    MaterialTheme {
-        DashboardAdminScreen()
-    }
+    MaterialTheme { DashboardAdminScreen() }
 }

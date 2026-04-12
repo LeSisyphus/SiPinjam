@@ -1,17 +1,17 @@
-package com.example.sipinjam.ui.navigation
+package com.example.sipinjam2.ui.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.sipinjam.ui.screens.admin.DashboardAdminScreen
-import com.example.sipinjam.ui.screens.admin.KelolaBarangScreen
-import com.example.sipinjam.ui.screens.auth.LoginScreen
-import com.example.sipinjam.ui.screens.user.PeminjamanScreen
-import com.example.sipinjam.ui.screens.user.HomeUserScreen
 import com.example.sipinjam.ui.screens.user.DetailBarang
-import com.example.sipinjam.ui.screens.user.DetailScreen
+import com.example.sipinjam.ui.screens.user.DetailBarangScreen
+import com.example.sipinjam2.ui.screens.admin.DashboardAdminScreen
+import com.example.sipinjam2.ui.screens.admin.KelolaBarangScreen
+import com.example.sipinjam2.ui.screens.auth.LoginScreen
+import com.example.sipinjam2.ui.screens.user.PeminjamanScreen
+import com.example.sipinjam2.ui.screens.user.BerandaUserScreen
 
 object Routes {
     const val LOGIN             = "login"
@@ -23,7 +23,7 @@ object Routes {
 }
 
 @Composable
-fun SiPinjamNavGraph(
+fun NavGraph(
     navController: NavHostController = rememberNavController(),
     startDestination: String = Routes.LOGIN,
 ) {
@@ -33,8 +33,8 @@ fun SiPinjamNavGraph(
     ) {
         composable(Routes.LOGIN) {
             LoginScreen(
-                onLoginClick = { email, _ ->
-                    if (email.contains("admin")) {
+                onLoginSuccess = { isAdmin ->
+                    if (isAdmin) {
                         navController.navigate(Routes.DASHBOARD_ADMIN) {
                             popUpTo(Routes.LOGIN) { inclusive = true }
                         }
@@ -50,14 +50,13 @@ fun SiPinjamNavGraph(
         }
 
         composable(Routes.BERANDA_USER) {
-            HomeUserScreen(
+            BerandaUserScreen(
                 onLihatSemuaBarang = {
                     navController.navigate(Routes.DETAIL_BARANG)
                 },
                 onBarangClick = {
                     navController.navigate(Routes.DETAIL_BARANG)
                 },
-                onKembalikan = {},
                 onBerandaClick = {},
                 onKatalogClick = {
                     navController.navigate(Routes.DETAIL_BARANG)
@@ -68,7 +67,7 @@ fun SiPinjamNavGraph(
         }
 
         composable(Routes.DETAIL_BARANG) {
-            DetailScreen(
+            DetailBarangScreen(
                 barang = DetailBarang(
                     nama = "MacBook Pro M2 14-inch Space Gray",
                     kategori = "ELEKTRONIK",
@@ -125,7 +124,6 @@ fun SiPinjamNavGraph(
             KelolaBarangScreen(
                 onTambahClick = {},
                 onEditClick = {},
-                onDeleteClick = {},
                 onDashboardClick = {
                     navController.navigate(Routes.DASHBOARD_ADMIN) {
                         popUpTo(Routes.DASHBOARD_ADMIN) { inclusive = true }
