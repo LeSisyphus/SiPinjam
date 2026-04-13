@@ -68,21 +68,9 @@ fun NavGraph(
 
         composable(Routes.DETAIL_BARANG) {
             DetailBarangScreen(
-                barang = DetailBarang(
-                    nama = "MacBook Pro M2 14-inch Space Gray",
-                    kategori = "ELEKTRONIK",
-                    totalUnit = 12,
-                    tersedia = true,
-                    kondisi = "Sangat Baik",
-                    jumlahTersedia = 8,
-                    lokasi = "Lab Komputer",
-                    maksimalPinjam = "14 Hari",
-                    deskripsi = "Laptop performa tinggi dengan chip M2 Pro. Cocok untuk kebutuhan desain grafis, editing video, dan pengembangan software.",
-                ),
                 onBackClick = {
                     navController.popBackStack()
                 },
-                onShareClick = {},
                 onAjukanPeminjaman = {
                     navController.navigate(Routes.AJUKAN_PEMINJAMAN)
                 }
@@ -91,12 +79,6 @@ fun NavGraph(
 
         composable(Routes.AJUKAN_PEMINJAMAN) {
             PeminjamanScreen(
-                namaBarang = "MacBook Pro M2 14-inch",
-                kategoriBarang = "ELEKTRONIK",
-                statusBarang = "TERSEDIA",
-                onBackClick = {
-                    navController.popBackStack()
-                },
                 onKirimPermohonan = { _, _, _ ->
                     navController.navigate(Routes.BERANDA_USER) {
                         popUpTo(Routes.BERANDA_USER) { inclusive = true }

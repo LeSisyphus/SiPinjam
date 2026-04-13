@@ -9,7 +9,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Book
 import androidx.compose.material.icons.filled.Info
-import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -50,7 +49,6 @@ fun DetailBarangScreen(
         deskripsi = "Laptop performa tinggi dengan chip M2 Pro. Cocok untuk kebutuhan desain grafis, editing video, dan pengembangan software. Unit dalam kondisi fisik 95% mulus dengan charger original disertakan.",
     ),
     onBackClick: () -> Unit = {},
-    onShareClick: () -> Unit = {},
     onAjukanPeminjaman: () -> Unit = {},
 ) {
     var deskripsiExpanded by rememberSaveable { mutableStateOf(true) }
@@ -82,13 +80,6 @@ fun DetailBarangScreen(
                         fontWeight = FontWeight.SemiBold,
                         modifier = Modifier.weight(1f)
                     )
-                    IconButton(onClick = onShareClick) {
-                        Icon(
-                            imageVector = Icons.Filled.Share,
-                            contentDescription = "Bagikan",
-                            tint = TextSecondary
-                        )
-                    }
                 }
             }
         },

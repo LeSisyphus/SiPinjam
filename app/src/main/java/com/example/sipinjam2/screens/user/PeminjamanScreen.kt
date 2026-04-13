@@ -31,8 +31,8 @@ fun PeminjamanScreen(
     onBackClick: () -> Unit = {},
     onKirimPermohonan: (tanggalPinjam: String, tanggalKembali: String, keperluan: String) -> Unit = { _, _, _ -> },
 ) {
-    var tanggalPinjam  by rememberSaveable { mutableStateOf("12 Oct 2024") }
-    var tanggalKembali by rememberSaveable { mutableStateOf("15 Oct 2024") }
+    var tanggalPinjam  by rememberSaveable { mutableStateOf("1 Juni 2026") }
+    var tanggalKembali by rememberSaveable { mutableStateOf("5 Juni 2026") }
     var keperluan      by rememberSaveable { mutableStateOf("") }
 
     Scaffold(
