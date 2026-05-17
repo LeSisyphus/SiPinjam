@@ -22,6 +22,6 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "SiPinjam2"
+rootProject.name = "SiPinjam"
 include(":app")
  
