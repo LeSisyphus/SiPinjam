@@ -1,34 +1,34 @@
 # SiPinjam : Sistem Inventarisasi dan Peminjaman Barang Kampus
 
 Aplikasi mobile Android untuk pengelolaan inventaris dan peminjaman barang kampus secara digital.  
-Dibangun sebagai Tugas UTS mata kuliah Pemrograman Mobile, Program Studi Teknologi Informasi, Universitas Lambung Mangkurat.
+Dibangun sebagai Projek Akhir mata kuliah Pemrograman Mobile, Program Studi Teknologi Informasi, Universitas Lambung Mangkurat.
 
 ---
 
 ## Tim Pengembang
 
-| Nama                    | NIM           | Role                          | GitHub       |
-| ----------------------- | ------------- | ----------------------------- | ------------ |
-| Muhammad Maulana Azhari | 2410817210003 | Project Lead, Auth & Admin    | @maulanaazhari |
-| Nabilla Putri Nugraha   | 2410817220009 | Katalog, Barang & Profil      | @nabillanugraha |
-| Rachel Wina Yuda        | 2410817220030 | Peminjaman, Pengembalian & Notifikasi | @rachelwina |
+| Nama                    | NIM           | Role                                          | GitHub               |
+| ----------------------- | ------------- | --------------------------------------------- |----------------------|
+| Muhammad Maulana Azhari | 2410817210003 | Project Lead, Auth & Admin                    | @LeSisyphus          |
+| Nabilla Putri Nugraha   | 2410817220009 | Katalog, Barang & Profil                      | @NabillaPutriNugraha |
+| Rachel Wina Yuda        | 2410817220030 | Peminjaman, Pengembalian & Notifikasi         | @raequellee          |
 
 ---
 
 ## Tech Stack
 
-| Komponen          | Teknologi                     |
-| ----------------- | ----------------------------- |
-| Bahasa            | Kotlin                        |
-| UI Framework      | Jetpack Compose               |
-| Arsitektur        | MVVM                          |
-| Navigasi          | Navigation Compose            |
-| Autentikasi       | Firebase Authentication       |
-| Database          | Firebase Firestore            |
-| Push Notification | Firebase Cloud Messaging (FCM)|
-| Penyimpanan Foto  | Firebase Storage              |
-| Image Loader      | Coil                          |
-| Version Control   | Git + GitHub                  |
+| Komponen          | Teknologi                        |
+| ----------------- | -------------------------------- |
+| Bahasa            | Kotlin                           |
+| UI Framework      | Jetpack Compose                  |
+| Arsitektur        | MVVM                             |
+| Navigasi          | Navigation Compose               |
+| Autentikasi       | Firebase Authentication          |
+| Database          | Firebase Firestore               |
+| Penyimpanan Foto  | Cloudinary (v2.3.1)              |
+| Push Notification | Firebase Cloud Messaging (FCM)   |
+| Image Loader      | Coil                             |
+| Version Control   | Git + GitHub                     |
 
 ---
 
@@ -40,8 +40,9 @@ Pastikan sudah terinstall di komputer:
 
 - Android Studio Hedgehog atau lebih baru
 - JDK 17+
-- Android SDK (minimum API 26 / Android 8.0)
+- Android SDK (minimum API 24 / Android 7.0)
 - Akun Google untuk Firebase Console
+- Akun Cloudinary 
 
 ### Langkah Instalasi
 
@@ -75,16 +76,28 @@ Pastikan sudah terinstall di komputer:
 
     - Authentication → Email/Password
     - Firestore Database
-    - Storage
     - Cloud Messaging
 
-5. Sinkronisasi Gradle
+5. Setup Cloudinary
+
+    - Daftar di [cloudinary.com](https://cloudinary.com) (gratis, tanpa kartu kredit)
+    - Buka dashboard → **Product Environment Credentials**
+    - Catat `Cloud Name`, `API Key`, dan `API Secret`
+    - Tambahkan ke file `local.properties` di root project:
+
+    ```properties
+    CLOUDINARY_CLOUD_NAME=your_cloud_name
+    CLOUDINARY_API_KEY=your_api_key
+    CLOUDINARY_API_SECRET=your_api_secret
+    ```
+
+6. Sinkronisasi Gradle
 
     ```
     File → Sync Project with Gradle Files
     ```
 
-6. Jalankan aplikasi
+7. Jalankan aplikasi
 
     ```
     Run → Run 'app' (Shift+F10)
@@ -98,24 +111,46 @@ Pastikan sudah terinstall di komputer:
 
 ---
 
+## Konfigurasi `local.properties`
+
+File `local.properties` **tidak di-commit ke repository** karena berisi kredensial sensitif. Setiap anggota tim wajib membuat file ini secara lokal dengan isi berikut:
+
+```properties
+sdk.dir=/path/to/your/android/sdk
+CLOUDINARY_CLOUD_NAME=your_cloud_name
+CLOUDINARY_API_KEY=your_api_key
+CLOUDINARY_API_SECRET=your_api_secret
+```
+
+---
+
 ## Akun Default
 
-| Role  | Cara Akses                         |
-| ----- | ---------------------------------- |
-| Admin | Daftar via halaman register, lalu ubah role menjadi `admin` langsung di Firestore Console |
-| Peminjam | Daftar langsung via halaman Register di aplikasi |
+| Role     | Cara Akses                                                                                  |
+| -------- | ------------------------------------------------------------------------------------------- |
+| Admin    | Daftar via halaman Register, lalu ubah field `role` menjadi `admin` langsung di Firestore Console |
+| Peminjam | Daftar langsung via halaman Register di aplikasi                                            |
 
 ---
 
 ## Struktur Firestore
 
-| Collection       | Keterangan                                          |
-| ---------------- | --------------------------------------------------- |
-| `users`          | Data akun dan profil semua pengguna                 |
-| `items`          | Data barang inventaris kampus                       |
-| `borrowings`     | Data transaksi peminjaman                           |
-| `returns`        | Data pengembalian beserta foto kondisi barang       |
-| `notifications`  | Riwayat notifikasi per pengguna                     |
+| Collection      | Keterangan                                          |
+| --------------- | --------------------------------------------------- |
+| `users`         | Data akun dan profil semua pengguna                 |
+| `items`         | Data barang inventaris kampus                       |
+| `borrowings`    | Data transaksi peminjaman                           |
+| `returns`       | Data pengembalian beserta foto kondisi barang       |
+| `notifications` | Riwayat notifikasi per pengguna                     |
+
+---
+
+## Struktur Cloudinary
+
+| Folder              | Isi                                      |
+| ------------------- | ---------------------------------------- |
+| `foto_profil/`      | Foto profil pengguna (public_id = UID)   |
+| `foto_pengembalian/`| Foto kondisi barang saat dikembalikan    |
 
 ---
 
@@ -130,7 +165,7 @@ Diproses → Disetujui  → Dipinjam → Menunggu Verifikasi → Selesai
 
 ## Role Pengguna
 
-### Peminjam (Mahasiswa / Dosen)
+### Peminjam (Mahasiswa / Dosen / Staf)
 
 - Melihat katalog barang inventaris secara real-time
 - Mengajukan permohonan peminjaman
