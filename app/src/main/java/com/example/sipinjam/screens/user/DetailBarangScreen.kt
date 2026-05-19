@@ -1,4 +1,4 @@
-package com.example.sipinjam.ui.screens.user
+package com.example.sipinjam.screens.user
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*

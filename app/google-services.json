@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "468680902653",
+    "project_id": "sipinjam-2026",
+    "storage_bucket": "sipinjam-2026.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:468680902653:android:1d72679553e285ea5b3b94",
+        "android_client_info": {
+          "package_name": "com.example.sipinjam"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAXBECJgZv2HEdEO6m8ezxeJ7HyGN109xU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

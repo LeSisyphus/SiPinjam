@@ -1,4 +1,4 @@
-package com.example.sipinjam.ui.screens.user
+package com.example.sipinjam.screens.user
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -29,6 +29,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.sipinjam.ui.components.UserBottomNavBar
 import com.example.sipinjam.ui.theme.*
 
 data class BarangTersedia(
@@ -61,11 +62,11 @@ fun BerandaUserScreen(
         containerColor = BackgroundGray,
         bottomBar = {
             UserBottomNavBar(
-                selected = selectedNav,
-                onBerandaClick = { selectedNav = 0; onBerandaClick() },
-                onKatalogClick = { selectedNav = 1; onKatalogClick() },
-                onRiwayatClick = { selectedNav = 2; onRiwayatClick() },
-                onProfilClick  = { selectedNav = 3; onProfilClick() },
+                selected = 0,
+                onBerandaClick = {},
+                onKatalogClick = onKatalogClick,
+                onRiwayatClick = onRiwayatClick,
+                onProfilClick = onProfilClick
             )
         }
     ) { innerPadding ->

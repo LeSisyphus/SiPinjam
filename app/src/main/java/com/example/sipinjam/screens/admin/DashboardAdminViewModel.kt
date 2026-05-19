@@ -1,4 +1,4 @@
-package com.example.sipinjam.ui.screens.admin
+package com.example.sipinjam.screens.admin
 
 import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.flow.MutableStateFlow

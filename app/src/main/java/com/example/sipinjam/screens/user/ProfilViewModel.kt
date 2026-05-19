@@ -1,0 +1,139 @@
+package com.example.sipinjam.screens.user
+
+import android.net.Uri
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.example.sipinjam.data.model.User
+import com.example.sipinjam.data.repository.AuthRepository
+import com.example.sipinjam.data.repository.StorageRepository
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
+
+data class ProfilUiState(
+    val user: User = User(),
+    val namaInput: String = "",
+    val nomorTeleponInput: String = "",
+    val isLoading: Boolean = false,
+    val isSaving: Boolean = false,
+    val isUploadingFoto: Boolean = false,
+    val errorMessage: String? = null,
+    val successMessage: String? = null,
+    val selectedLang: String = "ID",
+    val isDarkMode: Boolean = false,
+)
+
+class ProfilViewModel(
+    application: Application,
+) : AndroidViewModel(application) {
+
+    private val authRepository = AuthRepository()
+    private val storageRepository = StorageRepository(application)
+
+    private val _uiState = MutableStateFlow(ProfilUiState())
+    val uiState: StateFlow<ProfilUiState> = _uiState.asStateFlow()
+
+    init {
+        loadUser()
+    }
+
+    private fun loadUser() {
+        viewModelScope.launch {
+            _uiState.update { it.copy(isLoading = true) }
+            val user = authRepository.getCurrentUser()
+            if (user != null) {
+                _uiState.update {
+                    it.copy(
+                        user = user,
+                        namaInput = user.nama,
+                        nomorTeleponInput = user.nomorTelepon,
+                        isLoading = false
+                    )
+                }
+            } else {
+                _uiState.update { it.copy(isLoading = false) }
+            }
+        }
+    }
+
+    fun onNamaChange(value: String) {
+        _uiState.update { it.copy(namaInput = value, errorMessage = null) }
+    }
+
+    fun onNomorTeleponChange(value: String) {
+        _uiState.update { it.copy(nomorTeleponInput = value, errorMessage = null) }
+    }
+
+    fun onLangChange(lang: String) {
+        _uiState.update { it.copy(selectedLang = lang) }
+    }
+
+    fun onDarkModeToggle() {
+        _uiState.update { it.copy(isDarkMode = !it.isDarkMode) }
+    }
+
+    fun onSimpanProfil() {
+        val state = _uiState.value
+        if (state.namaInput.isBlank()) {
+            _uiState.update { it.copy(errorMessage = "Nama tidak boleh kosong.") }
+            return
+        }
+        viewModelScope.launch {
+            _uiState.update { it.copy(isSaving = true, errorMessage = null) }
+            val result = authRepository.updateProfile(state.namaInput, state.nomorTeleponInput)
+            result.fold(
+                onSuccess = {
+                    _uiState.update {
+                        it.copy(
+                            isSaving = false,
+                            successMessage = "Profil berhasil disimpan.",
+                            user = it.user.copy(
+                                nama = it.namaInput,
+                                nomorTelepon = it.nomorTeleponInput
+                            )
+                        )
+                    }
+                },
+                onFailure = { e ->
+                    _uiState.update {
+                        it.copy(isSaving = false, errorMessage = e.message ?: "Gagal menyimpan.")
+                    }
+                }
+            )
+        }
+    }
+
+    fun onFotoSelected(uri: Uri) {
+        viewModelScope.launch {
+            _uiState.update { it.copy(isUploadingFoto = true) }
+            val result = storageRepository.uploadFotoProfil(uri)
+            result.fold(
+                onSuccess = { url ->
+                    authRepository.updateFotoUrl(url)
+                    _uiState.update {
+                        it.copy(
+                            isUploadingFoto = false,
+                            user = it.user.copy(fotoUrl = url)
+                        )
+                    }
+                },
+                onFailure = {
+                    _uiState.update { it.copy(isUploadingFoto = false) }
+                }
+            )
+        }
+    }
+
+    fun onDismissSuccess() {
+        _uiState.update { it.copy(successMessage = null) }
+    }
+
+    fun onLogout(onDone: () -> Unit) {
+        authRepository.logout()
+        onDone()
+    }
+}

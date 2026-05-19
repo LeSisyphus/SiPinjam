@@ -1,4 +1,4 @@
-package com.example.sipinjam.ui.screens.auth
+package com.example.sipinjam.screens.auth
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable

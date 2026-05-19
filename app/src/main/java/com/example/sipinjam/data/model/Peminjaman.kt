@@ -1,4 +1,14 @@
 package com.example.sipinjam.data.model
 
-class Peminjaman {
-}
+data class Peminjaman(
+    val id: String = "",
+    val userId: String = "",
+    val namaUser: String = "",
+    val barangId: String = "",
+    val namaBarang: String = "",
+    val tanggalPinjam: String = "",
+    val tanggalKembali: String = "",
+    val keperluan: String = "",
+    val status: String = "Diproses",
+    val createdAt: Long = System.currentTimeMillis(),
+)
