@@ -1,7 +1,7 @@
 # SiPinjam : Sistem Inventarisasi dan Peminjaman Barang Kampus
 
 Aplikasi mobile Android untuk pengelolaan inventaris dan peminjaman barang kampus secara digital.  
-Dibangun sebagai Projek Akhir mata kuliah Pemrograman Mobile, Program Studi Teknologi Informasi, Universitas Lambung Mangkurat.
+Dibangun sebagai Proyek Akhir mata kuliah Pemrograman Mobile, Program Studi Teknologi Informasi, Universitas Lambung Mangkurat.
 
 ---
 
@@ -185,5 +185,5 @@ Diproses → Disetujui  → Dipinjam → Menunggu Verifikasi → Selesai
 
 ## Lisensi
 
-Proyek ini dibuat untuk keperluan akademik Tugas UTS mata kuliah Pemrograman Mobile,  
+Proyek ini dibuat untuk keperluan akademik Proyek Akhir mata kuliah Pemrograman Mobile,  
 Program Studi Teknologi Informasi, Universitas Lambung Mangkurat.
