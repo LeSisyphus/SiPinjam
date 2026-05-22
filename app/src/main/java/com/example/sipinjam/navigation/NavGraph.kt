@@ -15,19 +15,27 @@ import com.example.sipinjam.screens.user.PeminjamanScreen
 import com.example.sipinjam.screens.user.BerandaUserScreen
 import com.example.sipinjam.screens.user.GantiPasswordScreen
 import com.example.sipinjam.screens.user.ProfilScreen
+import androidx.navigation.NavType
+import androidx.navigation.navArgument
 
 object Routes {
     const val LOGIN             = "login"
-    const val REGISTER = "register"
+    const val REGISTER          = "register"
     const val BERANDA_USER      = "beranda_user"
     const val FORGOT_PASSWORD   = "forgot_password"
     const val DETAIL_BARANG     = "detail_barang"
-    const val AJUKAN_PEMINJAMAN = "ajukan_peminjaman"
+    const val AJUKAN_PEMINJAMAN = "ajukan_peminjaman/{barangId}/{namaBarang}/{kategoriBarang}/{statusBarang}"
     const val DASHBOARD_ADMIN   = "dashboard_admin"
     const val KELOLA_BARANG     = "kelola_barang"
-    const val PROFIL          = "profil"
-    const val GANTI_PASSWORD  = "ganti_password"
+    const val PROFIL            = "profil"
+    const val GANTI_PASSWORD    = "ganti_password"
 
+    fun ajukanPeminjaman(
+        barangId: String,
+        namaBarang: String,
+        kategoriBarang: String,
+        statusBarang: String
+    ) = "ajukan_peminjaman/$barangId/$namaBarang/$kategoriBarang/$statusBarang"
 }
 
 @Composable
@@ -136,21 +144,38 @@ fun NavGraph(
                 onBackClick = {
                     navController.navigate(Routes.BERANDA_USER)
                 },
-                onAjukanPeminjaman = {
-                    navController.navigate(Routes.AJUKAN_PEMINJAMAN)
+                onAjukanPeminjaman = { barangId, namaBarang, kategoriBarang, statusBarang ->
+                    navController.navigate(
+                        Routes.ajukanPeminjaman(barangId, namaBarang, kategoriBarang, statusBarang)
+                    )
                 }
             )
         }
 
-        composable(Routes.AJUKAN_PEMINJAMAN) {
+        composable(
+            route = Routes.AJUKAN_PEMINJAMAN,
+            arguments = listOf(
+                navArgument("barangId")       { type = NavType.StringType },
+                navArgument("namaBarang")     { type = NavType.StringType },
+                navArgument("kategoriBarang") { type = NavType.StringType },
+                navArgument("statusBarang")   { type = NavType.StringType },
+            )
+        ) { backStackEntry ->
+            val barangId       = backStackEntry.arguments?.getString("barangId") ?: ""
+            val namaBarang     = backStackEntry.arguments?.getString("namaBarang") ?: ""
+            val kategoriBarang = backStackEntry.arguments?.getString("kategoriBarang") ?: ""
+            val statusBarang   = backStackEntry.arguments?.getString("statusBarang") ?: ""
+
             PeminjamanScreen(
+                barangId       = barangId,
+                namaBarang     = namaBarang,
+                kategoriBarang = kategoriBarang,
+                statusBarang   = statusBarang,
+                onBackClick    = { navController.popBackStack() },
                 onKirimPermohonan = { _, _, _ ->
                     navController.navigate(Routes.BERANDA_USER) {
                         popUpTo(Routes.BERANDA_USER) { inclusive = true }
                     }
-                },
-                onBackClick = {
-                    navController.navigate(Routes.DETAIL_BARANG)
                 }
             )
         }
