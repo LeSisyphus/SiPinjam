@@ -23,21 +23,23 @@ import androidx.compose.ui.unit.sp
 import com.example.sipinjam.ui.theme.*
 
 data class DetailBarang(
-    val nama: String,
-    val kategori: String,
-    val totalUnit: Int,
-    val tersedia: Boolean,
-    val kondisi: String,
-    val jumlahTersedia: Int,
-    val lokasi: String,
-    val maksimalPinjam: String,
-    val deskripsi: String,
+    val id: String = "",
+    val nama: String = "",
+    val kategori: String = "",
+    val totalUnit: Int = 0,
+    val tersedia: Boolean = true,
+    val kondisi: String = "",
+    val jumlahTersedia: Int = 0,
+    val lokasi: String = "",
+    val maksimalPinjam: String = "",
+    val deskripsi: String = "",
     val imageUrl: String = "",
 )
 
 @Composable
 fun DetailBarangScreen(
     barang: DetailBarang = DetailBarang(
+        id = "barang_001",
         nama = "MacBook Pro M2 14-inch Space Gray",
         kategori = "ELEKTRONIK",
         totalUnit = 12,
@@ -49,7 +51,12 @@ fun DetailBarangScreen(
         deskripsi = "Laptop performa tinggi dengan chip M2 Pro. Cocok untuk kebutuhan desain grafis, editing video, dan pengembangan software. Unit dalam kondisi fisik 95% mulus dengan charger original disertakan.",
     ),
     onBackClick: () -> Unit = {},
-    onAjukanPeminjaman: () -> Unit = {},
+    onAjukanPeminjaman: (
+        barangId: String,
+        namaBarang: String,
+        kategoriBarang: String,
+        statusBarang: String
+    ) -> Unit = { _, _, _, _ -> },
 ) {
     var deskripsiExpanded by rememberSaveable { mutableStateOf(true) }
 
@@ -90,7 +97,15 @@ fun DetailBarangScreen(
                 shadowElevation = 8.dp
             ) {
                 Button(
-                    onClick = onAjukanPeminjaman,
+                    onClick = {
+                        onAjukanPeminjaman(
+                            barang.id,
+                            barang.nama,
+                            barang.kategori,
+                            if (barang.tersedia) "TERSEDIA" else "DIPINJAM"
+                        )
+                    },
+                    enabled = barang.tersedia,
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 20.dp, vertical = 16.dp)
@@ -99,7 +114,7 @@ fun DetailBarangScreen(
                     colors = ButtonDefaults.buttonColors(containerColor = SiPinjamBlue)
                 ) {
                     Text(
-                        text = "Ajukan Peminjaman",
+                        text = if (barang.tersedia) "Ajukan Peminjaman" else "Tidak Tersedia",
                         fontSize = 16.sp,
                         fontWeight = FontWeight.SemiBold,
                         color = Color.White
@@ -153,7 +168,6 @@ fun DetailBarangScreen(
                             letterSpacing = 0.4.sp
                         )
                     }
-
                     Box(
                         modifier = Modifier
                             .clip(RoundedCornerShape(6.dp))
@@ -167,7 +181,6 @@ fun DetailBarangScreen(
                             fontWeight = FontWeight.Medium
                         )
                     }
-
                     Box(
                         modifier = Modifier
                             .clip(RoundedCornerShape(6.dp))
@@ -317,18 +330,9 @@ private fun SpekItem(
     modifier: Modifier = Modifier,
 ) {
     Column(modifier = modifier) {
-        Text(
-            text = label,
-            color = TextSecondary,
-            fontSize = 12.sp
-        )
+        Text(text = label, color = TextSecondary, fontSize = 12.sp)
         Spacer(Modifier.height(2.dp))
-        Text(
-            text = value,
-            color = TextPrimary,
-            fontSize = 14.sp,
-            fontWeight = FontWeight.Bold
-        )
+        Text(text = value, color = TextPrimary, fontSize = 14.sp, fontWeight = FontWeight.Bold)
     }
 }
 

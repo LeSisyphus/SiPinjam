@@ -21,19 +21,34 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.sipinjam.ui.theme.*
 
 @Composable
 fun PeminjamanScreen(
+    barangId: String = "",
     namaBarang: String = "MacBook Pro M2 14-inch",
     kategoriBarang: String = "ELEKTRONIK",
     statusBarang: String = "TERSEDIA",
     onBackClick: () -> Unit = {},
     onKirimPermohonan: (tanggalPinjam: String, tanggalKembali: String, keperluan: String) -> Unit = { _, _, _ -> },
+    viewModel: PeminjamanViewModel = viewModel()
 ) {
-    var tanggalPinjam  by rememberSaveable { mutableStateOf("1 Juni 2026") }
-    var tanggalKembali by rememberSaveable { mutableStateOf("5 Juni 2026") }
+    var tanggalPinjam  by rememberSaveable { mutableStateOf("") }
+    var tanggalKembali by rememberSaveable { mutableStateOf("") }
     var keperluan      by rememberSaveable { mutableStateOf("") }
+
+    val isLoading   by viewModel.isLoading.collectAsState()
+    val sukses      by viewModel.sukses.collectAsState()
+    val errorMessage by viewModel.errorMessage.collectAsState()
+
+    // Kalau sukses, pindah ke beranda
+    LaunchedEffect(sukses) {
+        if (sukses) {
+            onKirimPermohonan(tanggalPinjam, tanggalKembali, keperluan)
+            viewModel.resetState()
+        }
+    }
 
     Scaffold(
         containerColor = BackgroundGray,
@@ -74,20 +89,49 @@ fun PeminjamanScreen(
                     modifier = Modifier.padding(horizontal = 20.dp, vertical = 16.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
+                    // Tampilkan error kalau ada
+                    if (errorMessage != null) {
+                        Text(
+                            text = errorMessage ?: "",
+                            color = Color.Red,
+                            fontSize = 12.sp,
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier.padding(bottom = 8.dp)
+                        )
+                    }
+
                     Button(
-                        onClick = { onKirimPermohonan(tanggalPinjam, tanggalKembali, keperluan) },
+                        onClick = {
+                            viewModel.kirimPermohonan(
+                                barangId       = barangId,
+                                namaBarang     = namaBarang,
+                                tanggalPinjam  = tanggalPinjam,
+                                tanggalKembali = tanggalKembali,
+                                keperluan      = keperluan
+                            )
+                        },
+                        enabled = !isLoading && tanggalPinjam.isNotBlank()
+                                && tanggalKembali.isNotBlank() && keperluan.isNotBlank(),
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(52.dp),
                         shape = RoundedCornerShape(14.dp),
                         colors = ButtonDefaults.buttonColors(containerColor = SiPinjamBlue)
                     ) {
-                        Text(
-                            text = "Kirim Permohonan",
-                            fontSize = 16.sp,
-                            fontWeight = FontWeight.SemiBold,
-                            color = Color.White
-                        )
+                        if (isLoading) {
+                            CircularProgressIndicator(
+                                color = Color.White,
+                                modifier = Modifier.size(22.dp),
+                                strokeWidth = 2.dp
+                            )
+                        } else {
+                            Text(
+                                text = "Kirim Permohonan",
+                                fontSize = 16.sp,
+                                fontWeight = FontWeight.SemiBold,
+                                color = Color.White
+                            )
+                        }
                     }
                     Spacer(Modifier.height(10.dp))
                     Text(
@@ -109,6 +153,7 @@ fun PeminjamanScreen(
                 .padding(horizontal = 20.dp, vertical = 20.dp),
             verticalArrangement = Arrangement.spacedBy(20.dp)
         ) {
+            // ── Info Barang ───────────────────────────────────────────────────
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(16.dp),
@@ -134,7 +179,6 @@ fun PeminjamanScreen(
                             modifier = Modifier.size(32.dp)
                         )
                     }
-
                     Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
                         Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                             Box(
@@ -176,6 +220,7 @@ fun PeminjamanScreen(
                 }
             }
 
+            // ── Tanggal Pinjam ────────────────────────────────────────────────
             Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
                 Text(
                     text = "Tanggal Pinjam",
@@ -187,12 +232,11 @@ fun PeminjamanScreen(
                     value = tanggalPinjam,
                     onValueChange = { tanggalPinjam = it },
                     modifier = Modifier.fillMaxWidth(),
+                    placeholder = {
+                        Text("cth: 1 Juni 2026", color = TextSecondary.copy(alpha = 0.6f), fontSize = 14.sp)
+                    },
                     trailingIcon = {
-                        Icon(
-                            imageVector = Icons.Filled.CalendarMonth,
-                            contentDescription = "Pilih tanggal",
-                            tint = SiPinjamBlue
-                        )
+                        Icon(Icons.Filled.CalendarMonth, contentDescription = null, tint = SiPinjamBlue)
                     },
                     singleLine = true,
                     shape = RoundedCornerShape(12.dp),
@@ -202,13 +246,11 @@ fun PeminjamanScreen(
                         unfocusedContainerColor = CardWhite,
                         focusedContainerColor = CardWhite,
                     ),
-                    textStyle = LocalTextStyle.current.copy(
-                        fontSize = 14.sp,
-                        color = TextPrimary
-                    )
+                    textStyle = LocalTextStyle.current.copy(fontSize = 14.sp, color = TextPrimary)
                 )
             }
 
+            // ── Tanggal Kembali ───────────────────────────────────────────────
             Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
                 Text(
                     text = "Tanggal Kembali",
@@ -220,12 +262,11 @@ fun PeminjamanScreen(
                     value = tanggalKembali,
                     onValueChange = { tanggalKembali = it },
                     modifier = Modifier.fillMaxWidth(),
+                    placeholder = {
+                        Text("cth: 5 Juni 2026", color = TextSecondary.copy(alpha = 0.6f), fontSize = 14.sp)
+                    },
                     trailingIcon = {
-                        Icon(
-                            imageVector = Icons.Filled.CalendarMonth,
-                            contentDescription = "Pilih tanggal",
-                            tint = SiPinjamBlue
-                        )
+                        Icon(Icons.Filled.CalendarMonth, contentDescription = null, tint = SiPinjamBlue)
                     },
                     singleLine = true,
                     shape = RoundedCornerShape(12.dp),
@@ -235,13 +276,11 @@ fun PeminjamanScreen(
                         unfocusedContainerColor = CardWhite,
                         focusedContainerColor = CardWhite,
                     ),
-                    textStyle = LocalTextStyle.current.copy(
-                        fontSize = 14.sp,
-                        color = TextPrimary
-                    )
+                    textStyle = LocalTextStyle.current.copy(fontSize = 14.sp, color = TextPrimary)
                 )
             }
 
+            // ── Keperluan ─────────────────────────────────────────────────────
             Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
                 Text(
                     text = "Keperluan/Alasan",
@@ -270,20 +309,10 @@ fun PeminjamanScreen(
                         unfocusedContainerColor = InputBg,
                         focusedContainerColor = InputBg,
                     ),
-                    textStyle = LocalTextStyle.current.copy(
-                        fontSize = 14.sp,
-                        color = TextPrimary
-                    )
+                    textStyle = LocalTextStyle.current.copy(fontSize = 14.sp, color = TextPrimary)
                 )
-                Box(
-                    modifier = Modifier.fillMaxWidth(),
-                    contentAlignment = Alignment.CenterEnd
-                ) {
-                    Text(
-                        text = "${keperluan.length}/200",
-                        color = TextSecondary,
-                        fontSize = 12.sp
-                    )
+                Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.CenterEnd) {
+                    Text(text = "${keperluan.length}/200", color = TextSecondary, fontSize = 12.sp)
                 }
             }
         }
