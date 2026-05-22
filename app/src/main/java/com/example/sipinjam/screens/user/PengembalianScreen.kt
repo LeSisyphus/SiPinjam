@@ -11,9 +11,8 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AddAPhoto
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -22,24 +21,26 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
+import com.example.sipinjam.R
 import com.example.sipinjam.ui.theme.*
 
 @Composable
 fun PengembalianScreen(
-    namaBarang: String = "MacBook Pro M2 14-inch",
-    tanggalPinjam: String = "1 Juni 2026",
-    tanggalKembali: String = "5 Juni 2026",
+    namaBarang: String = "MacBook Pro M2",
+    tanggalPinjam: String = "12 Mei",
+    tanggalJatuhTempo: String = "14 Mei",
     onBackClick: () -> Unit = {},
     onKirimPengembalian: (fotoUri: Uri?, catatan: String) -> Unit = { _, _ -> },
 ) {
-    var fotoUri    by remember { mutableStateOf<Uri?>(null) }
-    var catatan    by rememberSaveable { mutableStateOf("") }
+    var fotoUri by remember { mutableStateOf<Uri?>(null) }
+    var catatan by rememberSaveable { mutableStateOf("") }
     var showDialog by remember { mutableStateOf(false) }
 
     val galleryLauncher = rememberLauncherForActivityResult(
@@ -50,14 +51,6 @@ fun PengembalianScreen(
     if (showDialog) {
         AlertDialog(
             onDismissRequest = { showDialog = false },
-            icon = {
-                Icon(
-                    imageVector = Icons.Filled.CheckCircle,
-                    contentDescription = null,
-                    tint = SiPinjamBlue,
-                    modifier = Modifier.size(40.dp)
-                )
-            },
             title = {
                 Text(
                     text = "Konfirmasi Pengembalian",
@@ -130,33 +123,22 @@ fun PengembalianScreen(
                 color = CardWhite,
                 shadowElevation = 8.dp
             ) {
-                Column(
-                    modifier = Modifier.padding(horizontal = 20.dp, vertical = 16.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
+                Button(
+                    onClick = { showDialog = true },
+                    enabled = fotoUri != null,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 20.dp, vertical = 16.dp)
+                        .height(52.dp),
+                    shape = RoundedCornerShape(14.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = SiPinjamBlue)
                 ) {
-                    Button(
-                        onClick = { showDialog = true },
-                        enabled = fotoUri != null,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(52.dp),
-                        shape = RoundedCornerShape(14.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = SiPinjamBlue)
-                    ) {
-                        Text(
-                            text = "Kirim Pengembalian",
-                            fontSize = 16.sp,
-                            fontWeight = FontWeight.SemiBold,
-                            color = Color.White
-                        )
-                    }
-                    Spacer(Modifier.height(8.dp))
                     Text(
-                        text = "Foto kondisi barang wajib dilampirkan sebelum mengirim pengembalian.",
-                        color = TextSecondary,
-                        fontSize = 12.sp,
-                        textAlign = TextAlign.Center,
-                        lineHeight = 18.sp
+                        text = "KONFIRMASI PENGEMBALIAN",
+                        fontSize = 15.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.White,
+                        letterSpacing = 0.5.sp
                     )
                 }
             }
@@ -177,33 +159,57 @@ fun PengembalianScreen(
                 colors = CardDefaults.cardColors(containerColor = CardWhite),
                 elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
             ) {
-                Column(modifier = Modifier.padding(16.dp)) {
-                    Text(
-                        text = "BARANG YANG DIKEMBALIKAN",
-                        color = TextSecondary,
-                        fontSize = 11.sp,
-                        fontWeight = FontWeight.SemiBold,
-                        letterSpacing = 0.8.sp
-                    )
-                    Spacer(Modifier.height(10.dp))
-                    Text(
-                        text = namaBarang,
-                        color = TextPrimary,
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.Bold
-                    )
-                    Spacer(Modifier.height(10.dp))
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        Column {
-                            Text(text = "Tanggal Pinjam", color = TextSecondary, fontSize = 12.sp)
-                            Text(text = tanggalPinjam, color = TextPrimary, fontSize = 14.sp, fontWeight = FontWeight.Medium)
-                        }
-                        Column(horizontalAlignment = Alignment.End) {
-                            Text(text = "Tanggal Kembali", color = TextSecondary, fontSize = 12.sp)
-                            Text(text = tanggalKembali, color = TextPrimary, fontSize = 14.sp, fontWeight = FontWeight.Medium)
+                Row(
+                    modifier = Modifier.padding(14.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(14.dp)
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .size(56.dp)
+                            .clip(RoundedCornerShape(10.dp))
+                            .background(DarkImageBg),
+                        contentAlignment = Alignment.Center
+                    ) { }
+
+                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                        Text(
+                            text = namaBarang,
+                            color = TextPrimary,
+                            fontSize = 15.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                        Row(horizontalArrangement = Arrangement.spacedBy(24.dp)) {
+                            Column {
+                                Text(
+                                    text = "PINJAM",
+                                    color = TextSecondary,
+                                    fontSize = 11.sp,
+                                    fontWeight = FontWeight.SemiBold,
+                                    letterSpacing = 0.5.sp
+                                )
+                                Text(
+                                    text = tanggalPinjam,
+                                    color = TextPrimary,
+                                    fontSize = 13.sp,
+                                    fontWeight = FontWeight.Medium
+                                )
+                            }
+                            Column {
+                                Text(
+                                    text = "JATUH TEMPO",
+                                    color = TextSecondary,
+                                    fontSize = 11.sp,
+                                    fontWeight = FontWeight.SemiBold,
+                                    letterSpacing = 0.5.sp
+                                )
+                                Text(
+                                    text = tanggalJatuhTempo,
+                                    color = TextPrimary,
+                                    fontSize = 13.sp,
+                                    fontWeight = FontWeight.Medium
+                                )
+                            }
                         }
                     }
                 }
@@ -211,25 +217,22 @@ fun PengembalianScreen(
 
             // ── Upload Foto ───────────────────────────────────────────────────
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                Row {
-                    Text(
-                        text = "Foto Kondisi Barang",
-                        color = TextPrimary,
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.Medium
-                    )
-                    Text(text = " *", color = Color.Red, fontSize = 14.sp, fontWeight = FontWeight.Medium)
-                }
+                Text(
+                    text = "Foto Kondisi Barang",
+                    color = TextPrimary,
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.SemiBold
+                )
 
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(200.dp)
+                        .height(180.dp)
                         .clip(RoundedCornerShape(14.dp))
-                        .background(if (fotoUri == null) InputBg else Color.Transparent)
+                        .background(if (fotoUri == null) CardWhite else Color.Transparent)
                         .border(
                             width = 1.5.dp,
-                            color = if (fotoUri == null) TextSecondary.copy(alpha = 0.3f) else SiPinjamBlue,
+                            color = SiPinjamBlue.copy(alpha = 0.5f),
                             shape = RoundedCornerShape(14.dp)
                         )
                         .clickable { galleryLauncher.launch("image/*") },
@@ -238,22 +241,32 @@ fun PengembalianScreen(
                     if (fotoUri == null) {
                         Column(
                             horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.spacedBy(8.dp)
+                            verticalArrangement = Arrangement.spacedBy(10.dp)
                         ) {
-                            Icon(
-                                imageVector = Icons.Filled.AddAPhoto,
-                                contentDescription = null,
-                                tint = TextSecondary.copy(alpha = 0.5f),
-                                modifier = Modifier.size(40.dp)
+                            Box(
+                                modifier = Modifier
+                                    .size(56.dp)
+                                    .clip(RoundedCornerShape(50))
+                                    .background(SiPinjamBlue.copy(alpha = 0.1f)),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                // Pakai icon kamera
+                                Icon(
+                                    painter = painterResource(id = android.R.drawable.ic_menu_camera),
+                                    contentDescription = null,
+                                    tint = SiPinjamBlue,
+                                    modifier = Modifier.size(28.dp)
+                                )
+                            }
+                            Text(
+                                text = "Foto Kondisi Barang",
+                                color = TextPrimary,
+                                fontSize = 14.sp,
+                                fontWeight = FontWeight.SemiBold
                             )
                             Text(
-                                text = "Ketuk untuk upload foto",
+                                text = "Ketuk untuk ambil foto atau unggah",
                                 color = TextSecondary,
-                                fontSize = 14.sp
-                            )
-                            Text(
-                                text = "JPG, PNG maksimal 5MB",
-                                color = TextSecondary.copy(alpha = 0.6f),
                                 fontSize = 12.sp
                             )
                         }
@@ -266,7 +279,6 @@ fun PengembalianScreen(
                                 .clip(RoundedCornerShape(14.dp)),
                             contentScale = ContentScale.Crop
                         )
-                        // Tombol ganti foto
                         Box(
                             modifier = Modifier
                                 .align(Alignment.BottomEnd)
@@ -276,19 +288,24 @@ fun PengembalianScreen(
                                 .clickable { galleryLauncher.launch("image/*") }
                                 .padding(horizontal = 12.dp, vertical = 6.dp)
                         ) {
-                            Text(text = "Ganti Foto", color = Color.White, fontSize = 12.sp, fontWeight = FontWeight.Medium)
+                            Text(
+                                text = "Ganti Foto",
+                                color = Color.White,
+                                fontSize = 12.sp,
+                                fontWeight = FontWeight.Medium
+                            )
                         }
                     }
                 }
             }
 
             // ── Catatan ───────────────────────────────────────────────────────
-            Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 Text(
-                    text = "Catatan Kondisi (opsional)",
+                    text = "Catatan Kondisi",
                     color = TextPrimary,
                     fontSize = 14.sp,
-                    fontWeight = FontWeight.Medium
+                    fontWeight = FontWeight.SemiBold
                 )
                 OutlinedTextField(
                     value = catatan,
@@ -298,7 +315,7 @@ fun PengembalianScreen(
                         .height(120.dp),
                     placeholder = {
                         Text(
-                            text = "Deskripsikan kondisi barang saat dikembalikan...",
+                            text = "Jelaskan kondisi barang saat ini...",
                             color = TextSecondary.copy(alpha = 0.6f),
                             fontSize = 14.sp
                         )
@@ -313,9 +330,30 @@ fun PengembalianScreen(
                     ),
                     textStyle = LocalTextStyle.current.copy(fontSize = 14.sp, color = TextPrimary)
                 )
-                Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.CenterEnd) {
-                    Text(text = "${catatan.length}/200", color = TextSecondary, fontSize = 12.sp)
-                }
+            }
+
+            // ── Info Banner ───────────────────────────────────────────────────
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(12.dp))
+                    .background(InfoOrangeBg)
+                    .padding(14.dp),
+                verticalAlignment = Alignment.Top,
+                horizontalArrangement = Arrangement.spacedBy(10.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.Info,
+                    contentDescription = null,
+                    tint = StatusOrange,
+                    modifier = Modifier.size(18.dp)
+                )
+                Text(
+                    text = "Pastikan foto jelas dan barang dalam kondisi bersih.",
+                    color = StatusOrange,
+                    fontSize = 13.sp,
+                    lineHeight = 20.sp
+                )
             }
         }
     }
