@@ -18,4 +18,6 @@ val StatusRed       = Color(0xFFDC2626)
 val StatusRedBg     = Color(0xFFFEE2E2)
 val DarkImageBg     = Color(0xFF1A1A2E)
 val InfoOrangeBg    = Color(0xFFFFF7ED)
-
+val StatusBlueBg    = Color(0xFFE3F2FD)
+val StatusBlue      = Color(0xFF1E88E5)
+val StatusRedLightBg = Color(0xFFFFEBEE)
