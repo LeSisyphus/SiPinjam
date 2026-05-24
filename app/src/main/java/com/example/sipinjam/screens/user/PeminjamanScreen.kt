@@ -24,7 +24,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.sipinjam.ui.theme.*
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PeminjamanScreen(
     barangId: String = "",
@@ -42,6 +46,60 @@ fun PeminjamanScreen(
     val isLoading    by viewModel.isLoading.collectAsState()
     val sukses       by viewModel.sukses.collectAsState()
     val errorMessage by viewModel.errorMessage.collectAsState()
+
+    var showDatePickerPinjam  by remember { mutableStateOf(false) }
+    var showDatePickerKembali by remember { mutableStateOf(false) }
+
+    val datePickerStatePinjam  = rememberDatePickerState()
+    val datePickerStateKembali = rememberDatePickerState()
+
+    fun formatTanggal(millis: Long?): String {
+        if (millis == null) return ""
+        val sdf = SimpleDateFormat("d MMMM yyyy", Locale("id", "ID"))
+        return sdf.format(Date(millis))
+    }
+
+    if (showDatePickerPinjam) {
+        DatePickerDialog(
+            onDismissRequest = { showDatePickerPinjam = false },
+            confirmButton = {
+                TextButton(onClick = {
+                    tanggalPinjam = formatTanggal(datePickerStatePinjam.selectedDateMillis)
+                    showDatePickerPinjam = false
+                }) {
+                    Text("OK", color = SiPinjamBlue)
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDatePickerPinjam = false }) {
+                    Text("Batal", color = TextSecondary)
+                }
+            }
+        ) {
+            DatePicker(state = datePickerStatePinjam)
+        }
+    }
+
+    if (showDatePickerKembali) {
+        DatePickerDialog(
+            onDismissRequest = { showDatePickerKembali = false },
+            confirmButton = {
+                TextButton(onClick = {
+                    tanggalKembali = formatTanggal(datePickerStateKembali.selectedDateMillis)
+                    showDatePickerKembali = false
+                }) {
+                    Text("OK", color = SiPinjamBlue)
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDatePickerKembali = false }) {
+                    Text("Batal", color = TextSecondary)
+                }
+            }
+        ) {
+            DatePicker(state = datePickerStateKembali)
+        }
+    }
 
     // Dialog sukses
     if (sukses) {
@@ -267,13 +325,16 @@ fun PeminjamanScreen(
                 )
                 OutlinedTextField(
                     value = tanggalPinjam,
-                    onValueChange = { tanggalPinjam = it },
+                    onValueChange = {},
+                    readOnly = true,
                     modifier = Modifier.fillMaxWidth(),
                     placeholder = {
                         Text("cth: 1 Juni 2026", color = TextSecondary.copy(alpha = 0.6f), fontSize = 14.sp)
                     },
                     trailingIcon = {
-                        Icon(Icons.Filled.CalendarMonth, contentDescription = null, tint = SiPinjamBlue)
+                        IconButton(onClick = { showDatePickerPinjam = true }) {
+                            Icon(Icons.Filled.CalendarMonth, contentDescription = "Pilih tanggal pinjam", tint = SiPinjamBlue)
+                        }
                     },
                     singleLine = true,
                     shape = RoundedCornerShape(12.dp),
@@ -296,13 +357,16 @@ fun PeminjamanScreen(
                 )
                 OutlinedTextField(
                     value = tanggalKembali,
-                    onValueChange = { tanggalKembali = it },
+                    onValueChange = {},
+                    readOnly = true,
                     modifier = Modifier.fillMaxWidth(),
                     placeholder = {
                         Text("cth: 5 Juni 2026", color = TextSecondary.copy(alpha = 0.6f), fontSize = 14.sp)
                     },
                     trailingIcon = {
-                        Icon(Icons.Filled.CalendarMonth, contentDescription = null, tint = SiPinjamBlue)
+                        IconButton(onClick = { showDatePickerKembali = true }) {
+                            Icon(Icons.Filled.CalendarMonth, contentDescription = "Pilih tanggal kembali", tint = SiPinjamBlue)
+                        }
                     },
                     singleLine = true,
                     shape = RoundedCornerShape(12.dp),
