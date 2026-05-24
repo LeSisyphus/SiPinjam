@@ -9,6 +9,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Book
 import androidx.compose.material.icons.filled.CalendarMonth
+import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -105,6 +106,51 @@ fun PeminjamanScreen(
             onKirimPermohonan(tanggalPinjam, tanggalKembali, keperluan)
             viewModel.resetState()
         }
+    // Dialog sukses
+    if (sukses) {
+        AlertDialog(
+            onDismissRequest = {},
+            icon = {
+                Icon(
+                    imageVector = Icons.Filled.CheckCircle,
+                    contentDescription = null,
+                    tint = SiPinjamBlue,
+                    modifier = Modifier.size(48.dp)
+                )
+            },
+            title = {
+                Text(
+                    text = "Permohonan Terkirim!",
+                    fontWeight = FontWeight.Bold,
+                    textAlign = TextAlign.Center,
+                    color = TextPrimary
+                )
+            },
+            text = {
+                Text(
+                    text = "Permohonan peminjaman kamu sudah berhasil dikirim. Admin akan memproses dalam 1×24 jam.",
+                    textAlign = TextAlign.Center,
+                    color = TextSecondary,
+                    fontSize = 14.sp,
+                    lineHeight = 20.sp
+                )
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        onKirimPermohonan(tanggalPinjam, tanggalKembali, keperluan)
+                        viewModel.resetState()
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = SiPinjamBlue),
+                    shape = RoundedCornerShape(10.dp),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text("Kembali ke Beranda", color = Color.White)
+                }
+            },
+            shape = RoundedCornerShape(16.dp),
+            containerColor = CardWhite
+        )
     }
 
     Scaffold(

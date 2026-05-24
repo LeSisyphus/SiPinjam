@@ -24,10 +24,13 @@ class PeminjamanRepository {
         return try {
             val snapshot = collection
                 .whereEqualTo("userId", userId)
-                .orderBy("createdAt", com.google.firebase.firestore.Query.Direction.DESCENDING)
                 .get()
                 .await()
-            val list = snapshot.toObjects(Peminjaman::class.java)
+
+            val list = snapshot
+                .toObjects(Peminjaman::class.java)
+                .sortedByDescending { it.createdAt }
+
             Result.success(list)
         } catch (e: Exception) {
             Result.failure(e)
@@ -37,10 +40,13 @@ class PeminjamanRepository {
     suspend fun semuaPeminjaman(): Result<List<Peminjaman>> {
         return try {
             val snapshot = collection
-                .orderBy("createdAt", com.google.firebase.firestore.Query.Direction.DESCENDING)
                 .get()
                 .await()
-            val list = snapshot.toObjects(Peminjaman::class.java)
+
+            val list = snapshot
+                .toObjects(Peminjaman::class.java)
+                .sortedByDescending { it.createdAt }
+
             Result.success(list)
         } catch (e: Exception) {
             Result.failure(e)
