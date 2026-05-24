@@ -42,15 +42,15 @@ class PeminjamanViewModel : ViewModel() {
             }
 
             val peminjaman = Peminjaman(
-                userId        = currentUser.uid,
-                namaUser      = currentUser.nama,
-                barangId      = barangId,
-                namaBarang    = namaBarang,
-                tanggalPinjam = tanggalPinjam,
+                userId         = currentUser.uid,
+                namaUser       = currentUser.nama,
+                barangId       = barangId,
+                namaBarang     = namaBarang,
+                tanggalPinjam  = tanggalPinjam,
                 tanggalKembali = tanggalKembali,
-                keperluan     = keperluan,
-                status        = "Diproses",
-                createdAt     = System.currentTimeMillis()
+                keperluan      = keperluan,
+                status         = "Diproses",
+                createdAt      = System.currentTimeMillis()
             )
 
             val result = repository.tambahPeminjaman(peminjaman)
