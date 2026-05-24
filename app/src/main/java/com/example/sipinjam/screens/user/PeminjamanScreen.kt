@@ -100,12 +100,6 @@ fun PeminjamanScreen(
             DatePicker(state = datePickerStateKembali)
         }
     }
-
-    LaunchedEffect(sukses) {
-        if (sukses) {
-            onKirimPermohonan(tanggalPinjam, tanggalKembali, keperluan)
-            viewModel.resetState()
-        }
     // Dialog sukses
     if (sukses) {
         AlertDialog(
