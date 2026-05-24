@@ -23,7 +23,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.sipinjam.ui.theme.*
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PeminjamanScreen(
     barangId: String = "",
@@ -38,11 +42,64 @@ fun PeminjamanScreen(
     var tanggalKembali by rememberSaveable { mutableStateOf("") }
     var keperluan      by rememberSaveable { mutableStateOf("") }
 
-    val isLoading   by viewModel.isLoading.collectAsState()
-    val sukses      by viewModel.sukses.collectAsState()
+    val isLoading    by viewModel.isLoading.collectAsState()
+    val sukses       by viewModel.sukses.collectAsState()
     val errorMessage by viewModel.errorMessage.collectAsState()
 
-    // Kalau sukses, pindah ke beranda
+    var showDatePickerPinjam  by remember { mutableStateOf(false) }
+    var showDatePickerKembali by remember { mutableStateOf(false) }
+
+    val datePickerStatePinjam  = rememberDatePickerState()
+    val datePickerStateKembali = rememberDatePickerState()
+
+    fun formatTanggal(millis: Long?): String {
+        if (millis == null) return ""
+        val sdf = SimpleDateFormat("d MMMM yyyy", Locale("id", "ID"))
+        return sdf.format(Date(millis))
+    }
+
+    if (showDatePickerPinjam) {
+        DatePickerDialog(
+            onDismissRequest = { showDatePickerPinjam = false },
+            confirmButton = {
+                TextButton(onClick = {
+                    tanggalPinjam = formatTanggal(datePickerStatePinjam.selectedDateMillis)
+                    showDatePickerPinjam = false
+                }) {
+                    Text("OK", color = SiPinjamBlue)
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDatePickerPinjam = false }) {
+                    Text("Batal", color = TextSecondary)
+                }
+            }
+        ) {
+            DatePicker(state = datePickerStatePinjam)
+        }
+    }
+
+    if (showDatePickerKembali) {
+        DatePickerDialog(
+            onDismissRequest = { showDatePickerKembali = false },
+            confirmButton = {
+                TextButton(onClick = {
+                    tanggalKembali = formatTanggal(datePickerStateKembali.selectedDateMillis)
+                    showDatePickerKembali = false
+                }) {
+                    Text("OK", color = SiPinjamBlue)
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDatePickerKembali = false }) {
+                    Text("Batal", color = TextSecondary)
+                }
+            }
+        ) {
+            DatePicker(state = datePickerStateKembali)
+        }
+    }
+
     LaunchedEffect(sukses) {
         if (sukses) {
             onKirimPermohonan(tanggalPinjam, tanggalKembali, keperluan)
@@ -89,7 +146,6 @@ fun PeminjamanScreen(
                     modifier = Modifier.padding(horizontal = 20.dp, vertical = 16.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    // Tampilkan error kalau ada
                     if (errorMessage != null) {
                         Text(
                             text = errorMessage ?: "",
@@ -153,7 +209,6 @@ fun PeminjamanScreen(
                 .padding(horizontal = 20.dp, vertical = 20.dp),
             verticalArrangement = Arrangement.spacedBy(20.dp)
         ) {
-            // ── Info Barang ───────────────────────────────────────────────────
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(16.dp),
@@ -220,7 +275,6 @@ fun PeminjamanScreen(
                 }
             }
 
-            // ── Tanggal Pinjam ────────────────────────────────────────────────
             Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
                 Text(
                     text = "Tanggal Pinjam",
@@ -230,13 +284,16 @@ fun PeminjamanScreen(
                 )
                 OutlinedTextField(
                     value = tanggalPinjam,
-                    onValueChange = { tanggalPinjam = it },
+                    onValueChange = {},
+                    readOnly = true,
                     modifier = Modifier.fillMaxWidth(),
                     placeholder = {
                         Text("cth: 1 Juni 2026", color = TextSecondary.copy(alpha = 0.6f), fontSize = 14.sp)
                     },
                     trailingIcon = {
-                        Icon(Icons.Filled.CalendarMonth, contentDescription = null, tint = SiPinjamBlue)
+                        IconButton(onClick = { showDatePickerPinjam = true }) {
+                            Icon(Icons.Filled.CalendarMonth, contentDescription = "Pilih tanggal pinjam", tint = SiPinjamBlue)
+                        }
                     },
                     singleLine = true,
                     shape = RoundedCornerShape(12.dp),
@@ -250,7 +307,6 @@ fun PeminjamanScreen(
                 )
             }
 
-            // ── Tanggal Kembali ───────────────────────────────────────────────
             Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
                 Text(
                     text = "Tanggal Kembali",
@@ -260,13 +316,16 @@ fun PeminjamanScreen(
                 )
                 OutlinedTextField(
                     value = tanggalKembali,
-                    onValueChange = { tanggalKembali = it },
+                    onValueChange = {},
+                    readOnly = true,
                     modifier = Modifier.fillMaxWidth(),
                     placeholder = {
                         Text("cth: 5 Juni 2026", color = TextSecondary.copy(alpha = 0.6f), fontSize = 14.sp)
                     },
                     trailingIcon = {
-                        Icon(Icons.Filled.CalendarMonth, contentDescription = null, tint = SiPinjamBlue)
+                        IconButton(onClick = { showDatePickerKembali = true }) {
+                            Icon(Icons.Filled.CalendarMonth, contentDescription = "Pilih tanggal kembali", tint = SiPinjamBlue)
+                        }
                     },
                     singleLine = true,
                     shape = RoundedCornerShape(12.dp),
@@ -280,7 +339,6 @@ fun PeminjamanScreen(
                 )
             }
 
-            // ── Keperluan ─────────────────────────────────────────────────────
             Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
                 Text(
                     text = "Keperluan/Alasan",
