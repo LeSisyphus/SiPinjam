@@ -1,3 +1,4 @@
+import com.android.build.gradle.ProguardFiles.getDefaultProguardFile
 import java.util.Properties
 
 val localProps = Properties()
@@ -15,11 +16,7 @@ plugins {
 
 android {
     namespace = "com.example.sipinjam"
-    compileSdk {
-        version = release(36) {
-            minorApiLevel = 1
-        }
-    }
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.example.sipinjam"
