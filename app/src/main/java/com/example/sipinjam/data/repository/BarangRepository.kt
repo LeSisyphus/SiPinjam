@@ -48,6 +48,8 @@ class BarangRepository {
     }
 
     suspend fun updateBarang(barang: Barang): Boolean {
+        if (barang.id.isBlank()) return false
+        
         return try {
             itemsCollection.document(barang.id).set(barang).await()
             true
