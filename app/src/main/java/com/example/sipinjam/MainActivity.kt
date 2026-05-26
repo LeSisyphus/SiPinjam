@@ -11,7 +11,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.navigation.compose.rememberNavController
 import com.example.sipinjam.data.repository.AuthRepository
-import com.example.sipinjam.ui.navigation.NavGraph
+import com.example.sipinjam.navigation.NavGraph
 import com.cloudinary.android.MediaManager
 import androidx.compose.runtime.setValue
 

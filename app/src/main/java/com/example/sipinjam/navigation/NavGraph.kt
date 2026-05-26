@@ -1,4 +1,4 @@
-package com.example.sipinjam.ui.navigation
+package com.example.sipinjam.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
@@ -101,7 +101,7 @@ fun NavGraph(
         composable(Routes.BERANDA_USER) {
             BerandaUserScreen(
                 onLihatSemuaBarang = {},
-                onBarangClick = { barang -> navController.navigate(Routes.detailBarang(barang.imageUrl)) },
+                onBarangClick = { barang -> navController.navigate(Routes.detailBarang(barang.id)) },
                 onBerandaClick = {},
                 onKatalogClick = {},
                 onRiwayatClick = { navController.navigate(Routes.RIWAYAT_PEMINJAMAN) },
