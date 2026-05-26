@@ -7,4 +7,5 @@
     <string name="role_mahasiswa">MAHASISWA</string>
     <string name="role_dosen">DOSEN</string>
     <string name="role_staf">STAF</string>
+    <string name="empty_permohonan">Tidak ada permintaan masuk</string>
 </resources>

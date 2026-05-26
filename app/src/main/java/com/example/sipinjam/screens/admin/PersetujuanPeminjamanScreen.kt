@@ -16,18 +16,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.sipinjam.R
 import com.example.sipinjam.ui.components.AdminBottomNavBar
 import com.example.sipinjam.ui.theme.*
-
-data class PermohonanItem(
-    val id: String,
-    val namaPeminjam: String,
-    val nimPeminjam: String,
-    val rolePeminjam: String,
-    val namaBarang: String,
-    val tanggal: String,
-)
 
 @Composable
 fun PersetujuanPeminjamanScreen(
@@ -35,17 +27,15 @@ fun PersetujuanPeminjamanScreen(
     onBarangClick: () -> Unit = {},
     onPermintaanClick: () -> Unit = {},
     onProfilClick: () -> Unit = {},
+    viewModel: PersetujuanPeminjamanViewModel = viewModel()
 ) {
+    val daftarPeminjaman by viewModel.daftarPeminjaman.collectAsState()
+    val isLoading by viewModel.isLoading.collectAsState()
+
     var tabAktif by remember { mutableIntStateOf(0) }
     val tabs = listOf(
         stringResource(R.string.tab_persetujuan),
         stringResource(R.string.tab_pengembalian)
-    )
-
-    val dummyData = listOf(
-        PermohonanItem("1", "Aditya Saputra", "#442", stringResource(R.string.role_mahasiswa), "Kamera DSLR Canon EOS R50", "10-13 Apr"),
-        PermohonanItem("2", "Dr. Ratna Ningsih", "#108", stringResource(R.string.role_dosen), "Proyektor Epson EB-X51", "11 Apr"),
-        PermohonanItem("3", "Bambang Prakoso", "#862", stringResource(R.string.role_staf), "Tripod Kamera Profesional", "12-14 Apr"),
     )
 
     Scaffold(
@@ -97,19 +87,45 @@ fun PersetujuanPeminjamanScreen(
             )
         }
     ) { innerPadding ->
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding)
-                .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            items(dummyData) { item ->
-                PermohonanCard(
-                    item = item,
-                    onSetujui = {},
-                    onTolak = {}
+        if (isLoading) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator(color = SiPinjamBlue)
+            }
+        } else if (daftarPeminjaman.isEmpty()) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = stringResource(R.string.empty_permohonan),
+                    color = TextSecondary,
+                    fontSize = 14.sp
                 )
+            }
+        } else {
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding)
+                    .padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                items(daftarPeminjaman, key = { it.id }) { item ->
+                    PermohonanCard(
+                        namaUser = item.namaUser,
+                        namaBarang = item.namaBarang,
+                        tanggal = "${item.tanggalPinjam} - ${item.tanggalKembali}",
+                        onSetujui = { viewModel.setujui(item.id) },
+                        onTolak = { viewModel.tolak(item.id) }
+                    )
+                }
             }
         }
     }
@@ -117,17 +133,12 @@ fun PersetujuanPeminjamanScreen(
 
 @Composable
 fun PermohonanCard(
-    item: PermohonanItem,
+    namaUser: String,
+    namaBarang: String,
+    tanggal: String,
     onSetujui: () -> Unit,
     onTolak: () -> Unit
 ) {
-    val roleColor = when (item.rolePeminjam) {
-        "MAHASISWA" -> Pair(StatusBlueBg, StatusBlue)
-        "DOSEN"     -> Pair(StatusGreenBg, StatusGreen)
-        "STAF"      -> Pair(StatusOrangeBg, StatusOrange)
-        else        -> Pair(InputBg, TextSecondary)
-    }
-
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(14.dp),
@@ -148,32 +159,13 @@ fun PermohonanCard(
                         .clip(RoundedCornerShape(50))
                         .background(DarkImageBg)
                 )
-                Column(modifier = Modifier.weight(1f)) {
-                    Text(
-                        text = item.namaPeminjam,
-                        color = TextPrimary,
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.SemiBold
-                    )
-                    Text(
-                        text = item.nimPeminjam,
-                        color = TextSecondary,
-                        fontSize = 12.sp
-                    )
-                }
-                Box(
-                    modifier = Modifier
-                        .clip(RoundedCornerShape(4.dp))
-                        .background(roleColor.first)
-                        .padding(horizontal = 8.dp, vertical = 3.dp)
-                ) {
-                    Text(
-                        text = item.rolePeminjam,
-                        color = roleColor.second,
-                        fontSize = 10.sp,
-                        fontWeight = FontWeight.Bold
-                    )
-                }
+                Text(
+                    text = namaUser,
+                    color = TextPrimary,
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    modifier = Modifier.weight(1f)
+                )
             }
 
             Row(
@@ -188,13 +180,13 @@ fun PermohonanCard(
                 )
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
-                        text = item.namaBarang,
+                        text = namaBarang,
                         color = TextPrimary,
                         fontSize = 13.sp,
                         fontWeight = FontWeight.Medium
                     )
                     Text(
-                        text = item.tanggal,
+                        text = tanggal,
                         color = TextSecondary,
                         fontSize = 12.sp
                     )
