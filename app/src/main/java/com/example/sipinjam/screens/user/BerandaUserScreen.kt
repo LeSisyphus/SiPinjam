@@ -29,6 +29,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.sipinjam.data.model.Barang
 import com.example.sipinjam.ui.components.UserBottomNavBar
 import com.example.sipinjam.ui.theme.*
 
@@ -49,7 +50,7 @@ data class ItemDikembalikan(
 fun BerandaUserScreen(
     viewModel: BerandaUserViewModel = viewModel(),
     onLihatSemuaBarang: () -> Unit = {},
-    onBarangClick: (BarangTersedia) -> Unit = {},
+    onBarangClick: (Barang) -> Unit = {},
     onBerandaClick: () -> Unit = {},
     onKatalogClick: () -> Unit = {},
     onRiwayatClick: () -> Unit = {},
@@ -161,7 +162,9 @@ fun BerandaUserScreen(
                     items(uiState.barangTersedia) { barang ->
                         BarangCard(
                             barang = barang,
-                            onClick = { onBarangClick(barang) }
+                            onClick = {
+                                onBarangClick(Barang(id = barang.imageUrl, nama = barang.nama, kategori = barang.kategori))
+                            }
                         )
                     }
                 }
@@ -190,12 +193,6 @@ fun BerandaUserScreen(
             }
         }
     }
-}
-
-private fun LazyListScope.items(
-    count: Any,
-    itemContent: androidx.compose.foundation.lazy.LazyItemScope.(Int) -> Unit
-) {
 }
 
 @Composable
