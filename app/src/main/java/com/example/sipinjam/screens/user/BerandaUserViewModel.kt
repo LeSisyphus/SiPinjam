@@ -2,7 +2,6 @@ package com.example.sipinjam.screens.user
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.sipinjam.data.model.Barang
 import com.example.sipinjam.data.repository.BarangRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -49,7 +48,7 @@ class BerandaUserViewModel : ViewModel() {
                             BarangTersedia(
                                 nama = barangDoc.nama,
                                 kategori = barangDoc.kategori.uppercase(),
-                                imageUrl = barangDoc.fotoUrl
+                                imageUrl = barangDoc.id
                             )
                         }
 
