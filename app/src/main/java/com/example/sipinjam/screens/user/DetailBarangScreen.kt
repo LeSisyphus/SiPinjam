@@ -17,12 +17,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.sipinjam.ui.theme.*
 
 data class DetailBarang(
@@ -41,8 +38,18 @@ data class DetailBarang(
 
 @Composable
 fun DetailBarangScreen(
-    barangId: String = "barang_001",
-    viewModel: DetailBarangViewModel = viewModel(),
+    barang: DetailBarang = DetailBarang(
+        id = "barang_001",
+        nama = "MacBook Pro M2 14-inch Space Gray",
+        kategori = "ELEKTRONIK",
+        totalUnit = 12,
+        tersedia = true,
+        kondisi = "Sangat Baik",
+        jumlahTersedia = 8,
+        lokasi = "Lab Komputer",
+        maksimalPinjam = "14 Hari",
+        deskripsi = "Laptop performa tinggi dengan chip M2 Pro. Cocok untuk kebutuhan desain grafis, editing video, dan pengembangan software. Unit dalam kondisi fisik 95% mulus dengan charger original disertakan.",
+    ),
     onBackClick: () -> Unit = {},
     onAjukanPeminjaman: (
         barangId: String,
@@ -51,11 +58,6 @@ fun DetailBarangScreen(
         statusBarang: String
     ) -> Unit = { _, _, _, _ -> },
 ) {
-    LaunchedEffect(barangId) {
-        viewModel.loadBarangDetail(barangId)
-    }
-
-    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var deskripsiExpanded by rememberSaveable { mutableStateOf(true) }
 
     Scaffold(
@@ -89,253 +91,232 @@ fun DetailBarangScreen(
             }
         },
         bottomBar = {
-            uiState.barang?.let { barang ->
-                Surface(
-                    modifier = Modifier.fillMaxWidth(),
-                    color = CardWhite,
-                    shadowElevation = 8.dp
-                ) {
-                    Button(
-                        onClick = {
-                            onAjukanPeminjaman(
-                                barang.id,
-                                barang.nama,
-                                barang.kategori,
-                                if (barang.tersedia) "TERSEDIA" else "DIPINJAM"
-                            )
-                        },
-                        enabled = barang.tersedia,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 20.dp, vertical = 16.dp)
-                            .height(52.dp),
-                        shape = RoundedCornerShape(14.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = SiPinjamBlue)
-                    ) {
-                        Text(
-                            text = if (barang.tersedia) "Ajukan Peminjaman" else "Tidak Tersedia",
-                            fontSize = 16.sp,
-                            fontWeight = FontWeight.SemiBold,
-                            color = Color.White
+            Surface(
+                modifier = Modifier.fillMaxWidth(),
+                color = CardWhite,
+                shadowElevation = 8.dp
+            ) {
+                Button(
+                    onClick = {
+                        onAjukanPeminjaman(
+                            barang.id,
+                            barang.nama,
+                            barang.kategori,
+                            if (barang.tersedia) "TERSEDIA" else "DIPINJAM"
                         )
-                    }
+                    },
+                    enabled = barang.tersedia,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 20.dp, vertical = 16.dp)
+                        .height(52.dp),
+                    shape = RoundedCornerShape(14.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = SiPinjamBlue)
+                ) {
+                    Text(
+                        text = if (barang.tersedia) "Ajukan Peminjaman" else "Tidak Tersedia",
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        color = Color.White
+                    )
                 }
             }
         }
     ) { innerPadding ->
-        Box(
+        Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(innerPadding),
-            contentAlignment = Alignment.Center
+                .padding(innerPadding)
+                .verticalScroll(rememberScrollState())
         ) {
-            if (uiState.isLoading) {
-                CircularProgressIndicator(color = SiPinjamBlue)
-            } else if (uiState.errorMessage != null) {
-                Text(
-                    text = uiState.errorMessage ?: "Terjadi kesalahan",
-                    color = Color.Red,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.padding(20.dp)
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(220.dp)
+                    .background(DarkImageBg),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.Book,
+                    contentDescription = null,
+                    tint = Color.White.copy(alpha = 0.2f),
+                    modifier = Modifier.size(80.dp)
                 )
-            } else {
-                uiState.barang?.let { barang ->
-                    Column(
+            }
+
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 20.dp, vertical = 20.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Box(
                         modifier = Modifier
-                            .fillMaxSize()
-                            .verticalScroll(rememberScrollState())
+                            .clip(RoundedCornerShape(6.dp))
+                            .background(SiPinjamBlue)
+                            .padding(horizontal = 10.dp, vertical = 4.dp)
                     ) {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(220.dp)
-                                .background(DarkImageBg),
-                            contentAlignment = Alignment.Center
+                        Text(
+                            text = barang.kategori,
+                            color = Color.White,
+                            fontSize = 11.sp,
+                            fontWeight = FontWeight.Bold,
+                            letterSpacing = 0.4.sp
+                        )
+                    }
+                    Box(
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(6.dp))
+                            .background(InputBg)
+                            .padding(horizontal = 10.dp, vertical = 4.dp)
+                    ) {
+                        Text(
+                            text = "${barang.totalUnit} Unit",
+                            color = TextSecondary,
+                            fontSize = 11.sp,
+                            fontWeight = FontWeight.Medium
+                        )
+                    }
+                    Box(
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(6.dp))
+                            .background(if (barang.tersedia) StatusGreenBg else StatusOrangeBg)
+                            .padding(horizontal = 10.dp, vertical = 4.dp)
+                    ) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(4.dp)
                         ) {
-                            Icon(
-                                imageVector = Icons.Filled.Book,
-                                contentDescription = null,
-                                tint = Color.White.copy(alpha = 0.2f),
-                                modifier = Modifier.size(80.dp)
-                            )
-                        }
-
-                        Column(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(horizontal = 20.dp, vertical = 20.dp),
-                            verticalArrangement = Arrangement.spacedBy(16.dp)
-                        ) {
-                            Row(
-                                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Box(
-                                    modifier = Modifier
-                                        .clip(RoundedCornerShape(6.dp))
-                                        .background(SiPinjamBlue)
-                                        .padding(horizontal = 10.dp, vertical = 4.dp)
-                                ) {
-                                    Text(
-                                        text = barang.kategori,
-                                        color = Color.White,
-                                        fontSize = 11.sp,
-                                        fontWeight = FontWeight.Bold,
-                                        letterSpacing = 0.4.sp
-                                    )
-                                }
-                                Box(
-                                    modifier = Modifier
-                                        .clip(RoundedCornerShape(6.dp))
-                                        .background(InputBg)
-                                        .padding(horizontal = 10.dp, vertical = 4.dp)
-                                ) {
-                                    Text(
-                                        text = "${barang.totalUnit} Unit",
-                                        color = TextSecondary,
-                                        fontSize = 11.sp,
-                                        fontWeight = FontWeight.Medium
-                                    )
-                                }
-                                Box(
-                                    modifier = Modifier
-                                        .clip(RoundedCornerShape(6.dp))
-                                        .background(if (barang.tersedia) StatusGreenBg else StatusOrangeBg)
-                                        .padding(horizontal = 10.dp, vertical = 4.dp)
-                                ) {
-                                    Row(
-                                        verticalAlignment = Alignment.CenterVertically,
-                                        horizontalArrangement = Arrangement.spacedBy(4.dp)
-                                    ) {
-                                        Box(
-                                            modifier = Modifier
-                                                .size(6.dp)
-                                                .clip(RoundedCornerShape(50))
-                                                .background(if (barang.tersedia) StatusGreen else StatusOrange)
-                                        )
-                                        Text(
-                                            text = if (barang.tersedia) "Tersedia" else "Dipinjam",
-                                            color = if (barang.tersedia) StatusGreen else StatusOrange,
-                                            fontSize = 11.sp,
-                                            fontWeight = FontWeight.Medium
-                                        )
-                                    }
-                                }
-                            }
-
-                            Text(
-                                text = barang.nama,
-                                color = TextPrimary,
-                                fontSize = 22.sp,
-                                fontWeight = FontWeight.ExtraBold,
-                                lineHeight = 30.sp
-                            )
-
-                            Card(
-                                modifier = Modifier.fillMaxWidth(),
-                                shape = RoundedCornerShape(14.dp),
-                                colors = CardDefaults.cardColors(containerColor = InputBg),
-                                elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
-                            ) {
-                                Column(modifier = Modifier.padding(16.dp)) {
-                                    Text(
-                                        text = "SPESIFIKASI DETAIL",
-                                        color = TextSecondary,
-                                        fontSize = 11.sp,
-                                        fontWeight = FontWeight.SemiBold,
-                                        letterSpacing = 0.8.sp
-                                    )
-                                    Spacer(Modifier.height(12.dp))
-                                    Row(modifier = Modifier.fillMaxWidth()) {
-                                        SpekItem(
-                                            label = "Kondisi",
-                                            value = barang.kondisi,
-                                            modifier = Modifier.weight(1f)
-                                        )
-                                        SpekItem(
-                                            label = "Jumlah Tersedia",
-                                            value = "${barang.jumlahTersedia} Unit",
-                                            modifier = Modifier.weight(1f)
-                                        )
-                                    }
-                                    Spacer(Modifier.height(12.dp))
-                                    Row(modifier = Modifier.fillMaxWidth()) {
-                                        SpekItem(
-                                            label = "Lokasi",
-                                            value = barang.lokasi,
-                                            modifier = Modifier.weight(1f)
-                                        )
-                                        SpekItem(
-                                            label = "Maksimal Pinjam",
-                                            value = barang.maksimalPinjam,
-                                            modifier = Modifier.weight(1f)
-                                        )
-                                    }
-                                }
-                            }
-
-                            Card(
-                                modifier = Modifier.fillMaxWidth(),
-                                shape = RoundedCornerShape(14.dp),
-                                colors = CardDefaults.cardColors(containerColor = CardWhite),
-                                elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
-                            ) {
-                                Column(modifier = Modifier.padding(16.dp)) {
-                                    Row(
-                                        modifier = Modifier.fillMaxWidth(),
-                                        horizontalArrangement = Arrangement.SpaceBetween,
-                                        verticalAlignment = Alignment.CenterVertically
-                                    ) {
-                                        Text(
-                                            text = "Deskripsi Barang",
-                                            color = TextPrimary,
-                                            fontSize = 15.sp,
-                                            fontWeight = FontWeight.SemiBold
-                                        )
-                                        TextButton(onClick = { deskripsiExpanded = !deskripsiExpanded }) {
-                                            Text(
-                                                text = if (deskripsiExpanded) "▲" else "▼",
-                                                color = TextSecondary,
-                                                fontSize = 14.sp
-                                            )
-                                        }
-                                    }
-                                    if (deskripsiExpanded) {
-                                        Spacer(Modifier.height(8.dp))
-                                        Text(
-                                            text = barang.deskripsi,
-                                            color = TextSecondary,
-                                            fontSize = 14.sp,
-                                            lineHeight = 22.sp
-                                        )
-                                    }
-                                }
-                            }
-
-                            Row(
+                            Box(
                                 modifier = Modifier
-                                    .fillMaxWidth()
-                                    .clip(RoundedCornerShape(12.dp))
-                                    .background(InfoOrangeBg)
-                                    .padding(14.dp),
-                                verticalAlignment = Alignment.Top,
-                                horizontalArrangement = Arrangement.spacedBy(10.dp)
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Filled.Info,
-                                    contentDescription = null,
-                                    tint = StatusOrange,
-                                    modifier = Modifier.size(18.dp)
-                                )
-                                Text(
-                                    text = "Peminjaman memerlukan verifikasi Kartu Mahasiswa atau identitas staf aktif yang berlaku.",
-                                    color = StatusOrange,
-                                    fontSize = 13.sp,
-                                    lineHeight = 20.sp
-                                )
-                            }
+                                    .size(6.dp)
+                                    .clip(RoundedCornerShape(50))
+                                    .background(if (barang.tersedia) StatusGreen else StatusOrange)
+                            )
+                            Text(
+                                text = if (barang.tersedia) "Tersedia" else "Dipinjam",
+                                color = if (barang.tersedia) StatusGreen else StatusOrange,
+                                fontSize = 11.sp,
+                                fontWeight = FontWeight.Medium
+                            )
                         }
                     }
+                }
+
+                Text(
+                    text = barang.nama,
+                    color = TextPrimary,
+                    fontSize = 22.sp,
+                    fontWeight = FontWeight.ExtraBold,
+                    lineHeight = 30.sp
+                )
+
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(14.dp),
+                    colors = CardDefaults.cardColors(containerColor = InputBg),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
+                ) {
+                    Column(modifier = Modifier.padding(16.dp)) {
+                        Text(
+                            text = "SPESIFIKASI DETAIL",
+                            color = TextSecondary,
+                            fontSize = 11.sp,
+                            fontWeight = FontWeight.SemiBold,
+                            letterSpacing = 0.8.sp
+                        )
+                        Spacer(Modifier.height(12.dp))
+                        Row(modifier = Modifier.fillMaxWidth()) {
+                            SpekItem(
+                                label = "Kondisi",
+                                value = barang.kondisi,
+                                modifier = Modifier.weight(1f)
+                            )
+                            SpekItem(
+                                label = "Jumlah Tersedia",
+                                value = "${barang.jumlahTersedia} Unit",
+                                modifier = Modifier.weight(1f)
+                            )
+                        }
+                        Spacer(Modifier.height(12.dp))
+                        Row(modifier = Modifier.fillMaxWidth()) {
+                            SpekItem(
+                                label = "Lokasi",
+                                value = barang.lokasi,
+                                modifier = Modifier.weight(1f)
+                            )
+                            SpekItem(
+                                label = "Maksimal Pinjam",
+                                value = barang.maksimalPinjam,
+                                modifier = Modifier.weight(1f)
+                            )
+                        }
+                    }
+                }
+
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(14.dp),
+                    colors = CardDefaults.cardColors(containerColor = CardWhite),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+                ) {
+                    Column(modifier = Modifier.padding(16.dp)) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                text = "Deskripsi Barang",
+                                color = TextPrimary,
+                                fontSize = 15.sp,
+                                fontWeight = FontWeight.SemiBold
+                            )
+                            TextButton(onClick = { deskripsiExpanded = !deskripsiExpanded }) {
+                                Text(
+                                    text = if (deskripsiExpanded) "▲" else "▼",
+                                    color = TextSecondary,
+                                    fontSize = 14.sp
+                                )
+                            }
+                        }
+                        if (deskripsiExpanded) {
+                            Spacer(Modifier.height(8.dp))
+                            Text(
+                                text = barang.deskripsi,
+                                color = TextSecondary,
+                                fontSize = 14.sp,
+                                lineHeight = 22.sp
+                            )
+                        }
+                    }
+                }
+
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(12.dp))
+                        .background(InfoOrangeBg)
+                        .padding(14.dp),
+                    verticalAlignment = Alignment.Top,
+                    horizontalArrangement = Arrangement.spacedBy(10.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.Info,
+                        contentDescription = null,
+                        tint = StatusOrange,
+                        modifier = Modifier.size(18.dp)
+                    )
+                    Text(
+                        text = "Peminjaman memerlukan verifikasi Kartu Mahasiswa atau identitas staf aktif yang berlaku.",
+                        color = StatusOrange,
+                        fontSize = 13.sp,
+                        lineHeight = 20.sp
+                    )
                 }
             }
         }

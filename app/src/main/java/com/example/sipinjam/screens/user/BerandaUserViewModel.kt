@@ -49,7 +49,7 @@ class BerandaUserViewModel : ViewModel() {
                             BarangTersedia(
                                 nama = barangDoc.nama,
                                 kategori = barangDoc.kategori.uppercase(),
-                                imageUrl = barangDoc.fotoUrl
+                                imageUrl = barangDoc.id
                             )
                         }
 
