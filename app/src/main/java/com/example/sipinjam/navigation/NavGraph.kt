@@ -10,6 +10,7 @@ import com.example.sipinjam.screens.auth.RegisterScreen
 import com.example.sipinjam.screens.user.DetailBarangScreen
 import com.example.sipinjam.screens.admin.DashboardAdminScreen
 import com.example.sipinjam.screens.admin.KelolaBarangScreen
+import com.example.sipinjam.screens.admin.PersetujuanPeminjamanScreen
 import com.example.sipinjam.screens.auth.LoginScreen
 import com.example.sipinjam.screens.user.PeminjamanScreen
 import com.example.sipinjam.screens.user.BerandaUserScreen
@@ -21,18 +22,19 @@ import androidx.navigation.NavType
 import androidx.navigation.navArgument
 
 object Routes {
-    const val LOGIN              = "login"
-    const val REGISTER           = "register"
-    const val BERANDA_USER       = "beranda_user"
-    const val FORGOT_PASSWORD    = "forgot_password"
-    const val DETAIL_BARANG      = "detail_barang/{barangId}"
-    const val AJUKAN_PEMINJAMAN  = "ajukan_peminjaman/{barangId}/{namaBarang}/{kategoriBarang}/{statusBarang}"
-    const val DASHBOARD_ADMIN    = "dashboard_admin"
-    const val KELOLA_BARANG      = "kelola_barang"
-    const val PROFIL             = "profil"
-    const val GANTI_PASSWORD     = "ganti_password"
-    const val RIWAYAT_PEMINJAMAN = "riwayat_peminjaman"
-    const val PENGEMBALIAN       = "pengembalian/{namaBarang}/{tanggalPinjam}/{tanggalJatuhTempo}"
+    const val LOGIN                   = "login"
+    const val REGISTER                = "register"
+    const val BERANDA_USER            = "beranda_user"
+    const val FORGOT_PASSWORD         = "forgot_password"
+    const val DETAIL_BARANG           = "detail_barang"
+    const val AJUKAN_PEMINJAMAN       = "ajukan_peminjaman/{barangId}/{namaBarang}/{kategoriBarang}/{statusBarang}"
+    const val DASHBOARD_ADMIN         = "dashboard_admin"
+    const val KELOLA_BARANG           = "kelola_barang"
+    const val PROFIL                  = "profil"
+    const val GANTI_PASSWORD          = "ganti_password"
+    const val RIWAYAT_PEMINJAMAN      = "riwayat_peminjaman"
+    const val PENGEMBALIAN            = "pengembalian/{namaBarang}/{tanggalPinjam}/{tanggalJatuhTempo}"
+    const val PERSETUJUAN_PEMINJAMAN  = "persetujuan_peminjaman"
 
     fun ajukanPeminjaman(
         barangId: String,
@@ -174,13 +176,13 @@ fun NavGraph(
         composable(
             route = Routes.PENGEMBALIAN,
             arguments = listOf(
-                navArgument("namaBarang")      { type = NavType.StringType },
-                navArgument("tanggalPinjam")   { type = NavType.StringType },
+                navArgument("namaBarang")        { type = NavType.StringType },
+                navArgument("tanggalPinjam")     { type = NavType.StringType },
                 navArgument("tanggalJatuhTempo") { type = NavType.StringType },
             )
         ) { backStackEntry ->
-            val namaBarang       = backStackEntry.arguments?.getString("namaBarang") ?: ""
-            val tanggalPinjam    = backStackEntry.arguments?.getString("tanggalPinjam") ?: ""
+            val namaBarang        = backStackEntry.arguments?.getString("namaBarang") ?: ""
+            val tanggalPinjam     = backStackEntry.arguments?.getString("tanggalPinjam") ?: ""
             val tanggalJatuhTempo = backStackEntry.arguments?.getString("tanggalJatuhTempo") ?: ""
 
             PengembalianScreen(
@@ -193,6 +195,15 @@ fun NavGraph(
                         popUpTo(Routes.RIWAYAT_PEMINJAMAN) { inclusive = true }
                     }
                 }
+            )
+        }
+
+        composable(Routes.PERSETUJUAN_PEMINJAMAN) {
+            PersetujuanPeminjamanScreen(
+                onDashboardClick  = { navController.navigate(Routes.DASHBOARD_ADMIN) { popUpTo(Routes.DASHBOARD_ADMIN) { inclusive = true } } },
+                onBarangClick     = { navController.navigate(Routes.KELOLA_BARANG) },
+                onPermintaanClick = {},
+                onProfilClick     = { navController.navigate(Routes.PROFIL) }
             )
         }
 
@@ -210,7 +221,7 @@ fun NavGraph(
                 onRiwayatClick    = { navController.navigate(Routes.RIWAYAT_PEMINJAMAN) },
                 onDashboardClick  = { navController.navigate(Routes.DASHBOARD_ADMIN) { popUpTo(Routes.DASHBOARD_ADMIN) { inclusive = true } } },
                 onBarangClick     = { navController.navigate(Routes.KELOLA_BARANG) },
-                onPermintaanClick = {},
+                onPermintaanClick = { navController.navigate(Routes.PERSETUJUAN_PEMINJAMAN) },
             )
         }
 
@@ -222,23 +233,23 @@ fun NavGraph(
 
         composable(Routes.DASHBOARD_ADMIN) {
             DashboardAdminScreen(
-                onLihatSemua     = { navController.navigate(Routes.KELOLA_BARANG) },
-                onTinjau         = {},
-                onDashboardClick = {},
-                onBarangClick    = { navController.navigate(Routes.KELOLA_BARANG) },
-                onPermintaanClick = {},
-                onProfilClick    = { navController.navigate(Routes.PROFIL) }
+                onLihatSemua      = { navController.navigate(Routes.KELOLA_BARANG) },
+                onTinjau          = {},
+                onDashboardClick  = {},
+                onBarangClick     = { navController.navigate(Routes.KELOLA_BARANG) },
+                onPermintaanClick = { navController.navigate(Routes.PERSETUJUAN_PEMINJAMAN) },
+                onProfilClick     = { navController.navigate(Routes.PROFIL) }
             )
         }
 
         composable(Routes.KELOLA_BARANG) {
             KelolaBarangScreen(
-                onTambahClick    = {},
-                onEditClick      = {},
-                onDashboardClick = { navController.navigate(Routes.DASHBOARD_ADMIN) { popUpTo(Routes.DASHBOARD_ADMIN) { inclusive = true } } },
-                onBarangClick    = {},
-                onPermintaanClick = {},
-                onProfilClick    = { navController.navigate(Routes.PROFIL) }
+                onTambahClick     = {},
+                onEditClick       = {},
+                onDashboardClick  = { navController.navigate(Routes.DASHBOARD_ADMIN) { popUpTo(Routes.DASHBOARD_ADMIN) { inclusive = true } } },
+                onBarangClick     = {},
+                onPermintaanClick = { navController.navigate(Routes.PERSETUJUAN_PEMINJAMAN) },
+                onProfilClick     = { navController.navigate(Routes.PROFIL) }
             )
         }
     }
