@@ -25,7 +25,7 @@ object Routes {
     const val REGISTER           = "register"
     const val BERANDA_USER       = "beranda_user"
     const val FORGOT_PASSWORD    = "forgot_password"
-    const val DETAIL_BARANG      = "detail_barang"
+    const val DETAIL_BARANG      = "detail_barang/{barangId}"
     const val AJUKAN_PEMINJAMAN  = "ajukan_peminjaman/{barangId}/{namaBarang}/{kategoriBarang}/{statusBarang}"
     const val DASHBOARD_ADMIN    = "dashboard_admin"
     const val KELOLA_BARANG      = "kelola_barang"
@@ -46,6 +46,10 @@ object Routes {
         tanggalPinjam: String,
         tanggalJatuhTempo: String
     ) = "pengembalian/$namaBarang/$tanggalPinjam/$tanggalJatuhTempo"
+
+    fun detailBarang(
+        barangId: String
+    ) = "detail_barang/$barangId"
 }
 
 @Composable
@@ -96,21 +100,29 @@ fun NavGraph(
 
         composable(Routes.BERANDA_USER) {
             BerandaUserScreen(
-                onLihatSemuaBarang = { navController.navigate(Routes.DETAIL_BARANG) },
-                onBarangClick = { navController.navigate(Routes.DETAIL_BARANG) },
+                onLihatSemuaBarang = {},
+                onBarangClick = { barang -> navController.navigate(Routes.detailBarang(barang.imageUrl)) },
                 onBerandaClick = {},
-                onKatalogClick = { navController.navigate(Routes.DETAIL_BARANG) },
+                onKatalogClick = {},
                 onRiwayatClick = { navController.navigate(Routes.RIWAYAT_PEMINJAMAN) },
                 onProfilClick  = { navController.navigate(Routes.PROFIL) }
             )
         }
 
-        composable(Routes.DETAIL_BARANG) {
+        composable(
+            route = Routes.DETAIL_BARANG,
+            arguments = listOf(
+                navArgument("barangId") { type = NavType.StringType }
+            )
+        ) { backStackEntry ->
+            val barangId = backStackEntry.arguments?.getString("barangId") ?: ""
+
             DetailBarangScreen(
-                onBackClick = { navController.navigate(Routes.BERANDA_USER) },
-                onAjukanPeminjaman = { barangId, namaBarang, kategoriBarang, statusBarang ->
+                barangId = barangId,
+                onBackClick = { navController.popBackStack() },
+                onAjukanPeminjaman = { id, nama, kategori, status ->
                     navController.navigate(
-                        Routes.ajukanPeminjaman(barangId, namaBarang, kategoriBarang, statusBarang)
+                        Routes.ajukanPeminjaman(id, nama, kategori, status)
                     )
                 }
             )
@@ -148,7 +160,7 @@ fun NavGraph(
             RiwayatPeminjamanScreen(
                 onBackClick    = { navController.popBackStack() },
                 onBerandaClick = { navController.navigate(Routes.BERANDA_USER) },
-                onKatalogClick = { navController.navigate(Routes.DETAIL_BARANG) },
+                onKatalogClick = {},
                 onRiwayatClick = {},
                 onProfilClick  = { navController.navigate(Routes.PROFIL) },
                 onPengembalianClick = { namaBarang, tanggalPinjam, tanggalJatuhTempo ->
@@ -194,7 +206,7 @@ fun NavGraph(
                     }
                 },
                 onBerandaClick    = { navController.navigate(Routes.BERANDA_USER) { popUpTo(Routes.BERANDA_USER) { inclusive = true } } },
-                onKatalogClick    = { navController.navigate(Routes.DETAIL_BARANG) },
+                onKatalogClick    = {},
                 onRiwayatClick    = { navController.navigate(Routes.RIWAYAT_PEMINJAMAN) },
                 onDashboardClick  = { navController.navigate(Routes.DASHBOARD_ADMIN) { popUpTo(Routes.DASHBOARD_ADMIN) { inclusive = true } } },
                 onBarangClick     = { navController.navigate(Routes.KELOLA_BARANG) },
