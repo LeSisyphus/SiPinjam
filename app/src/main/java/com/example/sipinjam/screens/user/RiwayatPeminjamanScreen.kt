@@ -68,7 +68,7 @@ fun RiwayatPeminjamanScreen(
     onKatalogClick: () -> Unit = {},
     onRiwayatClick: () -> Unit = {},
     onProfilClick: () -> Unit = {},
-    onPengembalianClick: (namaBarang: String, tanggalPinjam: String, tanggalJatuhTempo: String) -> Unit = { _, _, _ -> },
+    onPengembalianClick: (peminjamanId: String, barangId: String, userId: String, namaBarang: String, tanggalPinjam: String, tanggalJatuhTempo: String) -> Unit = { _, _, _, _, _, _ -> },
     viewModel: RiwayatPeminjamanViewModel = viewModel()
 ) {
     val daftarPeminjaman by viewModel.daftarPeminjaman.collectAsState()
@@ -161,9 +161,7 @@ fun RiwayatPeminjamanScreen(
                 }
             } else if (filtered.isEmpty()) {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Text(text = "Belum ada riwayat peminjaman", color = TextSecondary, fontSize = 14.sp)
-                    }
+                    Text(text = "Belum ada riwayat peminjaman", color = TextSecondary, fontSize = 14.sp)
                 }
             } else {
                 LazyColumn(
@@ -176,6 +174,9 @@ fun RiwayatPeminjamanScreen(
                             peminjaman = peminjaman,
                             onClick = {
                                 onPengembalianClick(
+                                    peminjaman.id,
+                                    peminjaman.barangId,
+                                    peminjaman.userId,
                                     peminjaman.namaBarang,
                                     peminjaman.tanggalPinjam,
                                     peminjaman.tanggalKembali
