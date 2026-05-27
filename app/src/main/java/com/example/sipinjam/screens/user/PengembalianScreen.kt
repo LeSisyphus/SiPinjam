@@ -21,33 +21,49 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
-import com.example.sipinjam.R
 import com.example.sipinjam.ui.theme.*
 
 @Composable
 fun PengembalianScreen(
+    peminjamanId: String = "",
+    barangId: String = "",
+    userId: String = "",
     namaBarang: String = "MacBook Pro M2",
     tanggalPinjam: String = "12 Mei",
     tanggalJatuhTempo: String = "14 Mei",
     onBackClick: () -> Unit = {},
-    onKirimPengembalian: (fotoUri: Uri?, catatan: String) -> Unit = { _, _ -> },
+    onKirimPengembalian: () -> Unit = {},
+    viewModel: PengembalianViewModel = viewModel()
 ) {
+    val context = LocalContext.current
     var fotoUri by remember { mutableStateOf<Uri?>(null) }
     var catatan by rememberSaveable { mutableStateOf("") }
     var showDialog by remember { mutableStateOf(false) }
+
+    val isLoading by viewModel.isLoading.collectAsState()
+    val sukses by viewModel.sukses.collectAsState()
+    val errorMessage by viewModel.errorMessage.collectAsState()
+
+    LaunchedEffect(sukses) {
+        if (sukses) {
+            onKirimPengembalian()
+            viewModel.resetState()
+        }
+    }
 
     val galleryLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
     ) { uri -> if (uri != null) fotoUri = uri }
 
-    // Dialog konfirmasi
     if (showDialog) {
         AlertDialog(
             onDismissRequest = { showDialog = false },
@@ -70,7 +86,16 @@ fun PengembalianScreen(
                 Button(
                     onClick = {
                         showDialog = false
-                        onKirimPengembalian(fotoUri, catatan)
+                        fotoUri?.let {
+                            viewModel.kirimPengembalian(
+                                context      = context,
+                                peminjamanId = peminjamanId,
+                                barangId     = barangId,
+                                userId       = userId,
+                                fotoUri      = it,
+                                catatan      = catatan
+                            )
+                        }
                     },
                     colors = ButtonDefaults.buttonColors(containerColor = SiPinjamBlue),
                     shape = RoundedCornerShape(10.dp)
@@ -123,23 +148,43 @@ fun PengembalianScreen(
                 color = CardWhite,
                 shadowElevation = 8.dp
             ) {
-                Button(
-                    onClick = { showDialog = true },
-                    enabled = fotoUri != null,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 20.dp, vertical = 16.dp)
-                        .height(52.dp),
-                    shape = RoundedCornerShape(14.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = SiPinjamBlue)
-                ) {
-                    Text(
-                        text = "KONFIRMASI PENGEMBALIAN",
-                        fontSize = 15.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color.White,
-                        letterSpacing = 0.5.sp
-                    )
+                Column(modifier = Modifier.padding(horizontal = 20.dp, vertical = 16.dp)) {
+                    if (errorMessage != null) {
+                        Text(
+                            text = errorMessage ?: "",
+                            color = StatusRed,
+                            fontSize = 12.sp,
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(bottom = 8.dp)
+                        )
+                    }
+                    Button(
+                        onClick = { showDialog = true },
+                        enabled = fotoUri != null && !isLoading,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(52.dp),
+                        shape = RoundedCornerShape(14.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = SiPinjamBlue)
+                    ) {
+                        if (isLoading) {
+                            CircularProgressIndicator(
+                                color = Color.White,
+                                modifier = Modifier.size(22.dp),
+                                strokeWidth = 2.dp
+                            )
+                        } else {
+                            Text(
+                                text = "KONFIRMASI PENGEMBALIAN",
+                                fontSize = 15.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = Color.White,
+                                letterSpacing = 0.5.sp
+                            )
+                        }
+                    }
                 }
             }
         }
@@ -152,7 +197,6 @@ fun PengembalianScreen(
                 .padding(horizontal = 20.dp, vertical = 20.dp),
             verticalArrangement = Arrangement.spacedBy(20.dp)
         ) {
-            // ── Info Barang ───────────────────────────────────────────────────
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(16.dp),
@@ -215,7 +259,6 @@ fun PengembalianScreen(
                 }
             }
 
-            // ── Upload Foto ───────────────────────────────────────────────────
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 Text(
                     text = "Foto Kondisi Barang",
@@ -223,7 +266,6 @@ fun PengembalianScreen(
                     fontSize = 14.sp,
                     fontWeight = FontWeight.SemiBold
                 )
-
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -250,7 +292,6 @@ fun PengembalianScreen(
                                     .background(SiPinjamBlue.copy(alpha = 0.1f)),
                                 contentAlignment = Alignment.Center
                             ) {
-                                // Pakai icon kamera
                                 Icon(
                                     painter = painterResource(id = android.R.drawable.ic_menu_camera),
                                     contentDescription = null,
@@ -299,7 +340,6 @@ fun PengembalianScreen(
                 }
             }
 
-            // ── Catatan ───────────────────────────────────────────────────────
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 Text(
                     text = "Catatan Kondisi",
@@ -332,7 +372,6 @@ fun PengembalianScreen(
                 )
             }
 
-            // ── Info Banner ───────────────────────────────────────────────────
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
