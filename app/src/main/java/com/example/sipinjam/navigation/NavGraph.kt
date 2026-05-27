@@ -28,7 +28,7 @@ object Routes {
     const val REGISTER                = "register"
     const val BERANDA_USER            = "beranda_user"
     const val FORGOT_PASSWORD         = "forgot_password"
-    const val DETAIL_BARANG = "detail_barang/{barangId}"
+    const val DETAIL_BARANG           = "detail_barang/{barangId}"
     const val AJUKAN_PEMINJAMAN       = "ajukan_peminjaman/{barangId}/{namaBarang}/{kategoriBarang}/{statusBarang}"
     const val DASHBOARD_ADMIN         = "dashboard_admin"
     const val KELOLA_BARANG           = "kelola_barang"
@@ -252,8 +252,8 @@ fun NavGraph(
                 daftarBarang = adminUiState.daftarBarang,
                 showEditDialog = adminUiState.showEditDialog,
                 barangToEdit = adminUiState.barangToEdit,
-                showDeleteDialog = adminUiState.showDeleteDialog, // 🔥 Alirkan state dialog hapus
-                barangToDelete = adminUiState.barangToDelete,     // 🔥 Alirkan data barang target hapus
+                showDeleteDialog = adminUiState.showDeleteDialog, 
+                barangToDelete = adminUiState.barangToDelete,     
                 onTambahConfirm = { nama, kategori, stok, kondisi, lokasi, maksPinjam, deskripsi ->
                     adminViewModel.onTambahBarangFirestore(nama, kategori, stok, kondisi, lokasi, maksPinjam, deskripsi)
                 },
@@ -263,10 +263,10 @@ fun NavGraph(
                 },
                 onEditDismiss = { adminViewModel.onEditDismiss() },
                 onDeleteClick = { barang ->
-                    adminViewModel.onDeleteRequest(barang) // 🔥 Saat icon sampah diklik, munculkan konfirmasi
+                    adminViewModel.onDeleteRequest(barang) 
                 },
                 onDeleteConfirm = {
-                    adminViewModel.onDeleteConfirm() // 🔥 Jalankan fungsi delete Firestore
+                    adminViewModel.onDeleteConfirm() 
                 },
                 onDeleteDismiss = {
                     adminViewModel.onDeleteDismiss()
