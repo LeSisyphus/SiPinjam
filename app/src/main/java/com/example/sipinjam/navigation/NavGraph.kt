@@ -1,6 +1,8 @@
 package com.example.sipinjam.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -243,9 +245,32 @@ fun NavGraph(
         }
 
         composable(Routes.KELOLA_BARANG) {
+            val adminViewModel: com.example.sipinjam.screens.admin.KelolaBarangViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
+            val adminUiState by adminViewModel.uiState.collectAsState()
+
             KelolaBarangScreen(
-                onTambahClick     = {},
-                onEditClick       = {},
+                daftarBarang = adminUiState.daftarBarang,
+                showEditDialog = adminUiState.showEditDialog,
+                barangToEdit = adminUiState.barangToEdit,
+                showDeleteDialog = adminUiState.showDeleteDialog, // 🔥 Alirkan state dialog hapus
+                barangToDelete = adminUiState.barangToDelete,     // 🔥 Alirkan data barang target hapus
+                onTambahConfirm = { nama, kategori, stok, kondisi, lokasi, maksPinjam, deskripsi ->
+                    adminViewModel.onTambahBarangFirestore(nama, kategori, stok, kondisi, lokasi, maksPinjam, deskripsi)
+                },
+                onEditClick = { barang -> adminViewModel.onEditRequest(barang) },
+                onEditConfirm = { id, nama, kategori, stok ->
+                    adminViewModel.onEditBarangFirestore(id, nama, kategori, stok)
+                },
+                onEditDismiss = { adminViewModel.onEditDismiss() },
+                onDeleteClick = { barang ->
+                    adminViewModel.onDeleteRequest(barang) // 🔥 Saat icon sampah diklik, munculkan konfirmasi
+                },
+                onDeleteConfirm = {
+                    adminViewModel.onDeleteConfirm() // 🔥 Jalankan fungsi delete Firestore
+                },
+                onDeleteDismiss = {
+                    adminViewModel.onDeleteDismiss()
+                },
                 onDashboardClick  = { navController.navigate(Routes.DASHBOARD_ADMIN) { popUpTo(Routes.DASHBOARD_ADMIN) { inclusive = true } } },
                 onBarangClick     = {},
                 onPermintaanClick = { navController.navigate(Routes.PERSETUJUAN_PEMINJAMAN) },
