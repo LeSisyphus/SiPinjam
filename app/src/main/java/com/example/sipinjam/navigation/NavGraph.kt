@@ -2,6 +2,7 @@ package com.example.sipinjam.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -21,7 +22,6 @@ import com.example.sipinjam.screens.user.RiwayatPeminjamanScreen
 import com.example.sipinjam.screens.user.PengembalianScreen
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
-import androidx.compose.runtime.getValue
 
 object Routes {
     const val LOGIN                   = "login"
@@ -250,10 +250,20 @@ fun NavGraph(
 
             KelolaBarangScreen(
                 daftarBarang = adminUiState.daftarBarang,
+                showEditDialog = adminUiState.showEditDialog,
+                barangToEdit = adminUiState.barangToEdit,
                 onTambahConfirm = { nama, kategori, stok, kondisi, lokasi, maksPinjam, deskripsi ->
                     adminViewModel.onTambahBarangFirestore(nama, kategori, stok, kondisi, lokasi, maksPinjam, deskripsi)
                 },
-                onEditClick       = {},
+                onEditClick = { barang ->
+                    adminViewModel.onEditRequest(barang)
+                },
+                onEditConfirm = { id, nama, kategori, stok ->
+                    adminViewModel.onEditBarangFirestore(id, nama, kategori, stok)
+                },
+                onEditDismiss = {
+                    adminViewModel.onEditDismiss()
+                },
                 onDeleteClick     = {},
                 onDashboardClick  = { navController.navigate(Routes.DASHBOARD_ADMIN) { popUpTo(Routes.DASHBOARD_ADMIN) { inclusive = true } } },
                 onBarangClick     = {},

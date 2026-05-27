@@ -46,8 +46,12 @@ data class BarangAdmin(
 @Composable
 fun KelolaBarangScreen(
     daftarBarang: List<BarangAdmin> = emptyList(),
+    showEditDialog: Boolean = false,
+    barangToEdit: BarangAdmin? = null,
     onTambahConfirm: (nama: String, kategori: String, stok: Int, kondisi: String, lokasi: String, maksPinjam: String, deskripsi: String) -> Unit = { _, _, _, _, _, _, _ -> },
     onEditClick: (BarangAdmin) -> Unit = {},
+    onEditConfirm: (id: String, nama: String, kategori: String, stok: Int) -> Unit = { _, _, _, _ -> },
+    onEditDismiss: () -> Unit = {},
     onDeleteClick: (BarangAdmin) -> Unit = {},
     onDashboardClick: () -> Unit = {},
     onBarangClick: () -> Unit = {},
@@ -78,6 +82,10 @@ fun KelolaBarangScreen(
     var inputLokasi by remember { mutableStateOf("") }
     var inputMaksimalPinjam by remember { mutableStateOf("") }
     var inputDeskripsi by remember { mutableStateOf("") }
+
+    var editNama by remember(barangToEdit) { mutableStateOf(barangToEdit?.nama ?: "") }
+    var editKategori by remember(barangToEdit) { mutableStateOf(barangToEdit?.kategori ?: "") }
+    var editStok by remember(barangToEdit) { mutableStateOf(barangToEdit?.stok?.toString() ?: "") }
 
     val filteredBarang = daftarBarang.filter { barang ->
         val matchKategori = selectedKategori == "Semua" ||
@@ -217,7 +225,6 @@ fun KelolaBarangScreen(
         }
     }
 
-    // ================== DIALOG FORM INPUT BARANG BARU (ISSUE #20) ==================
     if (showTambahDialog) {
         AlertDialog(
             onDismissRequest = { showTambahDialog = false },
@@ -250,7 +257,6 @@ fun KelolaBarangScreen(
                                 inputMaksimalPinjam,
                                 inputDeskripsi
                             )
-                            // Reset Form setelah kirim data
                             inputNama = ""; inputStok = ""; inputKondisi = ""; inputLokasi = ""; inputMaksimalPinjam = ""; inputDeskripsi = ""
                             showTambahDialog = false
                         }
@@ -261,6 +267,46 @@ fun KelolaBarangScreen(
             },
             dismissButton = {
                 TextButton(onClick = { showTambahDialog = false }) {
+                    Text("Batal", color = textSecondary)
+                }
+            }
+        )
+    }
+
+    if (showEditDialog && barangToEdit != null) {
+        AlertDialog(
+            onDismissRequest = onEditDismiss,
+            title = { Text("Edit Data Barang", fontWeight = FontWeight.Bold, fontSize = 18.sp) },
+            text = {
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalArrangement = Arrangement.spacedBy(10.dp)
+                ) {
+                    Text("ID Barang: ${barangToEdit.id}", color = textSecondary, fontSize = 12.sp)
+                    OutlinedTextField(value = editNama, onValueChange = { editNama = it }, label = { Text("Nama Barang") }, modifier = Modifier.fillMaxWidth())
+                    OutlinedTextField(value = editKategori, onValueChange = { editKategori = it }, label = { Text("Kategori") }, modifier = Modifier.fillMaxWidth())
+                    OutlinedTextField(value = editStok, onValueChange = { editStok = it }, label = { Text("Jumlah Stok") }, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number), modifier = Modifier.fillMaxWidth())
+                }
+            },
+            confirmButton = {
+                Button(
+                    colors = ButtonDefaults.buttonColors(containerColor = sipinjamBlue),
+                    onClick = {
+                        if (editNama.isNotBlank() && editStok.isNotBlank()) {
+                            onEditConfirm(
+                                barangToEdit.id,
+                                editNama,
+                                editKategori,
+                                editStok.toIntOrNull() ?: 0
+                            )
+                        }
+                    }
+                ) {
+                    Text("Simpan Perubahan", color = Color.White)
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = onEditDismiss) {
                     Text("Batal", color = textSecondary)
                 }
             }

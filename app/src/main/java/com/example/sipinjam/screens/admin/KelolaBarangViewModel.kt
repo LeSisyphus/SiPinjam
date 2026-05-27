@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.sipinjam.data.model.Barang
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.SetOptions
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -11,12 +12,15 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 
+
 data class KelolaBarangUiState(
     val daftarBarang: List<BarangAdmin> = emptyList(),
     val searchQuery: String = "",
     val selectedKategori: String = "Semua",
     val showDeleteDialog: Boolean = false,
+    val showEditDialog: Boolean = false,
     val barangToDelete: BarangAdmin? = null,
+    val barangToEdit: BarangAdmin? = null,
     val isLoading: Boolean = false,
     val errorMessage: String? = null,
     val isSuccess: Boolean = false
@@ -63,87 +67,67 @@ class KelolaBarangViewModel : ViewModel() {
     }
 
     fun onTambahBarangFirestore(
-        nama: String,
-        kategori: String,
-        stok: Int,
-        kondisi: String,
-        lokasi: String,
-        maksimalPinjam: String,
-        deskripsi: String
+        nama: String, kategori: String, stok: Int, kondisi: String,
+        lokasi: String, maksimalPinjam: String, deskripsi: String
     ) {
         _uiState.update { it.copy(isLoading = true, isSuccess = false, errorMessage = null) }
-
         viewModelScope.launch {
             try {
                 val docRef = firestore.collection("items").document()
-
                 val barangBaru = Barang(
-                    id = docRef.id,
-                    nama = nama,
-                    kategori = kategori,
-                    stok = stok,
-                    tersedia = stok > 0,
-                    kondisi = kondisi,
-                    lokasi = lokasi,
-                    maksimalPinjam = maksimalPinjam,
-                    deskripsi = deskripsi,
-                    fotoUrl = ""
+                    id = docRef.id, nama = nama, kategori = kategori, stok = stok,
+                    tersedia = stok > 0, kondisi = kondisi, lokasi = lokasi,
+                    maksimalPinjam = maksimalPinjam, deskripsi = deskripsi, fotoUrl = ""
                 )
-
                 docRef.set(barangBaru).await()
 
-                _uiState.update { state ->
-                    state.copy(
-                        daftarBarang = state.daftarBarang + BarangAdmin(
-                            id = barangBaru.id,
-                            nama = barangBaru.nama,
-                            kategori = barangBaru.kategori,
-                            stok = barangBaru.stok,
-                            tersedia = barangBaru.tersedia
-                        ),
-                        isLoading = false,
-                        isSuccess = true
-                    )
-                }
+                muatSemuaBarang()
+                _uiState.update { it.copy(isSuccess = true) }
             } catch (e: Exception) {
                 _uiState.update { it.copy(isLoading = false, errorMessage = e.localizedMessage) }
             }
         }
     }
 
-    fun onSearchChange(query: String) {
-        _uiState.update { it.copy(searchQuery = query) }
+    fun onEditRequest(barang: BarangAdmin) {
+        _uiState.update { it.copy(showEditDialog = true, barangToEdit = barang) }
     }
 
-    fun onKategoriChange(kategori: String) {
-        _uiState.update { it.copy(selectedKategori = kategori) }
+    fun onEditDismiss() {
+        _uiState.update { it.copy(showEditDialog = false, barangToEdit = null) }
     }
 
-    fun onDeleteRequest(barang: BarangAdmin) {
-        _uiState.update { it.copy(showDeleteDialog = true, barangToDelete = barang) }
-    }
+    fun onEditBarangFirestore(
+        id: String,
+        nama: String,
+        kategori: String,
+        stok: Int
+    ) {
+        _uiState.update { it.copy(isLoading = true, errorMessage = null) }
+        viewModelScope.launch {
+            try {
+                val updateData = mapOf(
+                    "nama" to nama,
+                    "kategori" to kategori,
+                    "stok" to stok,
+                    "tersedia" to (stok > 0)
+                )
 
-    fun onDeleteConfirm() {
-        _uiState.update { state ->
-            state.copy(
-                daftarBarang = state.daftarBarang.filter { it.id != state.barangToDelete?.id },
-                showDeleteDialog = false,
-                barangToDelete = null
-            )
+                firestore.collection("items").document(id)
+                    .set(updateData, SetOptions.merge())
+                    .await()
+
+                muatSemuaBarang()
+                _uiState.update { it.copy(showEditDialog = false, barangToEdit = null) }
+            } catch (e: Exception) {
+                _uiState.update { it.copy(isLoading = false, errorMessage = e.localizedMessage) }
+            }
         }
     }
 
-    fun onDeleteDismiss() {
-        _uiState.update { it.copy(showDeleteDialog = false, barangToDelete = null) }
-    }
-
-    fun onEditBarang(updated: BarangAdmin) {
-        _uiState.update { state ->
-            state.copy(
-                daftarBarang = state.daftarBarang.map {
-                    if (it.id == updated.id) updated else it
-                }
-            )
-        }
-    }
+    fun onSearchChange(query: String) { _uiState.update { it.copy(searchQuery = query) } }
+    fun onKategoriChange(kategori: String) { _uiState.update { it.copy(selectedKategori = kategori) } }
+    fun onDeleteRequest(barang: BarangAdmin) { _uiState.update { it.copy(showDeleteDialog = true, barangToDelete = barang) } }
+    fun onDeleteConfirm() { /* Nanti di Issue 22 */ }
+    fun onDeleteDismiss() { _uiState.update { it.copy(showDeleteDialog = false, barangToDelete = null) } }
 }
