@@ -12,7 +12,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 
-
 data class KelolaBarangUiState(
     val daftarBarang: List<BarangAdmin> = emptyList(),
     val searchQuery: String = "",
@@ -38,6 +37,7 @@ data class KelolaBarangUiState(
 class KelolaBarangViewModel : ViewModel() {
 
     private val firestore = FirebaseFirestore.getInstance()
+
     private val _uiState = MutableStateFlow(KelolaBarangUiState())
     val uiState: StateFlow<KelolaBarangUiState> = _uiState.asStateFlow()
 
@@ -45,7 +45,7 @@ class KelolaBarangViewModel : ViewModel() {
         muatSemuaBarang()
     }
 
-    private fun muatSemuaBarang() {
+    fun muatSemuaBarang() {
         _uiState.update { it.copy(isLoading = true) }
         viewModelScope.launch {
             try {
@@ -97,12 +97,7 @@ class KelolaBarangViewModel : ViewModel() {
         _uiState.update { it.copy(showEditDialog = false, barangToEdit = null) }
     }
 
-    fun onEditBarangFirestore(
-        id: String,
-        nama: String,
-        kategori: String,
-        stok: Int
-    ) {
+    fun onEditBarangFirestore(id: String, nama: String, kategori: String, stok: Int) {
         _uiState.update { it.copy(isLoading = true, errorMessage = null) }
         viewModelScope.launch {
             try {
@@ -112,13 +107,36 @@ class KelolaBarangViewModel : ViewModel() {
                     "stok" to stok,
                     "tersedia" to (stok > 0)
                 )
-
                 firestore.collection("items").document(id)
                     .set(updateData, SetOptions.merge())
                     .await()
 
-                muatSemuaBarang()
+                muatSemuaBarang() // Refresh data
                 _uiState.update { it.copy(showEditDialog = false, barangToEdit = null) }
+            } catch (e: Exception) {
+                _uiState.update { it.copy(isLoading = false, errorMessage = e.localizedMessage) }
+            }
+        }
+    }
+
+    fun onDeleteRequest(barang: BarangAdmin) {
+        _uiState.update { it.copy(showDeleteDialog = true, barangToDelete = barang) }
+    }
+
+    fun onDeleteDismiss() {
+        _uiState.update { it.copy(showDeleteDialog = false, barangToDelete = null) }
+    }
+
+    fun onDeleteConfirm() {
+        val barang = _uiState.value.barangToDelete ?: return
+        _uiState.update { it.copy(isLoading = true, errorMessage = null) }
+
+        viewModelScope.launch {
+            try {
+                firestore.collection("items").document(barang.id).delete().await()
+
+                muatSemuaBarang()
+                _uiState.update { it.copy(showDeleteDialog = false, barangToDelete = null) }
             } catch (e: Exception) {
                 _uiState.update { it.copy(isLoading = false, errorMessage = e.localizedMessage) }
             }
@@ -127,7 +145,4 @@ class KelolaBarangViewModel : ViewModel() {
 
     fun onSearchChange(query: String) { _uiState.update { it.copy(searchQuery = query) } }
     fun onKategoriChange(kategori: String) { _uiState.update { it.copy(selectedKategori = kategori) } }
-    fun onDeleteRequest(barang: BarangAdmin) { _uiState.update { it.copy(showDeleteDialog = true, barangToDelete = barang) } }
-    fun onDeleteConfirm() { /* Nanti di Issue 22 */ }
-    fun onDeleteDismiss() { _uiState.update { it.copy(showDeleteDialog = false, barangToDelete = null) } }
 }

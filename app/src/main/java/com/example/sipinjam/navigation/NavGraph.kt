@@ -252,19 +252,25 @@ fun NavGraph(
                 daftarBarang = adminUiState.daftarBarang,
                 showEditDialog = adminUiState.showEditDialog,
                 barangToEdit = adminUiState.barangToEdit,
+                showDeleteDialog = adminUiState.showDeleteDialog, 
+                barangToDelete = adminUiState.barangToDelete,     
                 onTambahConfirm = { nama, kategori, stok, kondisi, lokasi, maksPinjam, deskripsi ->
                     adminViewModel.onTambahBarangFirestore(nama, kategori, stok, kondisi, lokasi, maksPinjam, deskripsi)
                 },
-                onEditClick = { barang ->
-                    adminViewModel.onEditRequest(barang)
-                },
+                onEditClick = { barang -> adminViewModel.onEditRequest(barang) },
                 onEditConfirm = { id, nama, kategori, stok ->
                     adminViewModel.onEditBarangFirestore(id, nama, kategori, stok)
                 },
-                onEditDismiss = {
-                    adminViewModel.onEditDismiss()
+                onEditDismiss = { adminViewModel.onEditDismiss() },
+                onDeleteClick = { barang ->
+                    adminViewModel.onDeleteRequest(barang) 
                 },
-                onDeleteClick     = {},
+                onDeleteConfirm = {
+                    adminViewModel.onDeleteConfirm() 
+                },
+                onDeleteDismiss = {
+                    adminViewModel.onDeleteDismiss()
+                },
                 onDashboardClick  = { navController.navigate(Routes.DASHBOARD_ADMIN) { popUpTo(Routes.DASHBOARD_ADMIN) { inclusive = true } } },
                 onBarangClick     = {},
                 onPermintaanClick = { navController.navigate(Routes.PERSETUJUAN_PEMINJAMAN) },

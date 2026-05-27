@@ -48,11 +48,15 @@ fun KelolaBarangScreen(
     daftarBarang: List<BarangAdmin> = emptyList(),
     showEditDialog: Boolean = false,
     barangToEdit: BarangAdmin? = null,
+    showDeleteDialog: Boolean = false,
+    barangToDelete: BarangAdmin? = null,
     onTambahConfirm: (nama: String, kategori: String, stok: Int, kondisi: String, lokasi: String, maksPinjam: String, deskripsi: String) -> Unit = { _, _, _, _, _, _, _ -> },
     onEditClick: (BarangAdmin) -> Unit = {},
     onEditConfirm: (id: String, nama: String, kategori: String, stok: Int) -> Unit = { _, _, _, _ -> },
     onEditDismiss: () -> Unit = {},
     onDeleteClick: (BarangAdmin) -> Unit = {},
+    onDeleteConfirm: () -> Unit = {},
+    onDeleteDismiss: () -> Unit = {},
     onDashboardClick: () -> Unit = {},
     onBarangClick: () -> Unit = {},
     onPermintaanClick: () -> Unit = {},
@@ -249,13 +253,8 @@ fun KelolaBarangScreen(
                     onClick = {
                         if (inputNama.isNotBlank() && inputStok.isNotBlank()) {
                             onTambahConfirm(
-                                inputNama,
-                                inputKategori,
-                                inputStok.toIntOrNull() ?: 0,
-                                inputKondisi,
-                                inputLokasi,
-                                inputMaksimalPinjam,
-                                inputDeskripsi
+                                inputNama, inputKategori, inputStok.toIntOrNull() ?: 0,
+                                inputKondisi, inputLokasi, inputMaksimalPinjam, inputDeskripsi
                             )
                             inputNama = ""; inputStok = ""; inputKondisi = ""; inputLokasi = ""; inputMaksimalPinjam = ""; inputDeskripsi = ""
                             showTambahDialog = false
@@ -307,6 +306,27 @@ fun KelolaBarangScreen(
             },
             dismissButton = {
                 TextButton(onClick = onEditDismiss) {
+                    Text("Batal", color = textSecondary)
+                }
+            }
+        )
+    }
+
+    if (showDeleteDialog && barangToDelete != null) {
+        AlertDialog(
+            onDismissRequest = onDeleteDismiss,
+            title = { Text("Hapus Barang", fontWeight = FontWeight.Bold, fontSize = 18.sp) },
+            text = { Text("Apakah Anda yakin ingin menghapus \"${barangToDelete.nama}\" dari sistem? Tindakan ini tidak dapat dibatalkan.") },
+            confirmButton = {
+                Button(
+                    colors = ButtonDefaults.buttonColors(containerColor = statusRed),
+                    onClick = onDeleteConfirm
+                ) {
+                    Text("Hapus", color = Color.White)
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = onDeleteDismiss) {
                     Text("Batal", color = textSecondary)
                 }
             }
