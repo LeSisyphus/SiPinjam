@@ -7,6 +7,7 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -26,6 +27,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -40,15 +42,11 @@ data class BarangAdmin(
     val imageUrl: String = "",
 )
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun KelolaBarangScreen(
-    daftarBarang: List<BarangAdmin> = listOf(
-        BarangAdmin("1", "Camera DSLR Canon", "ELEKTRONIK", 2, true),
-        BarangAdmin("2", "Proyektor Epson", "ELEKTRONIK", 1, true),
-        BarangAdmin("3", "Tripod Kamera", "OPTIK", 3, true),
-        BarangAdmin("4", "Kabel HDMI 5m", "KABEL", 0, false),
-    ),
-    onTambahClick: () -> Unit = {},
+    daftarBarang: List<BarangAdmin> = emptyList(),
+    onTambahConfirm: (nama: String, kategori: String, stok: Int, kondisi: String, lokasi: String, maksPinjam: String, deskripsi: String) -> Unit = { _, _, _, _, _, _, _ -> },
     onEditClick: (BarangAdmin) -> Unit = {},
     onDeleteClick: (BarangAdmin) -> Unit = {},
     onDashboardClick: () -> Unit = {},
@@ -71,6 +69,16 @@ fun KelolaBarangScreen(
     var selectedKategori by remember { mutableStateOf("Semua") }
     var searchQuery by remember { mutableStateOf("") }
 
+    var showTambahDialog by remember { mutableStateOf(false) }
+
+    var inputNama by remember { mutableStateOf("") }
+    var inputKategori by remember { mutableStateOf("Elektronik") }
+    var inputStok by remember { mutableStateOf("") }
+    var inputKondisi by remember { mutableStateOf("") }
+    var inputLokasi by remember { mutableStateOf("") }
+    var inputMaksimalPinjam by remember { mutableStateOf("") }
+    var inputDeskripsi by remember { mutableStateOf("") }
+
     val filteredBarang = daftarBarang.filter { barang ->
         val matchKategori = selectedKategori == "Semua" ||
                 barang.kategori.equals(selectedKategori, ignoreCase = true)
@@ -85,7 +93,7 @@ fun KelolaBarangScreen(
         containerColor = backgroundGray,
         floatingActionButton = {
             FloatingActionButton(
-                onClick = onTambahClick,
+                onClick = { showTambahDialog = true },
                 containerColor = sipinjamBlue,
                 shape = RoundedCornerShape(16.dp)
             ) {
@@ -94,17 +102,8 @@ fun KelolaBarangScreen(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(6.dp)
                 ) {
-                    Icon(
-                        imageVector = Icons.Filled.Add,
-                        contentDescription = null,
-                        tint = Color.White
-                    )
-                    Text(
-                        text = "Tambah",
-                        color = Color.White,
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.SemiBold
-                    )
+                    Icon(imageVector = Icons.Filled.Add, contentDescription = null, tint = Color.White)
+                    Text(text = "Tambah", color = Color.White, fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
                 }
             }
         },
@@ -138,29 +137,17 @@ fun KelolaBarangScreen(
                     .padding(horizontal = 16.dp, vertical = 14.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Icon(
-                    imageVector = Icons.Filled.Search,
-                    contentDescription = null,
-                    tint = textSecondary,
-                    modifier = Modifier.size(20.dp)
-                )
+                Icon(imageVector = Icons.Filled.Search, contentDescription = null, tint = textSecondary, modifier = Modifier.size(20.dp))
                 Spacer(Modifier.width(10.dp))
                 BasicTextField(
                     value = searchQuery,
                     onValueChange = { searchQuery = it },
                     modifier = Modifier.fillMaxWidth(),
                     singleLine = true,
-                    textStyle = LocalTextStyle.current.copy(
-                        fontSize = 14.sp,
-                        color = textPrimary
-                    ),
+                    textStyle = LocalTextStyle.current.copy(fontSize = 14.sp, color = textPrimary),
                     decorationBox = { innerTextField ->
                         if (searchQuery.isEmpty()) {
-                            Text(
-                                text = "Cari nama barang atau ID...",
-                                color = textSecondary.copy(alpha = 0.6f),
-                                fontSize = 14.sp
-                            )
+                            Text(text = "Cari nama barang atau ID...", color = textSecondary.copy(alpha = 0.6f), fontSize = 14.sp)
                         }
                         innerTextField()
                     }
@@ -170,31 +157,15 @@ fun KelolaBarangScreen(
             Spacer(Modifier.height(16.dp))
 
             Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 20.dp),
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(
-                    text = "KATEGORI",
-                    color = textSecondary,
-                    fontSize = 11.sp,
-                    fontWeight = FontWeight.SemiBold,
-                    letterSpacing = 0.6.sp
-                )
+                Text(text = "KATEGORI", color = textSecondary, fontSize = 11.sp, fontWeight = FontWeight.SemiBold, letterSpacing = 0.6.sp)
                 Box(
-                    modifier = Modifier
-                        .clip(RoundedCornerShape(20.dp))
-                        .background(sipinjamBlue.copy(alpha = 0.1f))
-                        .padding(horizontal = 12.dp, vertical = 4.dp)
+                    modifier = Modifier.clip(RoundedCornerShape(20.dp)).background(sipinjamBlue.copy(alpha = 0.1f)).padding(horizontal = 12.dp, vertical = 4.dp)
                 ) {
-                    Text(
-                        text = "${daftarBarang.size} barang terdaftar",
-                        color = sipinjamBlue,
-                        fontSize = 12.sp,
-                        fontWeight = FontWeight.Medium
-                    )
+                    Text(text = "${daftarBarang.size} barang terdaftar", color = sipinjamBlue, fontSize = 12.sp, fontWeight = FontWeight.Medium)
                 }
             }
 
@@ -213,12 +184,7 @@ fun KelolaBarangScreen(
                             .clickable { selectedKategori = kategori }
                             .padding(horizontal = 16.dp, vertical = 8.dp)
                     ) {
-                        Text(
-                            text = kategori,
-                            color = if (isSelected) Color.White else textSecondary,
-                            fontSize = 13.sp,
-                            fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Normal
-                        )
+                        Text(text = kategori, color = if (isSelected) Color.White else textSecondary, fontSize = 13.sp, fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Normal)
                     }
                 }
             }
@@ -250,6 +216,56 @@ fun KelolaBarangScreen(
             Spacer(Modifier.height(88.dp))
         }
     }
+
+    // ================== DIALOG FORM INPUT BARANG BARU (ISSUE #20) ==================
+    if (showTambahDialog) {
+        AlertDialog(
+            onDismissRequest = { showTambahDialog = false },
+            title = { Text("Tambah Barang Baru", fontWeight = FontWeight.Bold, fontSize = 18.sp) },
+            text = {
+                Column(
+                    modifier = Modifier.fillMaxWidth().verticalScroll(rememberScrollState()),
+                    verticalArrangement = Arrangement.spacedBy(10.dp)
+                ) {
+                    OutlinedTextField(value = inputNama, onValueChange = { inputNama = it }, label = { Text("Nama Barang") }, modifier = Modifier.fillMaxWidth())
+                    OutlinedTextField(value = inputKategori, onValueChange = { inputKategori = it }, label = { Text("Kategori (Elektronik/Optik/Kabel)") }, modifier = Modifier.fillMaxWidth())
+                    OutlinedTextField(value = inputStok, onValueChange = { inputStok = it }, label = { Text("Jumlah Stok") }, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number), modifier = Modifier.fillMaxWidth())
+                    OutlinedTextField(value = inputKondisi, onValueChange = { inputKondisi = it }, label = { Text("Kondisi Barang (ex: Sangat Baik)") }, modifier = Modifier.fillMaxWidth())
+                    OutlinedTextField(value = inputLokasi, onValueChange = { inputLokasi = it }, label = { Text("Lokasi Penyimpanan") }, modifier = Modifier.fillMaxWidth())
+                    OutlinedTextField(value = inputMaksimalPinjam, onValueChange = { inputMaksimalPinjam = it }, label = { Text("Maksimal Hari Pinjam") }, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number), modifier = Modifier.fillMaxWidth())
+                    OutlinedTextField(value = inputDeskripsi, onValueChange = { inputDeskripsi = it }, label = { Text("Deskripsi Lengkap") }, modifier = Modifier.fillMaxWidth(), minLines = 2)
+                }
+            },
+            confirmButton = {
+                Button(
+                    colors = ButtonDefaults.buttonColors(containerColor = sipinjamBlue),
+                    onClick = {
+                        if (inputNama.isNotBlank() && inputStok.isNotBlank()) {
+                            onTambahConfirm(
+                                inputNama,
+                                inputKategori,
+                                inputStok.toIntOrNull() ?: 0,
+                                inputKondisi,
+                                inputLokasi,
+                                inputMaksimalPinjam,
+                                inputDeskripsi
+                            )
+                            // Reset Form setelah kirim data
+                            inputNama = ""; inputStok = ""; inputKondisi = ""; inputLokasi = ""; inputMaksimalPinjam = ""; inputDeskripsi = ""
+                            showTambahDialog = false
+                        }
+                    }
+                ) {
+                    Text("Simpan", color = Color.White)
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showTambahDialog = false }) {
+                    Text("Batal", color = textSecondary)
+                }
+            }
+        )
+    }
 }
 
 @Composable
@@ -268,107 +284,36 @@ private fun BarangAdminCard(
     onDeleteClick: () -> Unit,
 ) {
     Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clip(RoundedCornerShape(14.dp))
-            .background(cardWhite)
-            .padding(12.dp),
+        modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(14.dp)).background(cardWhite).padding(12.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         Box(
-            modifier = Modifier
-                .size(56.dp)
-                .clip(RoundedCornerShape(10.dp))
-                .background(Color(0xFF1A1A2E)),
+            modifier = Modifier.size(56.dp).clip(RoundedCornerShape(10.dp)).background(Color(0xFF1A1A2E)),
             contentAlignment = Alignment.Center
         ) {
-            Icon(
-                imageVector = Icons.Filled.Book,
-                contentDescription = null,
-                tint = Color.White.copy(alpha = 0.2f),
-                modifier = Modifier.size(28.dp)
-            )
+            Icon(imageVector = Icons.Filled.Book, contentDescription = null, tint = Color.White.copy(alpha = 0.2f), modifier = Modifier.size(28.dp))
         }
 
-        Column(
-            modifier = Modifier.weight(1f),
-            verticalArrangement = Arrangement.spacedBy(4.dp)
-        ) {
-            Text(
-                text = barang.nama,
-                color = textPrimary,
-                fontSize = 14.sp,
-                fontWeight = FontWeight.SemiBold
-            )
+        Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+            Text(text = barang.nama, color = textPrimary, fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
             Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                Box(
-                    modifier = Modifier
-                        .clip(RoundedCornerShape(4.dp))
-                        .background(sipinjamBlue.copy(alpha = 0.1f))
-                        .padding(horizontal = 6.dp, vertical = 2.dp)
-                ) {
-                    Text(
-                        text = barang.kategori,
-                        color = sipinjamBlue,
-                        fontSize = 10.sp,
-                        fontWeight = FontWeight.SemiBold
-                    )
+                Box(modifier = Modifier.clip(RoundedCornerShape(4.dp)).background(sipinjamBlue.copy(alpha = 0.1f)).padding(horizontal = 6.dp, vertical = 2.dp)) {
+                    Text(text = barang.kategori, color = sipinjamBlue, fontSize = 10.sp, fontWeight = FontWeight.SemiBold)
                 }
-                Text(
-                    text = "Stok: ${barang.stok} unit",
-                    color = textSecondary,
-                    fontSize = 12.sp
-                )
+                Text(text = "Stok: ${barang.stok} unit", color = textSecondary, fontSize = 12.sp)
             }
-            Box(
-                modifier = Modifier
-                    .clip(RoundedCornerShape(4.dp))
-                    .background(if (barang.tersedia) statusGreenBg else statusRedBg)
-                    .padding(horizontal = 8.dp, vertical = 2.dp)
-            ) {
-                Text(
-                    text = if (barang.tersedia) "Tersedia" else "Habis",
-                    color = if (barang.tersedia) statusGreen else statusRed,
-                    fontSize = 11.sp,
-                    fontWeight = FontWeight.Medium
-                )
+            Box(modifier = Modifier.clip(RoundedCornerShape(4.dp)).background(if (barang.tersedia) statusGreenBg else statusRedBg).padding(horizontal = 8.dp, vertical = 2.dp)) {
+                Text(text = if (barang.tersedia) "Tersedia" else "Habis", color = if (barang.tersedia) statusGreen else statusRed, fontSize = 11.sp, fontWeight = FontWeight.Medium)
             }
         }
 
-        Column(
-            verticalArrangement = Arrangement.spacedBy(8.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Box(
-                modifier = Modifier
-                    .size(34.dp)
-                    .clip(RoundedCornerShape(8.dp))
-                    .background(sipinjamBlue.copy(alpha = 0.1f))
-                    .clickable { onEditClick() },
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(
-                    imageVector = Icons.Filled.Edit,
-                    contentDescription = "Edit",
-                    tint = sipinjamBlue,
-                    modifier = Modifier.size(18.dp)
-                )
+        Column(verticalArrangement = Arrangement.spacedBy(8.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+            Box(modifier = Modifier.size(34.dp).clip(RoundedCornerShape(8.dp)).background(sipinjamBlue.copy(alpha = 0.1f)).clickable { onEditClick() }, contentAlignment = Alignment.Center) {
+                Icon(imageVector = Icons.Filled.Edit, contentDescription = "Edit", tint = sipinjamBlue, modifier = Modifier.size(18.dp))
             }
-            Box(
-                modifier = Modifier
-                    .size(34.dp)
-                    .clip(RoundedCornerShape(8.dp))
-                    .background(statusRedBg)
-                    .clickable { onDeleteClick() },
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(
-                    imageVector = Icons.Filled.Delete,
-                    contentDescription = "Hapus",
-                    tint = statusRed,
-                    modifier = Modifier.size(18.dp)
-                )
+            Box(modifier = Modifier.size(34.dp).clip(RoundedCornerShape(8.dp)).background(statusRedBg).clickable { onDeleteClick() }, contentAlignment = Alignment.Center) {
+                Icon(imageVector = Icons.Filled.Delete, contentDescription = "Hapus", tint = statusRed, modifier = Modifier.size(18.dp))
             }
         }
     }
@@ -404,61 +349,34 @@ private fun AdminBottomNavBar(
     sipinjamBlue: Color,
     textSecondary: Color,
 ) {
-    NavigationBar(
-        containerColor = cardWhite,
-        tonalElevation = 0.dp
-    ) {
+    NavigationBar(containerColor = cardWhite, tonalElevation = 0.dp) {
         NavigationBarItem(
             selected = selected == 0,
             onClick = onDashboardClick,
             icon = { Icon(Icons.Filled.Dashboard, contentDescription = null) },
             label = { Text("DASHBOARD", fontSize = 10.sp) },
-            colors = NavigationBarItemDefaults.colors(
-                selectedIconColor = sipinjamBlue,
-                selectedTextColor = sipinjamBlue,
-                unselectedIconColor = textSecondary,
-                unselectedTextColor = textSecondary,
-                indicatorColor = cardWhite
-            )
+            colors = NavigationBarItemDefaults.colors(selectedIconColor = sipinjamBlue, selectedTextColor = sipinjamBlue, unselectedIconColor = textSecondary, unselectedTextColor = textSecondary, indicatorColor = cardWhite)
         )
         NavigationBarItem(
             selected = selected == 1,
             onClick = onBarangClick,
             icon = { Icon(Icons.Filled.Inventory, contentDescription = null) },
             label = { Text("BARANG", fontSize = 10.sp) },
-            colors = NavigationBarItemDefaults.colors(
-                selectedIconColor = sipinjamBlue,
-                selectedTextColor = sipinjamBlue,
-                unselectedIconColor = textSecondary,
-                unselectedTextColor = textSecondary,
-                indicatorColor = cardWhite
-            )
+            colors = NavigationBarItemDefaults.colors(selectedIconColor = sipinjamBlue, selectedTextColor = sipinjamBlue, unselectedIconColor = textSecondary, unselectedTextColor = textSecondary, indicatorColor = cardWhite)
         )
         NavigationBarItem(
             selected = selected == 2,
             onClick = onPermintaanClick,
             icon = { Icon(Icons.Filled.RequestPage, contentDescription = null) },
             label = { Text("PERMINTAAN", fontSize = 10.sp) },
-            colors = NavigationBarItemDefaults.colors(
-                selectedIconColor = sipinjamBlue,
-                selectedTextColor = sipinjamBlue,
-                unselectedIconColor = textSecondary,
-                unselectedTextColor = textSecondary,
-                indicatorColor = cardWhite
-            )
+            colors = NavigationBarItemDefaults.colors(selectedIconColor = sipinjamBlue, selectedTextColor = sipinjamBlue, unselectedIconColor = textSecondary, unselectedTextColor = textSecondary, indicatorColor = cardWhite)
         )
         NavigationBarItem(
             selected = selected == 3,
             onClick = onProfilClick,
             icon = { Icon(Icons.Filled.Person, contentDescription = null) },
             label = { Text("PROFIL", fontSize = 10.sp) },
-            colors = NavigationBarItemDefaults.colors(
-                selectedIconColor = sipinjamBlue,
-                selectedTextColor = sipinjamBlue,
-                unselectedIconColor = textSecondary,
-                unselectedTextColor = textSecondary,
-                indicatorColor = cardWhite
-            )
+            colors = NavigationBarItemDefaults.colors(selectedIconColor = sipinjamBlue, selectedTextColor = sipinjamBlue, unselectedIconColor = textSecondary, unselectedTextColor = textSecondary, indicatorColor = cardWhite)
         )
     }
 }

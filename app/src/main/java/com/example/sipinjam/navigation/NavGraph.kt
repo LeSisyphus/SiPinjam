@@ -1,6 +1,7 @@
 package com.example.sipinjam.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -20,13 +21,14 @@ import com.example.sipinjam.screens.user.RiwayatPeminjamanScreen
 import com.example.sipinjam.screens.user.PengembalianScreen
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
+import androidx.compose.runtime.getValue
 
 object Routes {
     const val LOGIN                   = "login"
     const val REGISTER                = "register"
     const val BERANDA_USER            = "beranda_user"
     const val FORGOT_PASSWORD         = "forgot_password"
-    const val DETAIL_BARANG = "detail_barang/{barangId}"
+    const val DETAIL_BARANG           = "detail_barang/{barangId}"
     const val AJUKAN_PEMINJAMAN       = "ajukan_peminjaman/{barangId}/{namaBarang}/{kategoriBarang}/{statusBarang}"
     const val DASHBOARD_ADMIN         = "dashboard_admin"
     const val KELOLA_BARANG           = "kelola_barang"
@@ -243,9 +245,16 @@ fun NavGraph(
         }
 
         composable(Routes.KELOLA_BARANG) {
+            val adminViewModel: com.example.sipinjam.screens.admin.KelolaBarangViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
+            val adminUiState by adminViewModel.uiState.collectAsState()
+
             KelolaBarangScreen(
-                onTambahClick     = {},
+                daftarBarang = adminUiState.daftarBarang,
+                onTambahConfirm = { nama, kategori, stok, kondisi, lokasi, maksPinjam, deskripsi ->
+                    adminViewModel.onTambahBarangFirestore(nama, kategori, stok, kondisi, lokasi, maksPinjam, deskripsi)
+                },
                 onEditClick       = {},
+                onDeleteClick     = {},
                 onDashboardClick  = { navController.navigate(Routes.DASHBOARD_ADMIN) { popUpTo(Routes.DASHBOARD_ADMIN) { inclusive = true } } },
                 onBarangClick     = {},
                 onPermintaanClick = { navController.navigate(Routes.PERSETUJUAN_PEMINJAMAN) },

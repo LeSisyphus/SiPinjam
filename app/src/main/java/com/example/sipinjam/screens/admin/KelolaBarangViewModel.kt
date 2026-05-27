@@ -1,26 +1,25 @@
 package com.example.sipinjam.screens.admin
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.example.sipinjam.data.model.Barang
+import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
-import kotlin.collections.filter
-import kotlin.collections.map
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 
 data class KelolaBarangUiState(
-    val daftarBarang: List<BarangAdmin> = listOf(
-        BarangAdmin("1", "Camera DSLR Canon", "ELEKTRONIK", 2, true),
-        BarangAdmin("2", "Proyektor Epson", "ELEKTRONIK", 1, true),
-        BarangAdmin("3", "Tripod Kamera", "OPTIK", 3, true),
-        BarangAdmin("4", "Kabel HDMI 5m", "KABEL", 0, false),
-    ),
+    val daftarBarang: List<BarangAdmin> = emptyList(),
     val searchQuery: String = "",
     val selectedKategori: String = "Semua",
     val showDeleteDialog: Boolean = false,
     val barangToDelete: BarangAdmin? = null,
     val isLoading: Boolean = false,
     val errorMessage: String? = null,
+    val isSuccess: Boolean = false
 ) {
     val filteredBarang: List<BarangAdmin>
         get() = daftarBarang.filter { barang ->
@@ -34,8 +33,83 @@ data class KelolaBarangUiState(
 
 class KelolaBarangViewModel : ViewModel() {
 
+    private val firestore = FirebaseFirestore.getInstance()
     private val _uiState = MutableStateFlow(KelolaBarangUiState())
     val uiState: StateFlow<KelolaBarangUiState> = _uiState.asStateFlow()
+
+    init {
+        muatSemuaBarang()
+    }
+
+    private fun muatSemuaBarang() {
+        _uiState.update { it.copy(isLoading = true) }
+        viewModelScope.launch {
+            try {
+                val snapshot = firestore.collection("items").get().await()
+                val listBarang = snapshot.documents.map { document ->
+                    BarangAdmin(
+                        id = document.id,
+                        nama = document.getString("nama") ?: "Tanpa Nama",
+                        kategori = document.getString("kategori") ?: "UMUM",
+                        stok = document.getLong("stok")?.toInt() ?: 0,
+                        tersedia = document.getBoolean("tersedia") ?: true
+                    )
+                }
+                _uiState.update { it.copy(daftarBarang = listBarang, isLoading = false) }
+            } catch (e: Exception) {
+                _uiState.update { it.copy(isLoading = false, errorMessage = e.localizedMessage) }
+            }
+        }
+    }
+
+    fun onTambahBarangFirestore(
+        nama: String,
+        kategori: String,
+        stok: Int,
+        kondisi: String,
+        lokasi: String,
+        maksimalPinjam: String,
+        deskripsi: String
+    ) {
+        _uiState.update { it.copy(isLoading = true, isSuccess = false, errorMessage = null) }
+
+        viewModelScope.launch {
+            try {
+                val docRef = firestore.collection("items").document()
+
+                val barangBaru = Barang(
+                    id = docRef.id,
+                    nama = nama,
+                    kategori = kategori,
+                    stok = stok,
+                    tersedia = stok > 0,
+                    kondisi = kondisi,
+                    lokasi = lokasi,
+                    maksimalPinjam = maksimalPinjam,
+                    deskripsi = deskripsi,
+                    fotoUrl = ""
+                )
+
+                docRef.set(barangBaru).await()
+
+                _uiState.update { state ->
+                    state.copy(
+                        daftarBarang = state.daftarBarang + BarangAdmin(
+                            id = barangBaru.id,
+                            nama = barangBaru.nama,
+                            kategori = barangBaru.kategori,
+                            stok = barangBaru.stok,
+                            tersedia = barangBaru.tersedia
+                        ),
+                        isLoading = false,
+                        isSuccess = true
+                    )
+                }
+            } catch (e: Exception) {
+                _uiState.update { it.copy(isLoading = false, errorMessage = e.localizedMessage) }
+            }
+        }
+    }
 
     fun onSearchChange(query: String) {
         _uiState.update { it.copy(searchQuery = query) }
@@ -61,12 +135,6 @@ class KelolaBarangViewModel : ViewModel() {
 
     fun onDeleteDismiss() {
         _uiState.update { it.copy(showDeleteDialog = false, barangToDelete = null) }
-    }
-
-    fun onTambahBarang(barang: BarangAdmin) {
-        _uiState.update { state ->
-            state.copy(daftarBarang = state.daftarBarang + barang)
-        }
     }
 
     fun onEditBarang(updated: BarangAdmin) {
