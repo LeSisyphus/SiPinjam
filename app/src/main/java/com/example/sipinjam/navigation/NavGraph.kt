@@ -28,7 +28,7 @@ object Routes {
     const val REGISTER                = "register"
     const val BERANDA_USER            = "beranda_user"
     const val FORGOT_PASSWORD         = "forgot_password"
-    const val DETAIL_BARANG = "detail_barang/{barangId}"
+    const val DETAIL_BARANG           = "detail_barang/{barangId}"
     const val AJUKAN_PEMINJAMAN       = "ajukan_peminjaman/{barangId}/{namaBarang}/{kategoriBarang}/{statusBarang}"
     const val DASHBOARD_ADMIN         = "dashboard_admin"
     const val KELOLA_BARANG           = "kelola_barang"
