@@ -3,6 +3,7 @@ package com.example.sipinjam.navigation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -270,31 +271,72 @@ fun NavGraph(
         }
 
         composable(Routes.KELOLA_BARANG) {
+            val context = LocalContext.current
             val adminViewModel: com.example.sipinjam.screens.admin.KelolaBarangViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
             val adminUiState by adminViewModel.uiState.collectAsState()
 
             KelolaBarangScreen(
-                daftarBarang     = adminUiState.daftarBarang,
-                showEditDialog   = adminUiState.showEditDialog,
-                barangToEdit     = adminUiState.barangToEdit,
-                showDeleteDialog = adminUiState.showDeleteDialog,
-                barangToDelete   = adminUiState.barangToDelete,
-                onTambahConfirm  = { nama, kategori, stok, kondisi, lokasi, maksPinjam, deskripsi ->
-                    adminViewModel.onTambahBarangFirestore(nama, kategori, stok, kondisi, lokasi, maksPinjam, deskripsi)
-                },
-                onEditClick      = { barang -> adminViewModel.onEditRequest(barang) },
-                onEditConfirm    = { id, nama, kategori, stok ->
-                    adminViewModel.onEditBarangFirestore(id, nama, kategori, stok)
-                },
-                onEditDismiss    = { adminViewModel.onEditDismiss() },
-                onDeleteClick    = { barang -> adminViewModel.onDeleteRequest(barang) },
-                onDeleteConfirm  = { adminViewModel.onDeleteConfirm() },
-                onDeleteDismiss  = { adminViewModel.onDeleteDismiss() },
-                onDashboardClick  = { navController.navigate(Routes.DASHBOARD_ADMIN) { popUpTo(Routes.DASHBOARD_ADMIN) { inclusive = true } } },
-                onBarangClick     = {},
-                onPermintaanClick = { navController.navigate(Routes.PERSETUJUAN_PEMINJAMAN) },
-                onProfilClick     = { navController.navigate(Routes.PROFIL) }
-            )
+    daftarBarang = adminUiState.filteredBarang,
+    showEditDialog = adminUiState.showEditDialog,
+    barangToEdit = adminUiState.barangToEdit,
+    showDeleteDialog = adminUiState.showDeleteDialog,
+    barangToDelete = adminUiState.barangToDelete,
+    isLoading = adminUiState.isLoading,
+    isSuccess = adminUiState.isSuccess,
+    onTambahConfirm = { nama, kategori, stok, kondisi, lokasi, maksPinjam, deskripsi, imageUri ->
+        adminViewModel.onTambahBarangCloudinary(
+            context,
+            nama,
+            kategori,
+            stok,
+            kondisi,
+            lokasi,
+            maksPinjam,
+            deskripsi,
+            imageUri
+        )
+    },
+    onEditClick = { barang ->
+        adminViewModel.onEditRequest(barang)
+    },
+    onEditConfirm = { id, nama, kategori, stok, imageUri ->
+        adminViewModel.onEditBarangFirestore(
+            context,
+            id,
+            nama,
+            kategori,
+            stok,
+            imageUri
+        )
+    },
+    onEditDismiss = {
+        adminViewModel.onEditDismiss()
+    },
+    onDeleteClick = { barang ->
+        adminViewModel.onDeleteRequest(barang)
+    },
+    onDeleteConfirm = {
+        adminViewModel.onDeleteConfirm()
+    },
+    onDeleteDismiss = {
+        adminViewModel.onDeleteDismiss()
+    },
+    onSuccessDismiss = {
+        adminViewModel.resetSuccessState()
+    },
+    onDashboardClick = {
+        navController.navigate(Routes.DASHBOARD_ADMIN) {
+            popUpTo(Routes.DASHBOARD_ADMIN) { inclusive = true }
+        }
+    },
+    onBarangClick = {},
+    onPermintaanClick = {
+        navController.navigate(Routes.PERSETUJUAN_PEMINJAMAN)
+    },
+    onProfilClick = {
+        navController.navigate(Routes.PROFIL)
+    }
+)
         }
     }
 }

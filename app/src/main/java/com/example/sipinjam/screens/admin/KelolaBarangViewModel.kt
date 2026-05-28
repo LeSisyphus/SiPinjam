@@ -1,7 +1,12 @@
 package com.example.sipinjam.screens.admin
 
+import android.content.Context
+import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.cloudinary.android.MediaManager
+import com.cloudinary.android.callback.ErrorInfo
+import com.cloudinary.android.callback.UploadCallback
 import com.example.sipinjam.data.model.Barang
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
@@ -11,6 +16,9 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
 
 data class KelolaBarangUiState(
     val daftarBarang: List<BarangAdmin> = emptyList(),
@@ -56,7 +64,8 @@ class KelolaBarangViewModel : ViewModel() {
                         nama = document.getString("nama") ?: "Tanpa Nama",
                         kategori = document.getString("kategori") ?: "UMUM",
                         stok = document.getLong("stok")?.toInt() ?: 0,
-                        tersedia = document.getBoolean("tersedia") ?: true
+                        tersedia = document.getBoolean("tersedia") ?: true,
+                        imageUrl = document.getString("fotoUrl") ?: ""
                     )
                 }
                 _uiState.update { it.copy(daftarBarang = listBarang, isLoading = false) }
@@ -66,27 +75,71 @@ class KelolaBarangViewModel : ViewModel() {
         }
     }
 
-    fun onTambahBarangFirestore(
+    private suspend fun uploadKeCloudinary(context: Context, imageUri: Uri): String = suspendCancellableCoroutine { continuation ->
+        try {
+            MediaManager.get().upload(imageUri)
+                .callback(object : UploadCallback {
+                    override fun onStart(requestId: String) {}
+                    override fun onProgress(requestId: String, bytes: Long, totalBytes: Long) {}
+
+                    override fun onSuccess(requestId: String, resultData: Map<*, *>) {
+                        val secureUrl = resultData["secure_url"] as? String ?: ""
+                        if (continuation.isActive) continuation.resume(secureUrl)
+                    }
+
+                    override fun onError(requestId: String, error: ErrorInfo) {
+                        if (continuation.isActive) {
+                            continuation.resumeWithException(Exception("Cloudinary Error: ${error.description}"))
+                        }
+                    }
+
+                    override fun onReschedule(requestId: String, error: ErrorInfo) {}
+                })
+                .dispatch(context)
+        } catch (e: Exception) {
+            if (continuation.isActive) continuation.resumeWithException(e)
+        }
+    }
+
+    fun onTambahBarangCloudinary(
+        context: Context,
         nama: String, kategori: String, stok: Int, kondisi: String,
-        lokasi: String, maksimalPinjam: String, deskripsi: String
+        lokasi: String, maksimalPinjam: String, deskripsi: String, imageUri: Uri?
     ) {
         _uiState.update { it.copy(isLoading = true, isSuccess = false, errorMessage = null) }
         viewModelScope.launch {
             try {
+                var finalImageUrl = ""
+
+                if (imageUri != null) {
+                    finalImageUrl = uploadKeCloudinary(context, imageUri)
+                }
+
                 val docRef = firestore.collection("items").document()
                 val barangBaru = Barang(
-                    id = docRef.id, nama = nama, kategori = kategori, stok = stok,
-                    tersedia = stok > 0, kondisi = kondisi, lokasi = lokasi,
-                    maksimalPinjam = maksimalPinjam, deskripsi = deskripsi, fotoUrl = ""
+                    id = docRef.id,
+                    nama = nama,
+                    kategori = kategori,
+                    stok = stok,
+                    tersedia = stok > 0,
+                    kondisi = kondisi,
+                    lokasi = lokasi,
+                    maksimalPinjam = maksimalPinjam,
+                    deskripsi = deskripsi,
+                    fotoUrl = finalImageUrl
                 )
                 docRef.set(barangBaru).await()
 
                 muatSemuaBarang()
-                _uiState.update { it.copy(isSuccess = true) }
+                _uiState.update { it.copy(isLoading = false, isSuccess = true) }
             } catch (e: Exception) {
                 _uiState.update { it.copy(isLoading = false, errorMessage = e.localizedMessage) }
             }
         }
+    }
+
+    fun resetSuccessState() {
+        _uiState.update { it.copy(isSuccess = false) }
     }
 
     fun onEditRequest(barang: BarangAdmin) {
@@ -97,22 +150,35 @@ class KelolaBarangViewModel : ViewModel() {
         _uiState.update { it.copy(showEditDialog = false, barangToEdit = null) }
     }
 
-    fun onEditBarangFirestore(id: String, nama: String, kategori: String, stok: Int) {
+    fun onEditBarangFirestore(
+        context: Context,
+        id: String,
+        nama: String,
+        kategori: String,
+        stok: Int,
+        imageUri: Uri?
+    ) {
         _uiState.update { it.copy(isLoading = true, errorMessage = null) }
         viewModelScope.launch {
             try {
-                val updateData = mapOf(
+                val updateData = mutableMapOf<String, Any>(
                     "nama" to nama,
                     "kategori" to kategori,
                     "stok" to stok,
                     "tersedia" to (stok > 0)
                 )
+
+                if (imageUri != null) {
+                    val newImageUrl = uploadKeCloudinary(context, imageUri)
+                    updateData["fotoUrl"] = newImageUrl
+                }
+
                 firestore.collection("items").document(id)
                     .set(updateData, SetOptions.merge())
                     .await()
 
-                muatSemuaBarang() // Refresh data
-                _uiState.update { it.copy(showEditDialog = false, barangToEdit = null) }
+                muatSemuaBarang()
+                _uiState.update { it.copy(isLoading = false, showEditDialog = false, barangToEdit = null) }
             } catch (e: Exception) {
                 _uiState.update { it.copy(isLoading = false, errorMessage = e.localizedMessage) }
             }
@@ -134,9 +200,8 @@ class KelolaBarangViewModel : ViewModel() {
         viewModelScope.launch {
             try {
                 firestore.collection("items").document(barang.id).delete().await()
-
                 muatSemuaBarang()
-                _uiState.update { it.copy(showDeleteDialog = false, barangToDelete = null) }
+                _uiState.update { it.copy(isLoading = false, showDeleteDialog = false, barangToDelete = null) }
             } catch (e: Exception) {
                 _uiState.update { it.copy(isLoading = false, errorMessage = e.localizedMessage) }
             }
