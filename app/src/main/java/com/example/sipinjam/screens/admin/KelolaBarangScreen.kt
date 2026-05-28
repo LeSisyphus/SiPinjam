@@ -1,6 +1,11 @@
 package com.example.sipinjam.screens.admin
 
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
@@ -12,9 +17,11 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Book
+import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Dashboard
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.filled.Inventory
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.RequestPage
@@ -25,12 +32,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.compose.rememberAsyncImagePainter
 import com.example.sipinjam.R
 
 data class BarangAdmin(
@@ -50,13 +59,16 @@ fun KelolaBarangScreen(
     barangToEdit: BarangAdmin? = null,
     showDeleteDialog: Boolean = false,
     barangToDelete: BarangAdmin? = null,
-    onTambahConfirm: (nama: String, kategori: String, stok: Int, kondisi: String, lokasi: String, maksPinjam: String, deskripsi: String) -> Unit = { _, _, _, _, _, _, _ -> },
+    isLoading: Boolean = false,
+    isSuccess: Boolean = false,
+    onTambahConfirm: (nama: String, kategori: String, stok: Int, kondisi: String, lokasi: String, maksPinjam: String, deskripsi: String, imageUri: Uri?) -> Unit = { _, _, _, _, _, _, _, _ -> },
     onEditClick: (BarangAdmin) -> Unit = {},
-    onEditConfirm: (id: String, nama: String, kategori: String, stok: Int) -> Unit = { _, _, _, _ -> },
+    onEditConfirm: (id: String, nama: String, kategori: String, stok: Int, imageUri: Uri?) -> Unit = { _, _, _, _, _ -> },
     onEditDismiss: () -> Unit = {},
     onDeleteClick: (BarangAdmin) -> Unit = {},
     onDeleteConfirm: () -> Unit = {},
     onDeleteDismiss: () -> Unit = {},
+    onSuccessDismiss: () -> Unit = {},
     onDashboardClick: () -> Unit = {},
     onBarangClick: () -> Unit = {},
     onPermintaanClick: () -> Unit = {},
@@ -86,6 +98,15 @@ fun KelolaBarangScreen(
     var inputLokasi by remember { mutableStateOf("") }
     var inputMaksimalPinjam by remember { mutableStateOf("") }
     var inputDeskripsi by remember { mutableStateOf("") }
+
+    // State gambar lokal HP
+    var selectedImageUri by remember { mutableStateOf<Uri?>(null) }
+
+    val launcher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri: Uri? ->
+        selectedImageUri = uri
+    }
 
     var editNama by remember(barangToEdit) { mutableStateOf(barangToEdit?.nama ?: "") }
     var editKategori by remember(barangToEdit) { mutableStateOf(barangToEdit?.kategori ?: "") }
@@ -203,6 +224,12 @@ fun KelolaBarangScreen(
 
             Spacer(Modifier.height(16.dp))
 
+            if (isLoading && !showTambahDialog && !showEditDialog) {
+                Box(modifier = Modifier.fillMaxWidth().padding(20.dp), contentAlignment = Alignment.Center) {
+                    CircularProgressIndicator(color = sipinjamBlue)
+                }
+            }
+
             Column(
                 modifier = Modifier.padding(horizontal = 20.dp),
                 verticalArrangement = Arrangement.spacedBy(10.dp)
@@ -229,106 +256,203 @@ fun KelolaBarangScreen(
         }
     }
 
+    // Dialog Tambah Barang
     if (showTambahDialog) {
         AlertDialog(
-            onDismissRequest = { showTambahDialog = false },
+            onDismissRequest = { if (!isLoading) showTambahDialog = false },
             title = { Text("Tambah Barang Baru", fontWeight = FontWeight.Bold, fontSize = 18.sp) },
             text = {
                 Column(
                     modifier = Modifier.fillMaxWidth().verticalScroll(rememberScrollState()),
                     verticalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
-                    OutlinedTextField(value = inputNama, onValueChange = { inputNama = it }, label = { Text("Nama Barang") }, modifier = Modifier.fillMaxWidth())
-                    OutlinedTextField(value = inputKategori, onValueChange = { inputKategori = it }, label = { Text("Kategori (Elektronik/Optik/Kabel)") }, modifier = Modifier.fillMaxWidth())
-                    OutlinedTextField(value = inputStok, onValueChange = { inputStok = it }, label = { Text("Jumlah Stok") }, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number), modifier = Modifier.fillMaxWidth())
-                    OutlinedTextField(value = inputKondisi, onValueChange = { inputKondisi = it }, label = { Text("Kondisi Barang (ex: Sangat Baik)") }, modifier = Modifier.fillMaxWidth())
-                    OutlinedTextField(value = inputLokasi, onValueChange = { inputLokasi = it }, label = { Text("Lokasi Penyimpanan") }, modifier = Modifier.fillMaxWidth())
-                    OutlinedTextField(value = inputMaksimalPinjam, onValueChange = { inputMaksimalPinjam = it }, label = { Text("Maksimal Hari Pinjam") }, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number), modifier = Modifier.fillMaxWidth())
-                    OutlinedTextField(value = inputDeskripsi, onValueChange = { inputDeskripsi = it }, label = { Text("Deskripsi Lengkap") }, modifier = Modifier.fillMaxWidth(), minLines = 2)
+                    Text(text = "Foto Barang", fontSize = 14.sp, fontWeight = FontWeight.Medium, color = textPrimary)
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(130.dp)
+                            .clip(RoundedCornerShape(12.dp))
+                            .background(inputBg)
+                            .border(1.dp, textSecondary.copy(alpha = 0.2f), RoundedCornerShape(12.dp))
+                            .clickable { if (!isLoading) launcher.launch("image/*") },
+                        contentAlignment = Alignment.Center
+                    ) {
+                        if (selectedImageUri != null) {
+                            Image(
+                                painter = rememberAsyncImagePainter(selectedImageUri),
+                                contentDescription = "Preview Gambar",
+                                modifier = Modifier.fillMaxSize(),
+                                contentScale = ContentScale.Crop
+                            )
+                        } else {
+                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                Icon(imageVector = Icons.Filled.Image, contentDescription = null, tint = textSecondary, modifier = Modifier.size(32.dp))
+                                Spacer(Modifier.height(6.dp))
+                                Text("Pilih Foto dari Galeri", color = textSecondary, fontSize = 12.sp)
+                            }
+                        }
+                    }
+
+                    Spacer(Modifier.height(4.dp))
+                    OutlinedTextField(value = inputNama, onValueChange = { inputNama = it }, label = { Text("Nama Barang") }, modifier = Modifier.fillMaxWidth(), enabled = !isLoading)
+                    OutlinedTextField(value = inputKategori, onValueChange = { inputKategori = it }, label = { Text("Kategori") }, modifier = Modifier.fillMaxWidth(), enabled = !isLoading)
+                    OutlinedTextField(value = inputStok, onValueChange = { inputStok = it }, label = { Text("Jumlah Stok") }, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number), modifier = Modifier.fillMaxWidth(), enabled = !isLoading)
+                    OutlinedTextField(value = inputKondisi, onValueChange = { inputKondisi = it }, label = { Text("Kondisi Barang") }, modifier = Modifier.fillMaxWidth(), enabled = !isLoading)
+                    OutlinedTextField(value = inputLokasi, onValueChange = { inputLokasi = it }, label = { Text("Lokasi Penyimpanan") }, modifier = Modifier.fillMaxWidth(), enabled = !isLoading)
+                    OutlinedTextField(value = inputMaksimalPinjam, onValueChange = { inputMaksimalPinjam = it }, label = { Text("Maksimal Hari Pinjam") }, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number), modifier = Modifier.fillMaxWidth(), enabled = !isLoading)
+                    OutlinedTextField(value = inputDeskripsi, onValueChange = { inputDeskripsi = it }, label = { Text("Deskripsi Lengkap") }, modifier = Modifier.fillMaxWidth(), minLines = 2, enabled = !isLoading)
                 }
             },
             confirmButton = {
                 Button(
                     colors = ButtonDefaults.buttonColors(containerColor = sipinjamBlue),
+                    enabled = !isLoading,
                     onClick = {
                         if (inputNama.isNotBlank() && inputStok.isNotBlank()) {
                             onTambahConfirm(
                                 inputNama, inputKategori, inputStok.toIntOrNull() ?: 0,
-                                inputKondisi, inputLokasi, inputMaksimalPinjam, inputDeskripsi
+                                inputKondisi, inputLokasi, inputMaksimalPinjam, inputDeskripsi,
+                                selectedImageUri
                             )
                             inputNama = ""; inputStok = ""; inputKondisi = ""; inputLokasi = ""; inputMaksimalPinjam = ""; inputDeskripsi = ""
+                            selectedImageUri = null
                             showTambahDialog = false
                         }
                     }
                 ) {
-                    Text("Simpan", color = Color.White)
+                    if (isLoading) {
+                        CircularProgressIndicator(color = Color.White, modifier = Modifier.size(18.dp), strokeWidth = 2.dp)
+                    } else {
+                        Text("Simpan", color = Color.White)
+                    }
                 }
             },
             dismissButton = {
-                TextButton(onClick = { showTambahDialog = false }) {
+                TextButton(onClick = { showTambahDialog = false }, enabled = !isLoading) {
                     Text("Batal", color = textSecondary)
                 }
             }
         )
     }
 
+    // Pop-up Sukses
+    if (isSuccess) {
+        AlertDialog(
+            onDismissRequest = {},
+            icon = { Icon(imageVector = Icons.Filled.CheckCircle, contentDescription = null, tint = sipinjamBlue, modifier = Modifier.size(48.dp)) },
+            title = { Text(text = "Barang Ditambahkan!", fontWeight = FontWeight.Bold, textAlign = TextAlign.Center, color = textPrimary) },
+            text = { Text(text = "Data inventaris barang baru telah berhasil disimpan dan diunggah ke dalam sistem database.", textAlign = TextAlign.Center, color = textSecondary, fontSize = 14.sp, lineHeight = 20.sp) },
+            confirmButton = {
+                Button(
+                    onClick = onSuccessDismiss,
+                    colors = ButtonDefaults.buttonColors(containerColor = sipinjamBlue),
+                    shape = RoundedCornerShape(10.dp),
+                    modifier = Modifier.fillMaxWidth()
+                ) { Text("Selesai", color = Color.White) }
+            },
+            shape = RoundedCornerShape(16.dp),
+            containerColor = cardWhite
+        )
+    }
+
+    // Dialog Edit Barang
     if (showEditDialog && barangToEdit != null) {
         AlertDialog(
-            onDismissRequest = onEditDismiss,
+            onDismissRequest = { if (!isLoading) onEditDismiss() },
             title = { Text("Edit Data Barang", fontWeight = FontWeight.Bold, fontSize = 18.sp) },
             text = {
                 Column(
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier.fillMaxWidth().verticalScroll(rememberScrollState()),
                     verticalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
                     Text("ID Barang: ${barangToEdit.id}", color = textSecondary, fontSize = 12.sp)
-                    OutlinedTextField(value = editNama, onValueChange = { editNama = it }, label = { Text("Nama Barang") }, modifier = Modifier.fillMaxWidth())
-                    OutlinedTextField(value = editKategori, onValueChange = { editKategori = it }, label = { Text("Kategori") }, modifier = Modifier.fillMaxWidth())
-                    OutlinedTextField(value = editStok, onValueChange = { editStok = it }, label = { Text("Jumlah Stok") }, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number), modifier = Modifier.fillMaxWidth())
+
+                    Text(text = "Foto Barang (Klik untuk ganti)", fontSize = 14.sp, fontWeight = FontWeight.Medium, color = textPrimary)
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(130.dp)
+                            .clip(RoundedCornerShape(12.dp))
+                            .background(inputBg)
+                            .border(1.dp, textSecondary.copy(alpha = 0.2f), RoundedCornerShape(12.dp))
+                            .clickable { if (!isLoading) launcher.launch("image/*") },
+                        contentAlignment = Alignment.Center
+                    ) {
+                        if (selectedImageUri != null) {
+                            Image(
+                                painter = rememberAsyncImagePainter(selectedImageUri),
+                                contentDescription = null,
+                                modifier = Modifier.fillMaxSize(),
+                                contentScale = ContentScale.Crop
+                            )
+                        } else if (barangToEdit.imageUrl.isNotEmpty()) {
+                            Image(
+                                painter = rememberAsyncImagePainter(barangToEdit.imageUrl),
+                                contentDescription = null,
+                                modifier = Modifier.fillMaxSize(),
+                                contentScale = ContentScale.Crop
+                            )
+                        } else {
+                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                Icon(imageVector = Icons.Filled.Image, contentDescription = null, tint = textSecondary, modifier = Modifier.size(32.dp))
+                                Spacer(Modifier.height(6.dp))
+                                Text("Pilih Foto dari Galeri", color = textSecondary, fontSize = 12.sp)
+                            }
+                        }
+                    }
+
+                    Spacer(Modifier.height(4.dp))
+                    OutlinedTextField(value = editNama, onValueChange = { editNama = it }, label = { Text("Nama Barang") }, modifier = Modifier.fillMaxWidth(), enabled = !isLoading)
+                    OutlinedTextField(value = editKategori, onValueChange = { editKategori = it }, label = { Text("Kategori") }, modifier = Modifier.fillMaxWidth(), enabled = !isLoading)
+                    OutlinedTextField(value = editStok, onValueChange = { editStok = it }, label = { Text("Jumlah Stok") }, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number), modifier = Modifier.fillMaxWidth(), enabled = !isLoading)
                 }
             },
             confirmButton = {
                 Button(
                     colors = ButtonDefaults.buttonColors(containerColor = sipinjamBlue),
+                    enabled = !isLoading,
                     onClick = {
                         if (editNama.isNotBlank() && editStok.isNotBlank()) {
+                            // 🔥 Melempar data sesuai urutan parameter ke-5 (selectedImageUri)
                             onEditConfirm(
                                 barangToEdit.id,
                                 editNama,
                                 editKategori,
-                                editStok.toIntOrNull() ?: 0
+                                editStok.toIntOrNull() ?: 0,
+                                selectedImageUri
                             )
+                            selectedImageUri = null
                         }
                     }
                 ) {
-                    Text("Simpan Perubahan", color = Color.White)
+                    if (isLoading) {
+                        CircularProgressIndicator(color = Color.White, modifier = Modifier.size(18.dp), strokeWidth = 2.dp)
+                    } else {
+                        Text("Simpan Perubahan", color = Color.White)
+                    }
                 }
             },
             dismissButton = {
-                TextButton(onClick = onEditDismiss) {
+                TextButton(onClick = { selectedImageUri = null; onEditDismiss() }, enabled = !isLoading) {
                     Text("Batal", color = textSecondary)
                 }
             }
         )
     }
 
+    // Dialog Delete Barang
     if (showDeleteDialog && barangToDelete != null) {
         AlertDialog(
             onDismissRequest = onDeleteDismiss,
             title = { Text("Hapus Barang", fontWeight = FontWeight.Bold, fontSize = 18.sp) },
-            text = { Text("Apakah Anda yakin ingin menghapus \"${barangToDelete.nama}\" dari sistem? Tindakan ini tidak dapat dibatalkan.") },
+            text = { Text("Apakah Anda yakin ingin menghapus \"${barangToDelete.nama}\" dari sistem?\nTindakan ini tidak dapat dibatalkan.") },
             confirmButton = {
-                Button(
-                    colors = ButtonDefaults.buttonColors(containerColor = statusRed),
-                    onClick = onDeleteConfirm
-                ) {
+                Button(colors = ButtonDefaults.buttonColors(containerColor = statusRed), onClick = onDeleteConfirm) {
                     Text("Hapus", color = Color.White)
                 }
             },
             dismissButton = {
-                TextButton(onClick = onDeleteDismiss) {
-                    Text("Batal", color = textSecondary)
-                }
+                TextButton(onClick = onDeleteDismiss) { Text("Batal", color = textSecondary) }
             }
         )
     }
@@ -358,7 +482,16 @@ private fun BarangAdminCard(
             modifier = Modifier.size(56.dp).clip(RoundedCornerShape(10.dp)).background(Color(0xFF1A1A2E)),
             contentAlignment = Alignment.Center
         ) {
-            Icon(imageVector = Icons.Filled.Book, contentDescription = null, tint = Color.White.copy(alpha = 0.2f), modifier = Modifier.size(28.dp))
+            if (barang.imageUrl.isNotEmpty()) {
+                Image(
+                    painter = rememberAsyncImagePainter(barang.imageUrl),
+                    contentDescription = null,
+                    modifier = Modifier.fillMaxSize(),
+                    contentScale = ContentScale.Crop
+                )
+            } else {
+                Icon(imageVector = Icons.Filled.Book, contentDescription = null, tint = Color.White.copy(alpha = 0.2f), modifier = Modifier.size(28.dp))
+            }
         }
 
         Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
@@ -444,13 +577,5 @@ private fun AdminBottomNavBar(
             label = { Text("PROFIL", fontSize = 10.sp) },
             colors = NavigationBarItemDefaults.colors(selectedIconColor = sipinjamBlue, selectedTextColor = sipinjamBlue, unselectedIconColor = textSecondary, unselectedTextColor = textSecondary, indicatorColor = cardWhite)
         )
-    }
-}
-
-@Preview(showBackground = true, widthDp = 390, heightDp = 844)
-@Composable
-fun KelolaBarangScreenPreview() {
-    MaterialTheme {
-        KelolaBarangScreen()
     }
 }
