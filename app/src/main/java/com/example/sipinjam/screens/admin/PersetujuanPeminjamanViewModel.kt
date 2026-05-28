@@ -9,6 +9,7 @@ import com.example.sipinjam.data.repository.PengembalianRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
 
 class PersetujuanPeminjamanViewModel(
@@ -25,6 +26,9 @@ class PersetujuanPeminjamanViewModel(
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
 
+    private val _errorMessage = MutableStateFlow<String?>(null)
+    val errorMessage: StateFlow<String?> = _errorMessage.asStateFlow()
+
     init {
         muatPeminjaman()
         muatPengembalian()
@@ -33,31 +37,53 @@ class PersetujuanPeminjamanViewModel(
     fun muatPeminjaman() {
         viewModelScope.launch {
             _isLoading.value = true
-            peminjamanRepository.listenSemuaPeminjaman().collect { list ->
-                _daftarPeminjaman.value = list.filter { it.status == "Diproses" }
-                _isLoading.value = false
-            }
+            _errorMessage.value = null
+
+            peminjamanRepository.listenSemuaPeminjaman()
+                .catch { exception ->
+                    _isLoading.value = false
+                    _errorMessage.value = exception.localizedMessage ?: "Gagal memuat data peminjaman"
+                }
+                .collect { list ->
+                    _daftarPeminjaman.value = list.filter { it.status == "Diproses" }
+                    _isLoading.value = false
+                }
         }
     }
 
     fun muatPengembalian() {
         viewModelScope.launch {
             val result = pengembalianRepository.semuaPengembalian()
-            result.onSuccess { list ->
-                _daftarPengembalian.value = list.filter { it.status == "Menunggu Verifikasi" }
-            }
+
+            result
+                .onSuccess { list ->
+                    _daftarPengembalian.value = list.filter {
+                        it.status == "Menunggu Verifikasi"
+                    }
+                }
+                .onFailure { exception ->
+                    _errorMessage.value = exception.localizedMessage ?: "Gagal memuat data pengembalian"
+                }
         }
     }
 
     fun setujui(id: String) {
         viewModelScope.launch {
-            peminjamanRepository.updateStatus(id, "Disetujui")
+            val result = peminjamanRepository.updateStatus(id, "Disetujui")
+
+            result.onFailure { exception ->
+                _errorMessage.value = exception.localizedMessage ?: "Gagal menyetujui peminjaman"
+            }
         }
     }
 
     fun tolak(id: String) {
         viewModelScope.launch {
-            peminjamanRepository.updateStatus(id, "Ditolak")
+            val result = peminjamanRepository.updateStatus(id, "Ditolak")
+
+            result.onFailure { exception ->
+                _errorMessage.value = exception.localizedMessage ?: "Gagal menolak peminjaman"
+            }
         }
     }
 }
