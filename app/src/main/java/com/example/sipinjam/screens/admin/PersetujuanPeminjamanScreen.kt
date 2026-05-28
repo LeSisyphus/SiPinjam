@@ -27,9 +27,11 @@ fun PersetujuanPeminjamanScreen(
     onBarangClick: () -> Unit = {},
     onPermintaanClick: () -> Unit = {},
     onProfilClick: () -> Unit = {},
+    onVerifikasiClick: (pengembalianId: String) -> Unit = {},
     viewModel: PersetujuanPeminjamanViewModel = viewModel()
 ) {
     val daftarPeminjaman by viewModel.daftarPeminjaman.collectAsState()
+    val daftarPengembalian by viewModel.daftarPengembalian.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
 
     var tabAktif by remember { mutableIntStateOf(0) }
@@ -96,34 +98,129 @@ fun PersetujuanPeminjamanScreen(
             ) {
                 CircularProgressIndicator(color = SiPinjamBlue)
             }
-        } else if (daftarPeminjaman.isEmpty()) {
+        } else {
+            when (tabAktif) {
+                0 -> {
+                    if (daftarPeminjaman.isEmpty()) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(innerPadding),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                text = stringResource(R.string.empty_permohonan),
+                                color = TextSecondary,
+                                fontSize = 14.sp
+                            )
+                        }
+                    } else {
+                        LazyColumn(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(innerPadding)
+                                .padding(16.dp),
+                            verticalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
+                            items(daftarPeminjaman, key = { it.id }) { item ->
+                                PermohonanCard(
+                                    namaUser   = item.namaUser,
+                                    namaBarang = item.namaBarang,
+                                    tanggal    = "${item.tanggalPinjam} - ${item.tanggalKembali}",
+                                    onSetujui  = { viewModel.setujui(item.id) },
+                                    onTolak    = { viewModel.tolak(item.id) }
+                                )
+                            }
+                        }
+                    }
+                }
+                1 -> {
+                    if (daftarPengembalian.isEmpty()) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(innerPadding),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                text = "Tidak ada pengembalian menunggu verifikasi",
+                                color = TextSecondary,
+                                fontSize = 14.sp
+                            )
+                        }
+                    } else {
+                        LazyColumn(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(innerPadding)
+                                .padding(16.dp),
+                            verticalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
+                            items(daftarPengembalian, key = { it.id }) { item ->
+                                PengembalianCard(
+                                    tanggalKembali = item.tanggalKembali,
+                                    catatan        = item.catatan,
+                                    onClick        = { onVerifikasiClick(item.id) }
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun PengembalianCard(
+    tanggalKembali: String,
+    catatan: String,
+    onClick: () -> Unit
+) {
+    Card(
+        onClick = onClick,
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(14.dp),
+        colors = CardDefaults.cardColors(containerColor = CardWhite),
+        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+    ) {
+        Row(
+            modifier = Modifier.padding(14.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
             Box(
                 modifier = Modifier
-                    .fillMaxSize()
-                    .padding(innerPadding),
-                contentAlignment = Alignment.Center
-            ) {
+                    .size(48.dp)
+                    .clip(RoundedCornerShape(8.dp))
+                    .background(DarkImageBg)
+            )
+            Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    text = stringResource(R.string.empty_permohonan),
-                    color = TextSecondary,
-                    fontSize = 14.sp
+                    text = tanggalKembali,
+                    color = TextPrimary,
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.SemiBold
                 )
-            }
-        } else {
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(innerPadding)
-                    .padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                items(daftarPeminjaman, key = { it.id }) { item ->
-                    PermohonanCard(
-                        namaUser = item.namaUser,
-                        namaBarang = item.namaBarang,
-                        tanggal = "${item.tanggalPinjam} - ${item.tanggalKembali}",
-                        onSetujui = { viewModel.setujui(item.id) },
-                        onTolak = { viewModel.tolak(item.id) }
+                if (catatan.isNotBlank()) {
+                    Text(
+                        text = catatan,
+                        color = TextSecondary,
+                        fontSize = 12.sp,
+                        maxLines = 1
+                    )
+                }
+                Box(
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(4.dp))
+                        .background(StatusOrangeBg)
+                        .padding(horizontal = 8.dp, vertical = 3.dp)
+                ) {
+                    Text(
+                        text = "Menunggu Verifikasi",
+                        color = StatusOrange,
+                        fontSize = 11.sp,
+                        fontWeight = FontWeight.Bold
                     )
                 }
             }
