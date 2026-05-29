@@ -1,52 +1,78 @@
 package com.example.sipinjam.navigation
 
+import android.net.Uri
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.sipinjam.screens.auth.ForgotPasswordScreen
-import com.example.sipinjam.screens.auth.RegisterScreen
-import com.example.sipinjam.screens.user.DetailBarangScreen
+import androidx.navigation.navArgument
 import com.example.sipinjam.screens.admin.DashboardAdminScreen
 import com.example.sipinjam.screens.admin.KelolaBarangScreen
+import com.example.sipinjam.screens.admin.KelolaBarangViewModel
 import com.example.sipinjam.screens.admin.PersetujuanPeminjamanScreen
 import com.example.sipinjam.screens.admin.VerifikasiPengembalianScreen
+import com.example.sipinjam.screens.auth.ForgotPasswordScreen
 import com.example.sipinjam.screens.auth.LoginScreen
-import com.example.sipinjam.screens.user.PeminjamanScreen
+import com.example.sipinjam.screens.auth.RegisterScreen
 import com.example.sipinjam.screens.user.BerandaUserScreen
+import com.example.sipinjam.screens.user.DetailBarangScreen
 import com.example.sipinjam.screens.user.GantiPasswordScreen
+import com.example.sipinjam.screens.user.PeminjamanScreen
+import com.example.sipinjam.screens.user.PengembalianScreen
 import com.example.sipinjam.screens.user.ProfilScreen
 import com.example.sipinjam.screens.user.RiwayatPeminjamanScreen
-import com.example.sipinjam.screens.user.PengembalianScreen
-import androidx.navigation.NavType
-import androidx.navigation.navArgument
 
 object Routes {
-    const val LOGIN                   = "login"
-    const val REGISTER                = "register"
-    const val BERANDA_USER            = "beranda_user"
-    const val FORGOT_PASSWORD         = "forgot_password"
-    const val DETAIL_BARANG           = "detail_barang"
-    const val AJUKAN_PEMINJAMAN       = "ajukan_peminjaman/{barangId}/{namaBarang}/{kategoriBarang}/{statusBarang}"
-    const val DASHBOARD_ADMIN         = "dashboard_admin"
-    const val KELOLA_BARANG           = "kelola_barang"
-    const val PROFIL                  = "profil"
-    const val GANTI_PASSWORD          = "ganti_password"
-    const val RIWAYAT_PEMINJAMAN      = "riwayat_peminjaman"
-    const val PENGEMBALIAN            = "pengembalian/{peminjamanId}/{barangId}/{userId}/{namaBarang}/{tanggalPinjam}/{tanggalJatuhTempo}"
-    const val PERSETUJUAN_PEMINJAMAN  = "persetujuan_peminjaman"
-    const val VERIFIKASI_PENGEMBALIAN = "verifikasi_pengembalian/{pengembalianId}"
+    const val LOGIN = "login"
+    const val REGISTER = "register"
+    const val BERANDA_USER = "beranda_user"
+    const val FORGOT_PASSWORD = "forgot_password"
+
+    private const val DETAIL_BARANG_BASE = "detail_barang"
+    const val DETAIL_BARANG = "$DETAIL_BARANG_BASE/{barangId}"
+
+    const val AJUKAN_PEMINJAMAN =
+        "ajukan_peminjaman?barangId={barangId}&namaBarang={namaBarang}&kategoriBarang={kategoriBarang}&statusBarang={statusBarang}"
+
+    const val DASHBOARD_ADMIN = "dashboard_admin"
+    const val KELOLA_BARANG = "kelola_barang"
+    const val PROFIL = "profil"
+    const val GANTI_PASSWORD = "ganti_password"
+    const val RIWAYAT_PEMINJAMAN = "riwayat_peminjaman"
+
+    const val PENGEMBALIAN =
+        "pengembalian?peminjamanId={peminjamanId}&barangId={barangId}&userId={userId}&namaBarang={namaBarang}&tanggalPinjam={tanggalPinjam}&tanggalJatuhTempo={tanggalJatuhTempo}"
+
+    const val PERSETUJUAN_PEMINJAMAN = "persetujuan_peminjaman"
+
+    private const val VERIFIKASI_PENGEMBALIAN_BASE = "verifikasi_pengembalian"
+    const val VERIFIKASI_PENGEMBALIAN = "$VERIFIKASI_PENGEMBALIAN_BASE/{pengembalianId}"
+
+    fun detailBarang(barangId: String): String {
+        return "$DETAIL_BARANG_BASE/${Uri.encode(barangId)}"
+    }
 
     fun ajukanPeminjaman(
         barangId: String,
         namaBarang: String,
         kategoriBarang: String,
         statusBarang: String
-    ) = "ajukan_peminjaman/$barangId/$namaBarang/$kategoriBarang/$statusBarang"
+    ): String {
+        return "ajukan_peminjaman" +
+                "?barangId=${Uri.encode(barangId)}" +
+                "&namaBarang=${Uri.encode(namaBarang)}" +
+                "&kategoriBarang=${Uri.encode(kategoriBarang)}" +
+                "&statusBarang=${Uri.encode(statusBarang)}"
+    }
 
     fun pengembalian(
         peminjamanId: String,
@@ -55,9 +81,25 @@ object Routes {
         namaBarang: String,
         tanggalPinjam: String,
         tanggalJatuhTempo: String
-    ) = "pengembalian/$peminjamanId/$barangId/$userId/$namaBarang/$tanggalPinjam/$tanggalJatuhTempo"
+    ): String {
+        return "pengembalian" +
+                "?peminjamanId=${Uri.encode(peminjamanId)}" +
+                "&barangId=${Uri.encode(barangId)}" +
+                "&userId=${Uri.encode(userId)}" +
+                "&namaBarang=${Uri.encode(namaBarang)}" +
+                "&tanggalPinjam=${Uri.encode(tanggalPinjam)}" +
+                "&tanggalJatuhTempo=${Uri.encode(tanggalJatuhTempo)}"
+    }
 
-    fun verifikasiPengembalian(pengembalianId: String) = "verifikasi_pengembalian/$pengembalianId"
+    fun verifikasiPengembalian(pengembalianId: String): String {
+        return "$VERIFIKASI_PENGEMBALIAN_BASE/${Uri.encode(pengembalianId)}"
+    }
+}
+
+private fun NavHostController.navigateSingleTop(route: String) {
+    navigate(route) {
+        launchSingleTop = true
+    }
 }
 
 @Composable
@@ -67,25 +109,40 @@ fun NavGraph(
     startDestination: String = Routes.LOGIN,
     isAdmin: Boolean = false,
 ) {
+    var currentIsAdmin by rememberSaveable { mutableStateOf(isAdmin) }
+
+    val resolvedStartDestination = when {
+        isLoggedIn && currentIsAdmin -> Routes.DASHBOARD_ADMIN
+        isLoggedIn && !currentIsAdmin -> Routes.BERANDA_USER
+        else -> startDestination
+    }
+
     NavHost(
         navController = navController,
-        startDestination = startDestination
+        startDestination = resolvedStartDestination
     ) {
         composable(Routes.LOGIN) {
             LoginScreen(
-                onLoginSuccess = { isAdmin ->
-                    if (isAdmin) {
-                        navController.navigate(Routes.DASHBOARD_ADMIN) {
-                            popUpTo(Routes.LOGIN) { inclusive = true }
-                        }
+                onLoginSuccess = { loggedInAsAdmin ->
+                    currentIsAdmin = loggedInAsAdmin
+
+                    val destination = if (loggedInAsAdmin) {
+                        Routes.DASHBOARD_ADMIN
                     } else {
-                        navController.navigate(Routes.BERANDA_USER) {
-                            popUpTo(Routes.LOGIN) { inclusive = true }
-                        }
+                        Routes.BERANDA_USER
+                    }
+
+                    navController.navigate(destination) {
+                        popUpTo(Routes.LOGIN) { inclusive = true }
+                        launchSingleTop = true
                     }
                 },
-                onRegisterClick = { navController.navigate(Routes.REGISTER) },
-                onForgotPasswordClick = { navController.navigate(Routes.FORGOT_PASSWORD) }
+                onRegisterClick = {
+                    navController.navigateSingleTop(Routes.REGISTER)
+                },
+                onForgotPasswordClick = {
+                    navController.navigateSingleTop(Routes.FORGOT_PASSWORD)
+                }
             )
         }
 
@@ -98,8 +155,11 @@ fun NavGraph(
         composable(Routes.REGISTER) {
             RegisterScreen(
                 onRegisterSuccess = {
+                    currentIsAdmin = false
+
                     navController.navigate(Routes.BERANDA_USER) {
                         popUpTo(Routes.LOGIN) { inclusive = true }
+                        launchSingleTop = true
                     }
                 },
                 onBackClick = { navController.popBackStack() }
@@ -108,21 +168,62 @@ fun NavGraph(
 
         composable(Routes.BERANDA_USER) {
             BerandaUserScreen(
-                onLihatSemuaBarang = { navController.navigate(Routes.DETAIL_BARANG) },
-                onBarangClick      = { navController.navigate(Routes.DETAIL_BARANG) },
-                onBerandaClick     = {},
-                onKatalogClick     = { navController.navigate(Routes.DETAIL_BARANG) },
-                onRiwayatClick     = { navController.navigate(Routes.RIWAYAT_PEMINJAMAN) },
-                onProfilClick      = { navController.navigate(Routes.PROFIL) }
+                onLihatSemuaBarang = {
+                    navController.navigateSingleTop(Routes.BERANDA_USER)
+                },
+                onBarangClick = { barang ->
+                    if (barang.id.isNotBlank()) {
+                        navController.navigate(Routes.detailBarang(barang.id))
+                    }
+                },
+                onBerandaClick = {},
+                onKatalogClick = {
+                    navController.navigateSingleTop(Routes.BERANDA_USER)
+                },
+                onRiwayatClick = {
+                    navController.navigateSingleTop(Routes.RIWAYAT_PEMINJAMAN)
+                },
+                onProfilClick = {
+                    navController.navigateSingleTop(Routes.PROFIL)
+                },
+                onPengembalianClick = { peminjamanId, barangId, userId, namaBarang, tanggalPinjam, tanggalJatuhTempo ->
+                    navController.navigate(
+                        Routes.pengembalian(
+                            peminjamanId = peminjamanId,
+                            barangId = barangId,
+                            userId = userId,
+                            namaBarang = namaBarang,
+                            tanggalPinjam = tanggalPinjam,
+                            tanggalJatuhTempo = tanggalJatuhTempo
+                        )
+                    )
+                }
             )
         }
 
-        composable(Routes.DETAIL_BARANG) {
+        composable(
+            route = Routes.DETAIL_BARANG,
+            arguments = listOf(
+                navArgument("barangId") {
+                    type = NavType.StringType
+                }
+            )
+        ) { backStackEntry ->
+            val barangId = backStackEntry.arguments?.getString("barangId").orEmpty()
+
             DetailBarangScreen(
-                onBackClick = { navController.navigate(Routes.BERANDA_USER) },
-                onAjukanPeminjaman = { barangId, namaBarang, kategoriBarang, statusBarang ->
+                barangId = barangId,
+                onBackClick = {
+                    navController.popBackStack()
+                },
+                onAjukanPeminjaman = { id, namaBarang, kategoriBarang, statusBarang ->
                     navController.navigate(
-                        Routes.ajukanPeminjaman(barangId, namaBarang, kategoriBarang, statusBarang)
+                        Routes.ajukanPeminjaman(
+                            barangId = id,
+                            namaBarang = namaBarang,
+                            kategoriBarang = kategoriBarang,
+                            statusBarang = statusBarang
+                        )
                     )
                 }
             )
@@ -131,26 +232,41 @@ fun NavGraph(
         composable(
             route = Routes.AJUKAN_PEMINJAMAN,
             arguments = listOf(
-                navArgument("barangId")       { type = NavType.StringType },
-                navArgument("namaBarang")     { type = NavType.StringType },
-                navArgument("kategoriBarang") { type = NavType.StringType },
-                navArgument("statusBarang")   { type = NavType.StringType },
+                navArgument("barangId") {
+                    type = NavType.StringType
+                    defaultValue = ""
+                },
+                navArgument("namaBarang") {
+                    type = NavType.StringType
+                    defaultValue = ""
+                },
+                navArgument("kategoriBarang") {
+                    type = NavType.StringType
+                    defaultValue = ""
+                },
+                navArgument("statusBarang") {
+                    type = NavType.StringType
+                    defaultValue = ""
+                },
             )
         ) { backStackEntry ->
-            val barangId       = backStackEntry.arguments?.getString("barangId") ?: ""
-            val namaBarang     = backStackEntry.arguments?.getString("namaBarang") ?: ""
-            val kategoriBarang = backStackEntry.arguments?.getString("kategoriBarang") ?: ""
-            val statusBarang   = backStackEntry.arguments?.getString("statusBarang") ?: ""
+            val barangId = backStackEntry.arguments?.getString("barangId").orEmpty()
+            val namaBarang = backStackEntry.arguments?.getString("namaBarang").orEmpty()
+            val kategoriBarang = backStackEntry.arguments?.getString("kategoriBarang").orEmpty()
+            val statusBarang = backStackEntry.arguments?.getString("statusBarang").orEmpty()
 
             PeminjamanScreen(
-                barangId       = barangId,
-                namaBarang     = namaBarang,
+                barangId = barangId,
+                namaBarang = namaBarang,
                 kategoriBarang = kategoriBarang,
-                statusBarang   = statusBarang,
-                onBackClick    = { navController.popBackStack() },
+                statusBarang = statusBarang,
+                onBackClick = {
+                    navController.popBackStack()
+                },
                 onKirimPermohonan = { _, _, _ ->
                     navController.navigate(Routes.BERANDA_USER) {
-                        popUpTo(Routes.BERANDA_USER) { inclusive = true }
+                        popUpTo(Routes.BERANDA_USER) { inclusive = false }
+                        launchSingleTop = true
                     }
                 }
             )
@@ -158,14 +274,29 @@ fun NavGraph(
 
         composable(Routes.RIWAYAT_PEMINJAMAN) {
             RiwayatPeminjamanScreen(
-                onBackClick    = { navController.popBackStack() },
-                onBerandaClick = { navController.navigate(Routes.BERANDA_USER) },
-                onKatalogClick = { navController.navigate(Routes.DETAIL_BARANG) },
+                onBackClick = {
+                    navController.popBackStack()
+                },
+                onBerandaClick = {
+                    navController.navigateSingleTop(Routes.BERANDA_USER)
+                },
+                onKatalogClick = {
+                    navController.navigateSingleTop(Routes.BERANDA_USER)
+                },
                 onRiwayatClick = {},
-                onProfilClick  = { navController.navigate(Routes.PROFIL) },
+                onProfilClick = {
+                    navController.navigateSingleTop(Routes.PROFIL)
+                },
                 onPengembalianClick = { peminjamanId, barangId, userId, namaBarang, tanggalPinjam, tanggalJatuhTempo ->
                     navController.navigate(
-                        Routes.pengembalian(peminjamanId, barangId, userId, namaBarang, tanggalPinjam, tanggalJatuhTempo)
+                        Routes.pengembalian(
+                            peminjamanId = peminjamanId,
+                            barangId = barangId,
+                            userId = userId,
+                            namaBarang = namaBarang,
+                            tanggalPinjam = tanggalPinjam,
+                            tanggalJatuhTempo = tanggalJatuhTempo
+                        )
                     )
                 }
             )
@@ -174,105 +305,82 @@ fun NavGraph(
         composable(
             route = Routes.PENGEMBALIAN,
             arguments = listOf(
-                navArgument("peminjamanId")      { type = NavType.StringType },
-                navArgument("barangId")          { type = NavType.StringType },
-                navArgument("userId")            { type = NavType.StringType },
-                navArgument("namaBarang")        { type = NavType.StringType },
-                navArgument("tanggalPinjam")     { type = NavType.StringType },
-                navArgument("tanggalJatuhTempo") { type = NavType.StringType },
+                navArgument("peminjamanId") {
+                    type = NavType.StringType
+                    defaultValue = ""
+                },
+                navArgument("barangId") {
+                    type = NavType.StringType
+                    defaultValue = ""
+                },
+                navArgument("userId") {
+                    type = NavType.StringType
+                    defaultValue = ""
+                },
+                navArgument("namaBarang") {
+                    type = NavType.StringType
+                    defaultValue = ""
+                },
+                navArgument("tanggalPinjam") {
+                    type = NavType.StringType
+                    defaultValue = ""
+                },
+                navArgument("tanggalJatuhTempo") {
+                    type = NavType.StringType
+                    defaultValue = ""
+                },
             )
         ) { backStackEntry ->
-            val peminjamanId      = backStackEntry.arguments?.getString("peminjamanId") ?: ""
-            val barangId          = backStackEntry.arguments?.getString("barangId") ?: ""
-            val userId            = backStackEntry.arguments?.getString("userId") ?: ""
-            val namaBarang        = backStackEntry.arguments?.getString("namaBarang") ?: ""
-            val tanggalPinjam     = backStackEntry.arguments?.getString("tanggalPinjam") ?: ""
-            val tanggalJatuhTempo = backStackEntry.arguments?.getString("tanggalJatuhTempo") ?: ""
+            val peminjamanId = backStackEntry.arguments?.getString("peminjamanId").orEmpty()
+            val barangId = backStackEntry.arguments?.getString("barangId").orEmpty()
+            val userId = backStackEntry.arguments?.getString("userId").orEmpty()
+            val namaBarang = backStackEntry.arguments?.getString("namaBarang").orEmpty()
+            val tanggalPinjam = backStackEntry.arguments?.getString("tanggalPinjam").orEmpty()
+            val tanggalJatuhTempo = backStackEntry.arguments?.getString("tanggalJatuhTempo").orEmpty()
 
             PengembalianScreen(
-                peminjamanId      = peminjamanId,
-                barangId          = barangId,
-                userId            = userId,
-                namaBarang        = namaBarang,
-                tanggalPinjam     = tanggalPinjam,
+                peminjamanId = peminjamanId,
+                barangId = barangId,
+                userId = userId,
+                namaBarang = namaBarang,
+                tanggalPinjam = tanggalPinjam,
                 tanggalJatuhTempo = tanggalJatuhTempo,
-                onBackClick       = { navController.popBackStack() },
+                onBackClick = {
+                    navController.popBackStack()
+                },
                 onKirimPengembalian = {
                     navController.navigate(Routes.RIWAYAT_PEMINJAMAN) {
-                        popUpTo(Routes.RIWAYAT_PEMINJAMAN) { inclusive = true }
+                        popUpTo(Routes.RIWAYAT_PEMINJAMAN) { inclusive = false }
+                        launchSingleTop = true
                     }
                 }
-            )
-        }
-
-        composable(Routes.PERSETUJUAN_PEMINJAMAN) {
-            PersetujuanPeminjamanScreen(
-                onDashboardClick  = { navController.navigate(Routes.DASHBOARD_ADMIN) { popUpTo(Routes.DASHBOARD_ADMIN) { inclusive = true } } },
-                onBarangClick     = { navController.navigate(Routes.KELOLA_BARANG) },
-                onPermintaanClick = {},
-                onProfilClick     = { navController.navigate(Routes.PROFIL) },
-                onVerifikasiClick = { pengembalianId ->
-                    navController.navigate(Routes.verifikasiPengembalian(pengembalianId))
-                }
-            )
-        }
-
-        composable(
-            route = Routes.VERIFIKASI_PENGEMBALIAN,
-            arguments = listOf(
-                navArgument("pengembalianId") { type = NavType.StringType }
-            )
-        ) { backStackEntry ->
-            val pengembalianId = backStackEntry.arguments?.getString("pengembalianId") ?: ""
-            VerifikasiPengembalianScreen(
-                pengembalianId   = pengembalianId,
-                onBackClick      = { navController.popBackStack() },
-                onVerifikasiDone = {
-                    navController.navigate(Routes.PERSETUJUAN_PEMINJAMAN) {
-                        popUpTo(Routes.PERSETUJUAN_PEMINJAMAN) { inclusive = true }
-                    }
-                }
-            )
-        }
-
-        composable(Routes.PROFIL) {
-            ProfilScreen(
-                isAdmin              = false,
-                onGantiPasswordClick = { navController.navigate(Routes.GANTI_PASSWORD) },
-                onLogoutDone         = {
-                    navController.navigate(Routes.LOGIN) {
-                        popUpTo(0) { inclusive = true }
-                    }
-                },
-                onBerandaClick    = { navController.navigate(Routes.BERANDA_USER) { popUpTo(Routes.BERANDA_USER) { inclusive = true } } },
-                onKatalogClick    = { navController.navigate(Routes.DETAIL_BARANG) },
-                onRiwayatClick    = { navController.navigate(Routes.RIWAYAT_PEMINJAMAN) },
-                onDashboardClick  = { navController.navigate(Routes.DASHBOARD_ADMIN) { popUpTo(Routes.DASHBOARD_ADMIN) { inclusive = true } } },
-                onBarangClick     = { navController.navigate(Routes.KELOLA_BARANG) },
-                onPermintaanClick = { navController.navigate(Routes.PERSETUJUAN_PEMINJAMAN) },
-            )
-        }
-
-        composable(Routes.GANTI_PASSWORD) {
-            GantiPasswordScreen(
-                onBackClick = { navController.popBackStack() }
             )
         }
 
         composable(Routes.DASHBOARD_ADMIN) {
             DashboardAdminScreen(
-                onLihatSemua      = { navController.navigate(Routes.KELOLA_BARANG) },
-                onTinjau          = {},
-                onDashboardClick  = {},
-                onBarangClick     = { navController.navigate(Routes.KELOLA_BARANG) },
-                onPermintaanClick = { navController.navigate(Routes.PERSETUJUAN_PEMINJAMAN) },
-                onProfilClick     = { navController.navigate(Routes.PROFIL) }
+                onLihatSemua = {
+                    navController.navigateSingleTop(Routes.KELOLA_BARANG)
+                },
+                onTinjau = {
+                    navController.navigateSingleTop(Routes.PERSETUJUAN_PEMINJAMAN)
+                },
+                onDashboardClick = {},
+                onBarangClick = {
+                    navController.navigateSingleTop(Routes.KELOLA_BARANG)
+                },
+                onPermintaanClick = {
+                    navController.navigateSingleTop(Routes.PERSETUJUAN_PEMINJAMAN)
+                },
+                onProfilClick = {
+                    navController.navigateSingleTop(Routes.PROFIL)
+                }
             )
         }
 
         composable(Routes.KELOLA_BARANG) {
             val context = LocalContext.current
-            val adminViewModel: com.example.sipinjam.screens.admin.KelolaBarangViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
+            val adminViewModel: KelolaBarangViewModel = viewModel()
             val adminUiState by adminViewModel.uiState.collectAsState()
 
             KelolaBarangScreen(
@@ -285,15 +393,15 @@ fun NavGraph(
                 isSuccess = adminUiState.isSuccess,
                 onTambahConfirm = { nama, kategori, stok, kondisi, lokasi, maksPinjam, deskripsi, imageUri ->
                     adminViewModel.onTambahBarangCloudinary(
-                        context,
-                        nama,
-                        kategori,
-                        stok,
-                        kondisi,
-                        lokasi,
-                        maksPinjam,
-                        deskripsi,
-                        imageUri
+                        context = context,
+                        nama = nama,
+                        kategori = kategori,
+                        stok = stok,
+                        kondisi = kondisi,
+                        lokasi = lokasi,
+                        maksimalPinjam = maksPinjam,
+                        deskripsi = deskripsi,
+                        imageUri = imageUri
                     )
                 },
                 onEditClick = { barang ->
@@ -301,12 +409,12 @@ fun NavGraph(
                 },
                 onEditConfirm = { id, nama, kategori, stok, imageUri ->
                     adminViewModel.onEditBarangFirestore(
-                        context,
-                        id,
-                        nama,
-                        kategori,
-                        stok,
-                        imageUri
+                        context = context,
+                        id = id,
+                        nama = nama,
+                        kategori = kategori,
+                        stok = stok,
+                        imageUri = imageUri
                     )
                 },
                 onEditDismiss = {
@@ -325,16 +433,101 @@ fun NavGraph(
                     adminViewModel.resetSuccessState()
                 },
                 onDashboardClick = {
-                    navController.navigate(Routes.DASHBOARD_ADMIN) {
-                        popUpTo(Routes.DASHBOARD_ADMIN) { inclusive = true }
-                    }
+                    navController.navigateSingleTop(Routes.DASHBOARD_ADMIN)
                 },
                 onBarangClick = {},
                 onPermintaanClick = {
-                    navController.navigate(Routes.PERSETUJUAN_PEMINJAMAN)
+                    navController.navigateSingleTop(Routes.PERSETUJUAN_PEMINJAMAN)
                 },
                 onProfilClick = {
-                    navController.navigate(Routes.PROFIL)
+                    navController.navigateSingleTop(Routes.PROFIL)
+                }
+            )
+        }
+
+        composable(Routes.PERSETUJUAN_PEMINJAMAN) {
+            PersetujuanPeminjamanScreen(
+                onDashboardClick = {
+                    navController.navigateSingleTop(Routes.DASHBOARD_ADMIN)
+                },
+                onBarangClick = {
+                    navController.navigateSingleTop(Routes.KELOLA_BARANG)
+                },
+                onPermintaanClick = {},
+                onProfilClick = {
+                    navController.navigateSingleTop(Routes.PROFIL)
+                },
+                onVerifikasiClick = { pengembalianId ->
+                    navController.navigate(
+                        Routes.verifikasiPengembalian(pengembalianId)
+                    )
+                }
+            )
+        }
+
+        composable(
+            route = Routes.VERIFIKASI_PENGEMBALIAN,
+            arguments = listOf(
+                navArgument("pengembalianId") {
+                    type = NavType.StringType
+                }
+            )
+        ) { backStackEntry ->
+            val pengembalianId = backStackEntry.arguments?.getString("pengembalianId").orEmpty()
+
+            VerifikasiPengembalianScreen(
+                pengembalianId = pengembalianId,
+                onBackClick = {
+                    navController.popBackStack()
+                },
+                onVerifikasiDone = {
+                    navController.navigate(Routes.PERSETUJUAN_PEMINJAMAN) {
+                        popUpTo(Routes.PERSETUJUAN_PEMINJAMAN) { inclusive = false }
+                        launchSingleTop = true
+                    }
+                }
+            )
+        }
+
+        composable(Routes.PROFIL) {
+            ProfilScreen(
+                isAdmin = currentIsAdmin,
+                onGantiPasswordClick = {
+                    navController.navigateSingleTop(Routes.GANTI_PASSWORD)
+                },
+                onLogoutDone = {
+                    currentIsAdmin = false
+
+                    navController.navigate(Routes.LOGIN) {
+                        popUpTo(0) { inclusive = true }
+                        launchSingleTop = true
+                    }
+                },
+                onBerandaClick = {
+                    navController.navigateSingleTop(Routes.BERANDA_USER)
+                },
+                onKatalogClick = {
+                    navController.navigateSingleTop(Routes.BERANDA_USER)
+                },
+                onRiwayatClick = {
+                    navController.navigateSingleTop(Routes.RIWAYAT_PEMINJAMAN)
+                },
+                onDashboardClick = {
+                    navController.navigateSingleTop(Routes.DASHBOARD_ADMIN)
+                },
+                onBarangClick = {
+                    navController.navigateSingleTop(Routes.KELOLA_BARANG)
+                },
+                onPermintaanClick = {
+                    navController.navigateSingleTop(Routes.PERSETUJUAN_PEMINJAMAN)
+                },
+            )
+        }
+
+        composable(Routes.GANTI_PASSWORD) {
+            GantiPasswordScreen(
+                onBackClick = {
+                    navController.popBackStack()
                 }
             )
         }
