@@ -3,6 +3,7 @@ package com.example.sipinjam.screens.admin
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.sipinjam.data.model.Pengembalian
+import com.example.sipinjam.data.repository.BarangRepository
 import com.example.sipinjam.data.repository.PengembalianRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -12,6 +13,7 @@ import kotlinx.coroutines.launch
 class VerifikasiPengembalianViewModel : ViewModel() {
 
     private val repository = PengembalianRepository()
+    private val barangRepository = BarangRepository()
 
     private val _pengembalian = MutableStateFlow<Pengembalian?>(null)
     val pengembalian: StateFlow<Pengembalian?> = _pengembalian.asStateFlow()
@@ -40,6 +42,14 @@ class VerifikasiPengembalianViewModel : ViewModel() {
             _isLoading.value = true
             val result = repository.updateStatus(pengembalianId, "Terverifikasi")
             if (result.isSuccess) {
+                val data = _pengembalian.value
+                if (data != null) {
+                    val barang = barangRepository.getBarangById(data.barangId)
+                    if (barang != null) {
+                        val stokBaru = barang.stok + 1
+                        barangRepository.updateBarang(barang.copy(stok = stokBaru, tersedia = true))
+                    }
+                }
                 _sukses.value = true
             } else {
                 _errorMessage.value = result.exceptionOrNull()?.message

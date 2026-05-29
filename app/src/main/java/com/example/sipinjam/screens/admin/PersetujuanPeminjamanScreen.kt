@@ -127,7 +127,7 @@ fun PersetujuanPeminjamanScreen(
                                     namaUser   = item.namaUser,
                                     namaBarang = item.namaBarang,
                                     tanggal    = "${item.tanggalPinjam} - ${item.tanggalKembali}",
-                                    onSetujui  = { viewModel.setujui(item.id) },
+                                    onSetujui  = { viewModel.setujui(item) },
                                     onTolak    = { viewModel.tolak(item.id) }
                                 )
                             }
