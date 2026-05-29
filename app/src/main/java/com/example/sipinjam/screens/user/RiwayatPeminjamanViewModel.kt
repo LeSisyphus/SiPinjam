@@ -31,12 +31,9 @@ class RiwayatPeminjamanViewModel : ViewModel() {
                 _isLoading.value = false
                 return@launch
             }
-            val result = repository.getPeminjamanByUser(currentUser.uid)
             _isLoading.value = false
-            if (result.isSuccess) {
-                _daftarPeminjaman.value = result.getOrDefault(emptyList())
-            } else {
-                _errorMessage.value = result.exceptionOrNull()?.message
+            repository.listenPeminjamanByUser(currentUser.uid).collect { list ->
+                _daftarPeminjaman.value = list
             }
         }
     }

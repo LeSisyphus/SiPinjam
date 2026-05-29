@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.sipinjam.data.model.Peminjaman
 import com.example.sipinjam.data.model.Pengembalian
+import com.example.sipinjam.data.repository.BarangRepository
 import com.example.sipinjam.data.repository.PeminjamanRepository
 import com.example.sipinjam.data.repository.PengembalianRepository
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -13,7 +14,8 @@ import kotlinx.coroutines.launch
 
 class PersetujuanPeminjamanViewModel(
     private val peminjamanRepository: PeminjamanRepository = PeminjamanRepository(),
-    private val pengembalianRepository: PengembalianRepository = PengembalianRepository()
+    private val pengembalianRepository: PengembalianRepository = PengembalianRepository(),
+    private val barangRepository: BarangRepository = BarangRepository()
 ) : ViewModel() {
 
     private val _daftarPeminjaman = MutableStateFlow<List<Peminjaman>>(emptyList())
@@ -33,11 +35,10 @@ class PersetujuanPeminjamanViewModel(
     fun muatPeminjaman() {
         viewModelScope.launch {
             _isLoading.value = true
-            val result = peminjamanRepository.semuaPeminjaman()
-            result.onSuccess { list ->
+            peminjamanRepository.listenSemuaPeminjaman().collect { list ->
                 _daftarPeminjaman.value = list.filter { it.status == "Diproses" }
+                _isLoading.value = false
             }
-            _isLoading.value = false
         }
     }
 
@@ -50,17 +51,21 @@ class PersetujuanPeminjamanViewModel(
         }
     }
 
-    fun setujui(id: String) {
+    fun setujui(peminjaman: Peminjaman) {
         viewModelScope.launch {
-            peminjamanRepository.updateStatus(id, "Disetujui")
-            muatPeminjaman()
+            peminjamanRepository.updateStatus(peminjaman.id, "Disetujui")
+            val barang = barangRepository.getBarangById(peminjaman.barangId)
+            if (barang != null) {
+                val stokBaru = (barang.stok - 1).coerceAtLeast(0)
+                val tersedia = stokBaru > 0
+                barangRepository.updateBarang(barang.copy(stok = stokBaru, tersedia = tersedia))
+            }
         }
     }
 
     fun tolak(id: String) {
         viewModelScope.launch {
             peminjamanRepository.updateStatus(id, "Ditolak")
-            muatPeminjaman()
         }
     }
 }
