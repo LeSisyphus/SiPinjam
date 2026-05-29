@@ -52,11 +52,18 @@ fun PengembalianScreen(
     val isLoading by viewModel.isLoading.collectAsState()
     val sukses by viewModel.sukses.collectAsState()
     val errorMessage by viewModel.errorMessage.collectAsState()
+    val catatanAdmin by viewModel.catatanAdmin.collectAsState()
 
     LaunchedEffect(sukses) {
         if (sukses) {
             onKirimPengembalian()
             viewModel.resetState()
+        }
+    }
+
+    LaunchedEffect(peminjamanId) {
+        if (peminjamanId.isNotBlank()) {
+            viewModel.muatCatatanAdmin(peminjamanId)
         }
     }
 
@@ -392,6 +399,16 @@ fun PengembalianScreen(
                     color = StatusOrange,
                     fontSize = 13.sp,
                     lineHeight = 20.sp
+                )
+            }
+
+            if (!catatanAdmin.isNullOrBlank()) {
+                Text(
+                    text = "Catatan Admin: $catatanAdmin",
+                    color = StatusRed,
+                    fontSize = 13.sp,
+                    fontWeight = FontWeight.Medium,
+                    modifier = Modifier.fillMaxWidth()
                 )
             }
         }

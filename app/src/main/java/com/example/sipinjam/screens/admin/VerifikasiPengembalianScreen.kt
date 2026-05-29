@@ -1,6 +1,7 @@
 package com.example.sipinjam.screens.admin
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -33,6 +34,7 @@ fun VerifikasiPengembalianScreen(
     val isLoading by viewModel.isLoading.collectAsState()
     val sukses by viewModel.sukses.collectAsState()
     val errorMessage by viewModel.errorMessage.collectAsState()
+    val catatanTolak by viewModel.catatanTolak.collectAsState()
 
     var kondisi by remember { mutableStateOf("Baik") }
     var catatanVerifikasi by remember { mutableStateOf("") }
@@ -98,9 +100,7 @@ fun VerifikasiPengembalianScreen(
                         )
                     }
                     Button(
-                        onClick = {
-                            viewModel.verifikasi(pengembalianId, catatanVerifikasi)
-                        },
+                        onClick = { viewModel.verifikasi(pengembalianId, catatanVerifikasi, kondisi) },
                         enabled = !isLoading,
                         modifier = Modifier
                             .fillMaxWidth()
@@ -124,7 +124,7 @@ fun VerifikasiPengembalianScreen(
                         }
                     }
                     OutlinedButton(
-                        onClick = { viewModel.tolak(pengembalianId) },
+                        onClick = { viewModel.tolak(pengembalianId, catatanVerifikasi) },
                         enabled = !isLoading,
                         modifier = Modifier
                             .fillMaxWidth()
@@ -259,6 +259,7 @@ fun VerifikasiPengembalianScreen(
                                     modifier = Modifier
                                         .clip(RoundedCornerShape(8.dp))
                                         .background(if (isSelected) SiPinjamBlue else InputBg)
+                                        .clickable { kondisi = item }
                                         .padding(horizontal = 16.dp, vertical = 8.dp)
                                 ) {
                                     Text(
@@ -314,6 +315,16 @@ fun VerifikasiPengembalianScreen(
                             textStyle = LocalTextStyle.current.copy(fontSize = 14.sp, color = TextPrimary)
                         )
                     }
+                }
+
+                if (!catatanTolak.isNullOrBlank()) {
+                    Text(
+                        text = "Catatan Admin: $catatanTolak",
+                        color = StatusRed,
+                        fontSize = 13.sp,
+                        fontWeight = FontWeight.Medium,
+                        modifier = Modifier.padding(bottom = 8.dp)
+                    )
                 }
             }
         }

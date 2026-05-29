@@ -68,4 +68,28 @@ class PengembalianRepository {
             Result.failure(e)
         }
     }
+
+    suspend fun updateCatatanAdmin(id: String, catatanAdmin: String): Result<Unit> {
+        return try {
+            collection.document(id)
+                .update("catatanAdmin", catatanAdmin)
+                .await()
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    suspend fun getPengembalianByPeminjamanId(peminjamanId: String): Result<Pengembalian?> {
+        return try {
+            val snapshot = collection
+                .whereEqualTo("peminjamanId", peminjamanId)
+                .get()
+                .await()
+            val pengembalian = snapshot.toObjects(Pengembalian::class.java).firstOrNull()
+            Result.success(pengembalian)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
 }

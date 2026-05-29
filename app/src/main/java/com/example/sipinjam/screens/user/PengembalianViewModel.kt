@@ -30,6 +30,20 @@ class PengembalianViewModel : ViewModel() {
     private val _errorMessage = MutableStateFlow<String?>(null)
     val errorMessage: StateFlow<String?> = _errorMessage.asStateFlow()
 
+    private val _catatanAdmin = MutableStateFlow<String?>(null)
+    val catatanAdmin: StateFlow<String?> = _catatanAdmin.asStateFlow()
+
+    fun muatCatatanAdmin(peminjamanId: String) {
+        viewModelScope.launch {
+            val result = pengembalianRepository.getPengembalianByPeminjamanId(peminjamanId)
+            result.onSuccess { pengembalian ->
+                if (pengembalian?.status == "Ditolak" && !pengembalian.catatanAdmin.isNullOrBlank()) {
+                    _catatanAdmin.value = pengembalian.catatanAdmin
+                }
+            }
+        }
+    }
+
     fun kirimPengembalian(
         context: Context,
         peminjamanId: String,

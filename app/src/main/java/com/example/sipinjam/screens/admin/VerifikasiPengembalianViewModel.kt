@@ -3,6 +3,7 @@ package com.example.sipinjam.screens.admin
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.sipinjam.data.model.Pengembalian
+import com.example.sipinjam.data.repository.BarangRepository
 import com.example.sipinjam.data.repository.PengembalianRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -12,6 +13,7 @@ import kotlinx.coroutines.launch
 class VerifikasiPengembalianViewModel : ViewModel() {
 
     private val repository = PengembalianRepository()
+    private val barangRepository = BarangRepository()
 
     private val _pengembalian = MutableStateFlow<Pengembalian?>(null)
     val pengembalian: StateFlow<Pengembalian?> = _pengembalian.asStateFlow()
@@ -25,21 +27,37 @@ class VerifikasiPengembalianViewModel : ViewModel() {
     private val _errorMessage = MutableStateFlow<String?>(null)
     val errorMessage: StateFlow<String?> = _errorMessage.asStateFlow()
 
+    private val _catatanTolak = MutableStateFlow<String?>(null)
+    val catatanTolak: StateFlow<String?> = _catatanTolak.asStateFlow()
+
     fun muatPengembalian(pengembalianId: String) {
         viewModelScope.launch {
             _isLoading.value = true
             val result = repository.getPengembalianById(pengembalianId)
-            result.onSuccess { _pengembalian.value = it }
+            result.onSuccess {
+                _pengembalian.value = it
+                if (it.status == "Ditolak") {
+                    _catatanTolak.value = it.catatan
+                }
+            }
             result.onFailure { _errorMessage.value = it.message }
             _isLoading.value = false
         }
     }
 
-    fun verifikasi(pengembalianId: String, catatan: String) {
+    fun verifikasi(pengembalianId: String, catatan: String, kondisi: String) {
         viewModelScope.launch {
             _isLoading.value = true
             val result = repository.updateStatus(pengembalianId, "Terverifikasi")
             if (result.isSuccess) {
+                val data = _pengembalian.value
+                if (data != null) {
+                    val barang = barangRepository.getBarangById(data.barangId)
+                    if (barang != null) {
+                        val stokBaru = barang.stok + 1
+                        barangRepository.updateBarang(barang.copy(stok = stokBaru, tersedia = true))
+                    }
+                }
                 _sukses.value = true
             } else {
                 _errorMessage.value = result.exceptionOrNull()?.message
@@ -48,15 +66,15 @@ class VerifikasiPengembalianViewModel : ViewModel() {
         }
     }
 
-    fun tolak(pengembalianId: String) {
+    fun tolak(pengembalianId: String, catatan: String) {
         viewModelScope.launch {
             _isLoading.value = true
-            val result = repository.updateStatus(pengembalianId, "Ditolak")
-            if (result.isSuccess) {
-                _sukses.value = true
-            } else {
-                _errorMessage.value = result.exceptionOrNull()?.message
+            repository.updateStatus(pengembalianId, "Ditolak")
+            if (catatan.isNotBlank()) {
+                repository.updateCatatanAdmin(pengembalianId, catatan)
             }
+            _catatanTolak.value = catatan
+            _sukses.value = true
             _isLoading.value = false
         }
     }
