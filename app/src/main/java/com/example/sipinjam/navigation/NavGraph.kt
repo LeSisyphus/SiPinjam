@@ -276,67 +276,67 @@ fun NavGraph(
             val adminUiState by adminViewModel.uiState.collectAsState()
 
             KelolaBarangScreen(
-    daftarBarang = adminUiState.filteredBarang,
-    showEditDialog = adminUiState.showEditDialog,
-    barangToEdit = adminUiState.barangToEdit,
-    showDeleteDialog = adminUiState.showDeleteDialog,
-    barangToDelete = adminUiState.barangToDelete,
-    isLoading = adminUiState.isLoading,
-    isSuccess = adminUiState.isSuccess,
-    onTambahConfirm = { nama, kategori, stok, kondisi, lokasi, maksPinjam, deskripsi, imageUri ->
-        adminViewModel.onTambahBarangCloudinary(
-            context,
-            nama,
-            kategori,
-            stok,
-            kondisi,
-            lokasi,
-            maksPinjam,
-            deskripsi,
-            imageUri
-        )
-    },
-    onEditClick = { barang ->
-        adminViewModel.onEditRequest(barang)
-    },
-    onEditConfirm = { id, nama, kategori, stok, imageUri ->
-        adminViewModel.onEditBarangFirestore(
-            context,
-            id,
-            nama,
-            kategori,
-            stok,
-            imageUri
-        )
-    },
-    onEditDismiss = {
-        adminViewModel.onEditDismiss()
-    },
-    onDeleteClick = { barang ->
-        adminViewModel.onDeleteRequest(barang)
-    },
-    onDeleteConfirm = {
-        adminViewModel.onDeleteConfirm()
-    },
-    onDeleteDismiss = {
-        adminViewModel.onDeleteDismiss()
-    },
-    onSuccessDismiss = {
-        adminViewModel.resetSuccessState()
-    },
-    onDashboardClick = {
-        navController.navigate(Routes.DASHBOARD_ADMIN) {
-            popUpTo(Routes.DASHBOARD_ADMIN) { inclusive = true }
-        }
-    },
-    onBarangClick = {},
-    onPermintaanClick = {
-        navController.navigate(Routes.PERSETUJUAN_PEMINJAMAN)
-    },
-    onProfilClick = {
-        navController.navigate(Routes.PROFIL)
-    }
-)
+                daftarBarang = adminUiState.filteredBarang,
+                showEditDialog = adminUiState.showEditDialog,
+                barangToEdit = adminUiState.barangToEdit,
+                showDeleteDialog = adminUiState.showDeleteDialog,
+                barangToDelete = adminUiState.barangToDelete,
+                isLoading = adminUiState.isLoading,
+                isSuccess = adminUiState.isSuccess,
+                onTambahConfirm = { nama, kategori, stok, kondisi, lokasi, maksPinjam, deskripsi, imageUri ->
+                    adminViewModel.onTambahBarangCloudinary(
+                        context,
+                        nama,
+                        kategori,
+                        stok,
+                        kondisi,
+                        lokasi,
+                        maksPinjam,
+                        deskripsi,
+                        imageUri
+                    )
+                },
+                onEditClick = { barang ->
+                    adminViewModel.onEditRequest(barang)
+                },
+                onEditConfirm = { id, nama, kategori, stok, imageUri ->
+                    adminViewModel.onEditBarangFirestore(
+                        context,
+                        id,
+                        nama,
+                        kategori,
+                        stok,
+                        imageUri
+                    )
+                },
+                onEditDismiss = {
+                    adminViewModel.onEditDismiss()
+                },
+                onDeleteClick = { barang ->
+                    adminViewModel.onDeleteRequest(barang)
+                },
+                onDeleteConfirm = {
+                    adminViewModel.onDeleteConfirm()
+                },
+                onDeleteDismiss = {
+                    adminViewModel.onDeleteDismiss()
+                },
+                onSuccessDismiss = {
+                    adminViewModel.resetSuccessState()
+                },
+                onDashboardClick = {
+                    navController.navigate(Routes.DASHBOARD_ADMIN) {
+                        popUpTo(Routes.DASHBOARD_ADMIN) { inclusive = true }
+                    }
+                },
+                onBarangClick = {},
+                onPermintaanClick = {
+                    navController.navigate(Routes.PERSETUJUAN_PEMINJAMAN)
+                },
+                onProfilClick = {
+                    navController.navigate(Routes.PROFIL)
+                }
+            )
         }
     }
 }
