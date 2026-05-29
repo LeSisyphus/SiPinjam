@@ -24,6 +24,8 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.sipinjam.ui.theme.*
+import androidx.compose.ui.layout.ContentScale
+import coil.compose.AsyncImage
 
 data class DetailBarang(
     val id: String = "",
@@ -41,7 +43,7 @@ data class DetailBarang(
 
 @Composable
 fun DetailBarangScreen(
-    barangId: String = "barang_001",
+    barangId: String,
     viewModel: DetailBarangViewModel = viewModel(),
     onBackClick: () -> Unit = {},
     onAjukanPeminjaman: (
@@ -152,12 +154,21 @@ fun DetailBarangScreen(
                                 .background(DarkImageBg),
                             contentAlignment = Alignment.Center
                         ) {
-                            Icon(
-                                imageVector = Icons.Filled.Book,
-                                contentDescription = null,
-                                tint = Color.White.copy(alpha = 0.2f),
-                                modifier = Modifier.size(80.dp)
-                            )
+                            if (barang.imageUrl.isNotBlank()) {
+                                AsyncImage(
+                                    model = barang.imageUrl,
+                                    contentDescription = barang.nama,
+                                    modifier = Modifier.fillMaxSize(),
+                                    contentScale = ContentScale.Crop
+                                )
+                            } else {
+                                Icon(
+                                    imageVector = Icons.Filled.Book,
+                                    contentDescription = null,
+                                    tint = Color.White.copy(alpha = 0.2f),
+                                    modifier = Modifier.size(80.dp)
+                                )
+                            }
                         }
 
                         Column(
@@ -311,29 +322,6 @@ fun DetailBarangScreen(
                                     }
                                 }
                             }
-
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .clip(RoundedCornerShape(12.dp))
-                                    .background(InfoOrangeBg)
-                                    .padding(14.dp),
-                                verticalAlignment = Alignment.Top,
-                                horizontalArrangement = Arrangement.spacedBy(10.dp)
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Filled.Info,
-                                    contentDescription = null,
-                                    tint = StatusOrange,
-                                    modifier = Modifier.size(18.dp)
-                                )
-                                Text(
-                                    text = "Peminjaman memerlukan verifikasi Kartu Mahasiswa atau identitas staf aktif yang berlaku.",
-                                    color = StatusOrange,
-                                    fontSize = 13.sp,
-                                    lineHeight = 20.sp
-                                )
-                            }
                         }
                     }
                 }
@@ -359,6 +347,6 @@ private fun SpekItem(
 @Composable
 fun DetailBarangScreenPreview() {
     MaterialTheme {
-        DetailBarangScreen()
+        DetailBarangScreen(barangId = "preview_barang")
     }
 }
