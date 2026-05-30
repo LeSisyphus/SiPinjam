@@ -118,6 +118,7 @@ fun NavGraph(
     isLoggedIn: Boolean = false,
     startDestination: String = Routes.LOGIN,
     isAdmin: Boolean = false,
+    onAuthStateChanged: (isLoggedIn: Boolean, isAdmin: Boolean) -> Unit = { _, _ -> },
 ) {
     var currentIsAdmin by rememberSaveable { mutableStateOf(isAdmin) }
 
@@ -135,6 +136,7 @@ fun NavGraph(
             LoginScreen(
                 onLoginSuccess = { loggedInAsAdmin ->
                     currentIsAdmin = loggedInAsAdmin
+                    onAuthStateChanged(true, loggedInAsAdmin)
 
                     val destination = if (loggedInAsAdmin) {
                         Routes.DASHBOARD_ADMIN
@@ -168,6 +170,7 @@ fun NavGraph(
             RegisterScreen(
                 onRegisterSuccess = {
                     currentIsAdmin = false
+                    onAuthStateChanged(true, false)
 
                     navController.navigate(Routes.BERANDA_USER) {
                         popUpTo(Routes.LOGIN) { inclusive = true }
@@ -564,6 +567,7 @@ fun NavGraph(
                 },
                 onLogoutDone = {
                     currentIsAdmin = false
+                    onAuthStateChanged(false, false)
 
                     navController.navigate(Routes.LOGIN) {
                         popUpTo(0) { inclusive = true }
