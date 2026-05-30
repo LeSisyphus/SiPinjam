@@ -27,6 +27,7 @@ fun PersetujuanPeminjamanScreen(
     onBarangClick: () -> Unit = {},
     onPermintaanClick: () -> Unit = {},
     onProfilClick: () -> Unit = {},
+    onDetailPengajuanClick: (peminjamanId: String) -> Unit = {},
     onVerifikasiClick: (pengembalianId: String) -> Unit = {},
     viewModel: PersetujuanPeminjamanViewModel = viewModel()
 ) {
@@ -124,11 +125,12 @@ fun PersetujuanPeminjamanScreen(
                         ) {
                             items(daftarPeminjaman, key = { it.id }) { item ->
                                 PermohonanCard(
-                                    namaUser   = item.namaUser,
+                                    namaUser = item.namaUser,
                                     namaBarang = item.namaBarang,
-                                    tanggal    = "${item.tanggalPinjam} - ${item.tanggalKembali}",
-                                    onSetujui  = { viewModel.setujui(item) },
-                                    onTolak    = { viewModel.tolak(item.id) }
+                                    tanggal = "${item.tanggalPinjam} - ${item.tanggalKembali}",
+                                    onDetailClick = {
+                                        onDetailPengajuanClick(item.id)
+                                    }
                                 )
                             }
                         }
@@ -233,8 +235,7 @@ fun PermohonanCard(
     namaUser: String,
     namaBarang: String,
     tanggal: String,
-    onSetujui: () -> Unit,
-    onTolak: () -> Unit
+    onDetailClick: () -> Unit
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -256,6 +257,7 @@ fun PermohonanCard(
                         .clip(RoundedCornerShape(50))
                         .background(DarkImageBg)
                 )
+
                 Text(
                     text = namaUser,
                     color = TextPrimary,
@@ -275,6 +277,7 @@ fun PermohonanCard(
                         .clip(RoundedCornerShape(8.dp))
                         .background(DarkImageBg)
                 )
+
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
                         text = namaBarang,
@@ -282,6 +285,7 @@ fun PermohonanCard(
                         fontSize = 13.sp,
                         fontWeight = FontWeight.Medium
                     )
+
                     Text(
                         text = tanggal,
                         color = TextSecondary,
@@ -290,26 +294,19 @@ fun PermohonanCard(
                 }
             }
 
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(10.dp)
+            Button(
+                onClick = onDetailClick,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(44.dp),
+                shape = RoundedCornerShape(10.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = SiPinjamBlue)
             ) {
-                OutlinedButton(
-                    onClick = onTolak,
-                    modifier = Modifier.weight(1f),
-                    shape = RoundedCornerShape(10.dp),
-                    colors = ButtonDefaults.outlinedButtonColors(contentColor = StatusRed)
-                ) {
-                    Text(stringResource(R.string.btn_tolak), fontWeight = FontWeight.SemiBold)
-                }
-                Button(
-                    onClick = onSetujui,
-                    modifier = Modifier.weight(1f),
-                    shape = RoundedCornerShape(10.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = SiPinjamBlue)
-                ) {
-                    Text(stringResource(R.string.btn_setujui), color = Color.White, fontWeight = FontWeight.SemiBold)
-                }
+                Text(
+                    text = "Lihat Detail Pengajuan",
+                    color = Color.White,
+                    fontWeight = FontWeight.SemiBold
+                )
             }
         }
     }
