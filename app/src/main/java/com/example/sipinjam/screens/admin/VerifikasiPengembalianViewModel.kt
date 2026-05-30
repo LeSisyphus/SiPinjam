@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.sipinjam.data.model.Pengembalian
 import com.example.sipinjam.data.repository.BarangRepository
+import com.example.sipinjam.data.repository.PeminjamanRepository
 import com.example.sipinjam.data.repository.PengembalianRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -14,6 +15,7 @@ class VerifikasiPengembalianViewModel : ViewModel() {
 
     private val repository = PengembalianRepository()
     private val barangRepository = BarangRepository()
+    private val peminjamanRepository = PeminjamanRepository()
 
     private val _pengembalian = MutableStateFlow<Pengembalian?>(null)
     val pengembalian: StateFlow<Pengembalian?> = _pengembalian.asStateFlow()
@@ -37,7 +39,7 @@ class VerifikasiPengembalianViewModel : ViewModel() {
             result.onSuccess {
                 _pengembalian.value = it
                 if (it.status == "Ditolak") {
-                    _catatanTolak.value = it.catatan
+                    _catatanTolak.value = it.catatanAdmin
                 }
             }
             result.onFailure { _errorMessage.value = it.message }
@@ -48,15 +50,25 @@ class VerifikasiPengembalianViewModel : ViewModel() {
     fun verifikasi(pengembalianId: String, catatan: String, kondisi: String) {
         viewModelScope.launch {
             _isLoading.value = true
-            val result = repository.updateStatus(pengembalianId, "Terverifikasi")
+            val data = _pengembalian.value
+
+            val result = repository.updateVerifikasi(
+                id            = pengembalianId,
+                status        = "Terverifikasi",
+                catatanAdmin  = catatan,
+                kondisiBarang = kondisi
+            )
+
             if (result.isSuccess) {
-                val data = _pengembalian.value
                 if (data != null) {
                     val barang = barangRepository.getBarangById(data.barangId)
-                    if (barang != null) {
+                    if (barang != null && data.status != "Terverifikasi") {
                         val stokBaru = barang.stok + 1
                         barangRepository.updateBarang(barang.copy(stok = stokBaru, tersedia = true))
                     }
+                }
+                data?.peminjamanId?.let {
+                    peminjamanRepository.updateStatus(it, "Selesai")
                 }
                 _sukses.value = true
             } else {
@@ -68,13 +80,29 @@ class VerifikasiPengembalianViewModel : ViewModel() {
 
     fun tolak(pengembalianId: String, catatan: String) {
         viewModelScope.launch {
-            _isLoading.value = true
-            repository.updateStatus(pengembalianId, "Ditolak")
-            if (catatan.isNotBlank()) {
-                repository.updateCatatanAdmin(pengembalianId, catatan)
+            if (catatan.isBlank()) {
+                _errorMessage.value = "Catatan admin wajib diisi saat menolak pengembalian"
+                return@launch
             }
-            _catatanTolak.value = catatan
-            _sukses.value = true
+            _isLoading.value = true
+            val data = _pengembalian.value
+
+            val result = repository.updateVerifikasi(
+                id            = pengembalianId,
+                status        = "Ditolak",
+                catatanAdmin  = catatan,
+                kondisiBarang = ""
+            )
+
+            if (result.isSuccess) {
+                data?.peminjamanId?.let {
+                    peminjamanRepository.updateStatus(it, "Dipinjam")
+                }
+                _catatanTolak.value = catatan
+                _sukses.value = true
+            } else {
+                _errorMessage.value = result.exceptionOrNull()?.message
+            }
             _isLoading.value = false
         }
     }
