@@ -3,8 +3,6 @@ package com.example.sipinjam.screens.admin
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.sipinjam.data.model.Pengembalian
-import com.example.sipinjam.data.repository.BarangRepository
-import com.example.sipinjam.data.repository.PeminjamanRepository
 import com.example.sipinjam.data.repository.PengembalianRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -14,8 +12,6 @@ import kotlinx.coroutines.launch
 class VerifikasiPengembalianViewModel : ViewModel() {
 
     private val repository = PengembalianRepository()
-    private val barangRepository = BarangRepository()
-    private val peminjamanRepository = PeminjamanRepository()
 
     private val _pengembalian = MutableStateFlow<Pengembalian?>(null)
     val pengembalian: StateFlow<Pengembalian?> = _pengembalian.asStateFlow()
@@ -35,74 +31,83 @@ class VerifikasiPengembalianViewModel : ViewModel() {
     fun muatPengembalian(pengembalianId: String) {
         viewModelScope.launch {
             _isLoading.value = true
+            _errorMessage.value = null
+
             val result = repository.getPengembalianById(pengembalianId)
-            result.onSuccess {
-                _pengembalian.value = it
-                if (it.status == "Ditolak") {
-                    _catatanTolak.value = it.catatanAdmin
+
+            result.onSuccess { data ->
+                _pengembalian.value = data
+
+                if (data.status.equals("Ditolak", ignoreCase = true)) {
+                    _catatanTolak.value = data.catatanAdmin
                 }
             }
-            result.onFailure { _errorMessage.value = it.message }
+
+            result.onFailure { error ->
+                _errorMessage.value = error.message ?: "Gagal memuat data pengembalian"
+            }
+
             _isLoading.value = false
         }
     }
 
-    fun verifikasi(pengembalianId: String, catatan: String, kondisi: String) {
+    fun verifikasi(
+        pengembalianId: String,
+        catatan: String,
+        kondisi: String
+    ) {
         viewModelScope.launch {
-            _isLoading.value = true
-            val data = _pengembalian.value
+            if (kondisi.isBlank()) {
+                _errorMessage.value = "Kondisi barang wajib dipilih"
+                return@launch
+            }
 
-            val result = repository.updateVerifikasi(
-                id            = pengembalianId,
-                status        = "Terverifikasi",
-                catatanAdmin  = catatan,
+            _isLoading.value = true
+            _errorMessage.value = null
+
+            val result = repository.setujuiPengembalian(
+                pengembalianId = pengembalianId,
+                catatanAdmin = catatan,
                 kondisiBarang = kondisi
             )
 
             if (result.isSuccess) {
-                if (data != null) {
-                    val barang = barangRepository.getBarangById(data.barangId)
-                    if (barang != null && data.status != "Terverifikasi") {
-                        val stokBaru = barang.stok + 1
-                        barangRepository.updateBarang(barang.copy(stok = stokBaru, tersedia = true))
-                    }
-                }
-                data?.peminjamanId?.let {
-                    peminjamanRepository.updateStatus(it, "Selesai")
-                }
                 _sukses.value = true
             } else {
                 _errorMessage.value = result.exceptionOrNull()?.message
+                    ?: "Gagal memverifikasi pengembalian"
             }
+
             _isLoading.value = false
         }
     }
 
-    fun tolak(pengembalianId: String, catatan: String) {
+    fun tolak(
+        pengembalianId: String,
+        catatan: String
+    ) {
         viewModelScope.launch {
             if (catatan.isBlank()) {
                 _errorMessage.value = "Catatan admin wajib diisi saat menolak pengembalian"
                 return@launch
             }
-            _isLoading.value = true
-            val data = _pengembalian.value
 
-            val result = repository.updateVerifikasi(
-                id            = pengembalianId,
-                status        = "Ditolak",
-                catatanAdmin  = catatan,
-                kondisiBarang = ""
+            _isLoading.value = true
+            _errorMessage.value = null
+
+            val result = repository.tolakPengembalian(
+                pengembalianId = pengembalianId,
+                catatanAdmin = catatan
             )
 
             if (result.isSuccess) {
-                data?.peminjamanId?.let {
-                    peminjamanRepository.updateStatus(it, "Dipinjam")
-                }
                 _catatanTolak.value = catatan
                 _sukses.value = true
             } else {
                 _errorMessage.value = result.exceptionOrNull()?.message
+                    ?: "Gagal menolak pengembalian"
             }
+
             _isLoading.value = false
         }
     }
