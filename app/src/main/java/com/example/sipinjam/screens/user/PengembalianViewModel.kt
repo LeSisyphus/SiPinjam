@@ -5,7 +5,6 @@ import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.sipinjam.data.model.Pengembalian
-import com.example.sipinjam.data.repository.PeminjamanRepository
 import com.example.sipinjam.data.repository.PengembalianRepository
 import com.example.sipinjam.data.repository.StorageRepository
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -19,7 +18,6 @@ import java.util.Locale
 class PengembalianViewModel : ViewModel() {
 
     private val pengembalianRepository = PengembalianRepository()
-    private val peminjamanRepository = PeminjamanRepository()
 
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
@@ -36,9 +34,13 @@ class PengembalianViewModel : ViewModel() {
     fun muatCatatanAdmin(peminjamanId: String) {
         viewModelScope.launch {
             val result = pengembalianRepository.getPengembalianByPeminjamanId(peminjamanId)
+
             result.onSuccess { pengembalian ->
-                if (pengembalian?.status == "Ditolak" && !pengembalian.catatanAdmin.isNullOrBlank()) {
-                    _catatanAdmin.value = pengembalian.catatanAdmin
+                if (
+                    pengembalian?.status.equals("Ditolak", ignoreCase = true) &&
+                    !pengembalian?.catatanAdmin.isNullOrBlank()
+                ) {
+                    _catatanAdmin.value = pengembalian?.catatanAdmin
                 }
             }
         }
@@ -66,27 +68,30 @@ class PengembalianViewModel : ViewModel() {
             }
 
             val fotoUrl = uploadResult.getOrDefault("")
-            val tanggalKembali = SimpleDateFormat("d MMMM yyyy", Locale("id", "ID")).format(Date())
+            val tanggalKembali = SimpleDateFormat(
+                "d MMMM yyyy",
+                Locale("id", "ID")
+            ).format(Date())
 
             val pengembalian = Pengembalian(
-                peminjamanId   = peminjamanId,
-                userId         = userId,
-                barangId       = barangId,
+                peminjamanId = peminjamanId,
+                userId = userId,
+                barangId = barangId,
                 fotoKondisiUrl = fotoUrl,
-                catatan        = catatan,
-                tanggalKembali = tanggalKembali
+                catatan = catatan,
+                catatanAdmin = "",
+                kondisiBarang = "",
+                tanggalKembali = tanggalKembali,
+                status = "Menunggu Verifikasi"
             )
 
-            val simpanResult = pengembalianRepository.tambahPengembalian(pengembalian)
-            if (simpanResult.isFailure) {
-                _errorMessage.value = "Gagal menyimpan data: ${simpanResult.exceptionOrNull()?.message}"
-                _isLoading.value = false
-                return@launch
-            }
+            val result = pengembalianRepository.ajukanPengembalianDanUpdatePeminjaman(
+                pengembalian = pengembalian
+            )
 
-            val updateResult = peminjamanRepository.updateStatus(peminjamanId, "Dikembalikan")
-            if (updateResult.isFailure) {
-                _errorMessage.value = "Gagal update status: ${updateResult.exceptionOrNull()?.message}"
+            if (result.isFailure) {
+                _errorMessage.value = result.exceptionOrNull()?.message
+                    ?: "Gagal mengajukan pengembalian"
                 _isLoading.value = false
                 return@launch
             }
