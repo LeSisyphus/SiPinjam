@@ -44,8 +44,7 @@ class PersetujuanPeminjamanViewModel(
 
     fun muatPengembalian() {
         viewModelScope.launch {
-            val result = pengembalianRepository.semuaPengembalian()
-            result.onSuccess { list ->
+            pengembalianRepository.listenSemuaPengembalian().collect { list ->
                 _daftarPengembalian.value = list.filter { it.status == "Menunggu Verifikasi" }
             }
         }

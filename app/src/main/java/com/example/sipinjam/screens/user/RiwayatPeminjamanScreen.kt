@@ -75,7 +75,7 @@ fun RiwayatPeminjamanScreen(
     val isLoading by viewModel.isLoading.collectAsState()
 
     var filterAktif by remember { mutableStateOf("Semua") }
-    val filterList = listOf("Semua", "Diproses", "Disetujui", "Ditolak", "Dikembalikan")
+    val filterList = listOf("Semua", "Diproses", "Disetujui", "Ditolak", "Dikembalikan", "Selesai")
 
     val filtered = if (filterAktif == "Semua") {
         daftarPeminjaman
@@ -172,16 +172,18 @@ fun RiwayatPeminjamanScreen(
                     items(filtered) { peminjaman ->
                         RiwayatCard(
                             peminjaman = peminjaman,
-                            onClick = {
-                                onPengembalianClick(
-                                    peminjaman.id,
-                                    peminjaman.barangId,
-                                    peminjaman.userId,
-                                    peminjaman.namaBarang,
-                                    peminjaman.tanggalPinjam,
-                                    peminjaman.tanggalKembali
-                                )
-                            }
+                            onClick = if (peminjaman.status == "Disetujui" || peminjaman.status == "Dipinjam") {
+                                {
+                                    onPengembalianClick(
+                                        peminjaman.id,
+                                        peminjaman.barangId,
+                                        peminjaman.userId,
+                                        peminjaman.namaBarang,
+                                        peminjaman.tanggalPinjam,
+                                        peminjaman.tanggalKembali
+                                    )
+                                }
+                            } else null
                         )
                     }
                 }
@@ -193,13 +195,17 @@ fun RiwayatPeminjamanScreen(
 @Composable
 fun RiwayatCard(
     peminjaman: Peminjaman,
-    onClick: () -> Unit = {}
+    onClick: (() -> Unit)? = null
 ) {
     Card(
-        onClick = onClick,
+        onClick = { onClick?.invoke() },
+        enabled = onClick != null,
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(14.dp),
-        colors = CardDefaults.cardColors(containerColor = CardWhite),
+        colors = CardDefaults.cardColors(
+            containerColor = CardWhite,
+            disabledContainerColor = CardWhite
+        ),
         elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
     ) {
         Row(
@@ -244,12 +250,14 @@ fun RiwayatCard(
                 StatusBadge(status = peminjaman.status)
             }
 
-            Icon(
-                imageVector = Icons.Filled.ChevronRight,
-                contentDescription = null,
-                tint = TextSecondary,
-                modifier = Modifier.size(20.dp)
-            )
+            if (onClick != null) {
+                Icon(
+                    imageVector = Icons.Filled.ChevronRight,
+                    contentDescription = null,
+                    tint = TextSecondary,
+                    modifier = Modifier.size(20.dp)
+                )
+            }
         }
     }
 }
@@ -261,6 +269,7 @@ fun StatusBadge(status: String) {
         "Disetujui"    -> Pair(StatusGreenBg, StatusGreen)
         "Ditolak"      -> Pair(StatusRedLightBg, StatusRed)
         "Dikembalikan" -> Pair(StatusBlueBg, StatusBlue)
+        "Dipinjam"     -> Pair(StatusOrangeBg, StatusOrange)
         else           -> Pair(InputBg, TextSecondary)
     }
     Box(

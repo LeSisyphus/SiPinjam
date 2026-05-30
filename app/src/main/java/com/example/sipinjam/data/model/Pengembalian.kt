@@ -8,6 +8,7 @@ data class Pengembalian(
     val fotoKondisiUrl: String = "",
     val catatan: String = "",
     val catatanAdmin: String = "",
+    val kondisiBarang: String = "",
     val tanggalKembali: String = "",
     val status: String = "Menunggu Verifikasi",
     val createdAt: Long = System.currentTimeMillis(),
