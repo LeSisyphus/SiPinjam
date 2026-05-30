@@ -130,4 +130,13 @@ class AuthRepository {
             Result.failure(e)
         }
     }
+
+    suspend fun getUserById(uid: String): User? {
+        return try {
+            val snapshot = db.collection("users").document(uid).get().await()
+            snapshot.toObject(User::class.java)?.copy(uid = snapshot.id)
+        } catch (e: Exception) {
+            null
+        }
+    }
 }

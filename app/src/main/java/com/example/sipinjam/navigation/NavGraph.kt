@@ -16,6 +16,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.sipinjam.screens.admin.DashboardAdminScreen
+import com.example.sipinjam.screens.admin.DetailPengajuanScreen
 import com.example.sipinjam.screens.admin.KelolaBarangScreen
 import com.example.sipinjam.screens.admin.KelolaBarangViewModel
 import com.example.sipinjam.screens.admin.PersetujuanPeminjamanScreen
@@ -56,11 +57,18 @@ object Routes {
     const val KELOLA_BARANG = "kelola_barang"
     const val PERSETUJUAN_PEMINJAMAN = "persetujuan_peminjaman"
 
+    private const val DETAIL_PENGAJUAN_BASE = "detail_pengajuan"
+    const val DETAIL_PENGAJUAN = "$DETAIL_PENGAJUAN_BASE/{peminjamanId}"
+
     private const val VERIFIKASI_PENGEMBALIAN_BASE = "verifikasi_pengembalian"
     const val VERIFIKASI_PENGEMBALIAN = "$VERIFIKASI_PENGEMBALIAN_BASE/{pengembalianId}"
 
     fun detailBarang(barangId: String): String {
         return "$DETAIL_BARANG_BASE/${Uri.encode(barangId)}"
+    }
+
+    fun detailPengajuan(peminjamanId: String): String {
+        return "$DETAIL_PENGAJUAN_BASE/${Uri.encode(peminjamanId)}"
     }
 
     fun ajukanPeminjaman(
@@ -483,10 +491,41 @@ fun NavGraph(
                 onProfilClick = {
                     navController.navigateSingleTop(Routes.PROFIL)
                 },
+                onDetailPengajuanClick = { peminjamanId ->
+                    navController.navigate(
+                        Routes.detailPengajuan(peminjamanId)
+                    )
+                },
                 onVerifikasiClick = { pengembalianId ->
                     navController.navigate(
                         Routes.verifikasiPengembalian(pengembalianId)
                     )
+                }
+            )
+        }
+
+        composable(
+            route = Routes.DETAIL_PENGAJUAN,
+            arguments = listOf(
+                navArgument("peminjamanId") {
+                    type = NavType.StringType
+                }
+            )
+        ) { backStackEntry ->
+            val peminjamanId = backStackEntry.arguments?.getString("peminjamanId").orEmpty()
+
+            DetailPengajuanScreen(
+                peminjamanId = peminjamanId,
+                onBackClick = {
+                    navController.popBackStack()
+                },
+                onActionDone = {
+                    navController.navigate(Routes.PERSETUJUAN_PEMINJAMAN) {
+                        popUpTo(Routes.PERSETUJUAN_PEMINJAMAN) {
+                            inclusive = false
+                        }
+                        launchSingleTop = true
+                    }
                 }
             )
         }
@@ -508,7 +547,9 @@ fun NavGraph(
                 },
                 onVerifikasiDone = {
                     navController.navigate(Routes.PERSETUJUAN_PEMINJAMAN) {
-                        popUpTo(Routes.PERSETUJUAN_PEMINJAMAN) { inclusive = false }
+                        popUpTo(Routes.PERSETUJUAN_PEMINJAMAN) {
+                            inclusive = false
+                        }
                         launchSingleTop = true
                     }
                 }
