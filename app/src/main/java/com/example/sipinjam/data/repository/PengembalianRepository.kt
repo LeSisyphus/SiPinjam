@@ -3,6 +3,7 @@ package com.example.sipinjam.data.repository
 import com.example.sipinjam.data.model.Pengembalian
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
+import com.google.firebase.firestore.Query
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
@@ -24,11 +25,45 @@ class PengembalianRepository {
         }
     }
 
+    suspend fun ajukanPengembalianDanUpdatePeminjaman(
+        pengembalian: Pengembalian
+    ): Result<Unit> {
+        return try {
+            val pengembalianRef = collection.document()
+            val peminjamanRef = db.collection("borrowings").document(pengembalian.peminjamanId)
+
+            db.runTransaction { transaction ->
+                val peminjamanSnapshot = transaction.get(peminjamanRef)
+
+                if (!peminjamanSnapshot.exists()) {
+                    throw IllegalStateException("Data peminjaman tidak ditemukan")
+                }
+
+                val dataPengembalian = pengembalian.copy(
+                    id = pengembalianRef.id,
+                    status = "Menunggu Verifikasi"
+                )
+
+                transaction.set(pengembalianRef, dataPengembalian)
+                transaction.update(peminjamanRef, "status", "Menunggu Verifikasi")
+
+                Unit
+            }.await()
+
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
     suspend fun getPengembalianById(id: String): Result<Pengembalian> {
         return try {
             val doc = collection.document(id).get().await()
+
             val pengembalian = doc.toObject(Pengembalian::class.java)
-                ?: return Result.failure(Exception("Data tidak ditemukan"))
+                ?.copy(id = doc.id)
+                ?: return Result.failure(Exception("Data pengembalian tidak ditemukan"))
+
             Result.success(pengembalian)
         } catch (e: Exception) {
             Result.failure(e)
@@ -41,7 +76,14 @@ class PengembalianRepository {
                 .whereEqualTo("peminjamanId", peminjamanId)
                 .get()
                 .await()
-            val pengembalian = snapshot.toObjects(Pengembalian::class.java).firstOrNull()
+
+            val pengembalian = snapshot.documents
+                .mapNotNull { document ->
+                    document.toObject(Pengembalian::class.java)?.copy(id = document.id)
+                }
+                .sortedByDescending { it.createdAt }
+                .firstOrNull()
+
             Result.success(pengembalian)
         } catch (e: Exception) {
             Result.failure(e)
@@ -64,6 +106,136 @@ class PengembalianRepository {
                     )
                 )
                 .await()
+
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    suspend fun setujuiPengembalian(
+        pengembalianId: String,
+        catatanAdmin: String,
+        kondisiBarang: String
+    ): Result<Unit> {
+        return try {
+            val pengembalianRef = collection.document(pengembalianId)
+
+            db.runTransaction { transaction ->
+                val pengembalianSnapshot = transaction.get(pengembalianRef)
+
+                if (!pengembalianSnapshot.exists()) {
+                    throw IllegalStateException("Data pengembalian tidak ditemukan")
+                }
+
+                val pengembalian = pengembalianSnapshot.toObject(Pengembalian::class.java)
+                    ?.copy(id = pengembalianSnapshot.id)
+                    ?: throw IllegalStateException("Data pengembalian tidak valid")
+
+                if (!pengembalian.status.equals("Menunggu Verifikasi", ignoreCase = true)) {
+                    throw IllegalStateException("Pengembalian ini sudah diproses")
+                }
+
+                val peminjamanRef = db.collection("borrowings").document(pengembalian.peminjamanId)
+                val barangRef = db.collection("items").document(pengembalian.barangId)
+
+                val peminjamanSnapshot = transaction.get(peminjamanRef)
+                val barangSnapshot = transaction.get(barangRef)
+
+                if (!peminjamanSnapshot.exists()) {
+                    throw IllegalStateException("Data peminjaman tidak ditemukan")
+                }
+
+                if (!barangSnapshot.exists()) {
+                    throw IllegalStateException("Data barang tidak ditemukan")
+                }
+
+                val stokSaatIni = barangSnapshot.getLong("stok")?.toInt() ?: 0
+                val stokBaru = stokSaatIni + 1
+
+                transaction.update(
+                    pengembalianRef,
+                    mapOf(
+                        "status" to "Terverifikasi",
+                        "catatanAdmin" to catatanAdmin,
+                        "kondisiBarang" to kondisiBarang
+                    )
+                )
+
+                transaction.update(
+                    peminjamanRef,
+                    "status",
+                    "Selesai"
+                )
+
+                transaction.update(
+                    barangRef,
+                    mapOf(
+                        "stok" to stokBaru,
+                        "tersedia" to true
+                    )
+                )
+
+                Unit
+            }.await()
+
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    suspend fun tolakPengembalian(
+        pengembalianId: String,
+        catatanAdmin: String
+    ): Result<Unit> {
+        return try {
+            if (catatanAdmin.isBlank()) {
+                return Result.failure(Exception("Catatan admin wajib diisi saat menolak pengembalian"))
+            }
+
+            val pengembalianRef = collection.document(pengembalianId)
+
+            db.runTransaction { transaction ->
+                val pengembalianSnapshot = transaction.get(pengembalianRef)
+
+                if (!pengembalianSnapshot.exists()) {
+                    throw IllegalStateException("Data pengembalian tidak ditemukan")
+                }
+
+                val pengembalian = pengembalianSnapshot.toObject(Pengembalian::class.java)
+                    ?.copy(id = pengembalianSnapshot.id)
+                    ?: throw IllegalStateException("Data pengembalian tidak valid")
+
+                if (!pengembalian.status.equals("Menunggu Verifikasi", ignoreCase = true)) {
+                    throw IllegalStateException("Pengembalian ini sudah diproses")
+                }
+
+                val peminjamanRef = db.collection("borrowings").document(pengembalian.peminjamanId)
+                val peminjamanSnapshot = transaction.get(peminjamanRef)
+
+                if (!peminjamanSnapshot.exists()) {
+                    throw IllegalStateException("Data peminjaman tidak ditemukan")
+                }
+
+                transaction.update(
+                    pengembalianRef,
+                    mapOf(
+                        "status" to "Ditolak",
+                        "catatanAdmin" to catatanAdmin,
+                        "kondisiBarang" to ""
+                    )
+                )
+
+                transaction.update(
+                    peminjamanRef,
+                    "status",
+                    "Dipinjam"
+                )
+
+                Unit
+            }.await()
+
             Result.success(Unit)
         } catch (e: Exception) {
             Result.failure(e)
@@ -84,15 +256,23 @@ class PengembalianRepository {
 
     fun listenSemuaPengembalian(): Flow<List<Pengembalian>> = callbackFlow {
         val listener: ListenerRegistration = collection
-            .orderBy("createdAt", com.google.firebase.firestore.Query.Direction.DESCENDING)
+            .orderBy("createdAt", Query.Direction.DESCENDING)
             .addSnapshotListener { snapshot, error ->
                 if (error != null) {
                     trySend(emptyList())
                     return@addSnapshotListener
                 }
-                val list = snapshot?.toObjects(Pengembalian::class.java) ?: emptyList()
+
+                val list = snapshot
+                    ?.documents
+                    ?.mapNotNull { document ->
+                        document.toObject(Pengembalian::class.java)?.copy(id = document.id)
+                    }
+                    ?: emptyList()
+
                 trySend(list)
             }
+
         awaitClose { listener.remove() }
     }
 }

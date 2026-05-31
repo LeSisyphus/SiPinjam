@@ -16,6 +16,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.sipinjam.screens.admin.DashboardAdminScreen
+import com.example.sipinjam.screens.admin.DetailPengajuanScreen
 import com.example.sipinjam.screens.admin.KelolaBarangScreen
 import com.example.sipinjam.screens.admin.KelolaBarangViewModel
 import com.example.sipinjam.screens.admin.PersetujuanPeminjamanScreen
@@ -26,6 +27,7 @@ import com.example.sipinjam.screens.auth.RegisterScreen
 import com.example.sipinjam.screens.user.BerandaUserScreen
 import com.example.sipinjam.screens.user.DetailBarangScreen
 import com.example.sipinjam.screens.user.GantiPasswordScreen
+import com.example.sipinjam.screens.user.KatalogScreen
 import com.example.sipinjam.screens.user.PeminjamanScreen
 import com.example.sipinjam.screens.user.PengembalianScreen
 import com.example.sipinjam.screens.user.ProfilScreen
@@ -34,8 +36,13 @@ import com.example.sipinjam.screens.user.RiwayatPeminjamanScreen
 object Routes {
     const val LOGIN = "login"
     const val REGISTER = "register"
-    const val BERANDA_USER = "beranda_user"
     const val FORGOT_PASSWORD = "forgot_password"
+
+    const val BERANDA_USER = "beranda_user"
+    const val KATALOG_USER = "katalog_user"
+    const val PROFIL = "profil"
+    const val GANTI_PASSWORD = "ganti_password"
+    const val RIWAYAT_PEMINJAMAN = "riwayat_peminjaman"
 
     private const val DETAIL_BARANG_BASE = "detail_barang"
     const val DETAIL_BARANG = "$DETAIL_BARANG_BASE/{barangId}"
@@ -43,22 +50,25 @@ object Routes {
     const val AJUKAN_PEMINJAMAN =
         "ajukan_peminjaman?barangId={barangId}&namaBarang={namaBarang}&kategoriBarang={kategoriBarang}&statusBarang={statusBarang}"
 
-    const val DASHBOARD_ADMIN = "dashboard_admin"
-    const val KELOLA_BARANG = "kelola_barang"
-    const val PROFIL = "profil"
-    const val GANTI_PASSWORD = "ganti_password"
-    const val RIWAYAT_PEMINJAMAN = "riwayat_peminjaman"
-
     const val PENGEMBALIAN =
         "pengembalian?peminjamanId={peminjamanId}&barangId={barangId}&userId={userId}&namaBarang={namaBarang}&tanggalPinjam={tanggalPinjam}&tanggalJatuhTempo={tanggalJatuhTempo}"
 
+    const val DASHBOARD_ADMIN = "dashboard_admin"
+    const val KELOLA_BARANG = "kelola_barang"
     const val PERSETUJUAN_PEMINJAMAN = "persetujuan_peminjaman"
+
+    private const val DETAIL_PENGAJUAN_BASE = "detail_pengajuan"
+    const val DETAIL_PENGAJUAN = "$DETAIL_PENGAJUAN_BASE/{peminjamanId}"
 
     private const val VERIFIKASI_PENGEMBALIAN_BASE = "verifikasi_pengembalian"
     const val VERIFIKASI_PENGEMBALIAN = "$VERIFIKASI_PENGEMBALIAN_BASE/{pengembalianId}"
 
     fun detailBarang(barangId: String): String {
         return "$DETAIL_BARANG_BASE/${Uri.encode(barangId)}"
+    }
+
+    fun detailPengajuan(peminjamanId: String): String {
+        return "$DETAIL_PENGAJUAN_BASE/${Uri.encode(peminjamanId)}"
     }
 
     fun ajukanPeminjaman(
@@ -108,6 +118,7 @@ fun NavGraph(
     isLoggedIn: Boolean = false,
     startDestination: String = Routes.LOGIN,
     isAdmin: Boolean = false,
+    onAuthStateChanged: (isLoggedIn: Boolean, isAdmin: Boolean) -> Unit = { _, _ -> },
 ) {
     var currentIsAdmin by rememberSaveable { mutableStateOf(isAdmin) }
 
@@ -125,6 +136,7 @@ fun NavGraph(
             LoginScreen(
                 onLoginSuccess = { loggedInAsAdmin ->
                     currentIsAdmin = loggedInAsAdmin
+                    onAuthStateChanged(true, loggedInAsAdmin)
 
                     val destination = if (loggedInAsAdmin) {
                         Routes.DASHBOARD_ADMIN
@@ -148,7 +160,9 @@ fun NavGraph(
 
         composable(Routes.FORGOT_PASSWORD) {
             ForgotPasswordScreen(
-                onBackClick = { navController.popBackStack() }
+                onBackClick = {
+                    navController.popBackStack()
+                }
             )
         }
 
@@ -156,20 +170,23 @@ fun NavGraph(
             RegisterScreen(
                 onRegisterSuccess = {
                     currentIsAdmin = false
+                    onAuthStateChanged(true, false)
 
                     navController.navigate(Routes.BERANDA_USER) {
                         popUpTo(Routes.LOGIN) { inclusive = true }
                         launchSingleTop = true
                     }
                 },
-                onBackClick = { navController.popBackStack() }
+                onBackClick = {
+                    navController.popBackStack()
+                }
             )
         }
 
         composable(Routes.BERANDA_USER) {
             BerandaUserScreen(
                 onLihatSemuaBarang = {
-                    navController.navigateSingleTop(Routes.BERANDA_USER)
+                    navController.navigateSingleTop(Routes.KATALOG_USER)
                 },
                 onBarangClick = { barang ->
                     if (barang.id.isNotBlank()) {
@@ -178,7 +195,7 @@ fun NavGraph(
                 },
                 onBerandaClick = {},
                 onKatalogClick = {
-                    navController.navigateSingleTop(Routes.BERANDA_USER)
+                    navController.navigateSingleTop(Routes.KATALOG_USER)
                 },
                 onRiwayatClick = {
                     navController.navigateSingleTop(Routes.RIWAYAT_PEMINJAMAN)
@@ -197,6 +214,26 @@ fun NavGraph(
                             tanggalJatuhTempo = tanggalJatuhTempo
                         )
                     )
+                }
+            )
+        }
+
+        composable(Routes.KATALOG_USER) {
+            KatalogScreen(
+                onBarangClick = { barang ->
+                    if (barang.id.isNotBlank()) {
+                        navController.navigate(Routes.detailBarang(barang.id))
+                    }
+                },
+                onBerandaClick = {
+                    navController.navigateSingleTop(Routes.BERANDA_USER)
+                },
+                onKatalogClick = {},
+                onRiwayatClick = {
+                    navController.navigateSingleTop(Routes.RIWAYAT_PEMINJAMAN)
+                },
+                onProfilClick = {
+                    navController.navigateSingleTop(Routes.PROFIL)
                 }
             )
         }
@@ -281,7 +318,7 @@ fun NavGraph(
                     navController.navigateSingleTop(Routes.BERANDA_USER)
                 },
                 onKatalogClick = {
-                    navController.navigateSingleTop(Routes.BERANDA_USER)
+                    navController.navigateSingleTop(Routes.KATALOG_USER)
                 },
                 onRiwayatClick = {},
                 onProfilClick = {
@@ -457,10 +494,41 @@ fun NavGraph(
                 onProfilClick = {
                     navController.navigateSingleTop(Routes.PROFIL)
                 },
+                onDetailPengajuanClick = { peminjamanId ->
+                    navController.navigate(
+                        Routes.detailPengajuan(peminjamanId)
+                    )
+                },
                 onVerifikasiClick = { pengembalianId ->
                     navController.navigate(
                         Routes.verifikasiPengembalian(pengembalianId)
                     )
+                }
+            )
+        }
+
+        composable(
+            route = Routes.DETAIL_PENGAJUAN,
+            arguments = listOf(
+                navArgument("peminjamanId") {
+                    type = NavType.StringType
+                }
+            )
+        ) { backStackEntry ->
+            val peminjamanId = backStackEntry.arguments?.getString("peminjamanId").orEmpty()
+
+            DetailPengajuanScreen(
+                peminjamanId = peminjamanId,
+                onBackClick = {
+                    navController.popBackStack()
+                },
+                onActionDone = {
+                    navController.navigate(Routes.PERSETUJUAN_PEMINJAMAN) {
+                        popUpTo(Routes.PERSETUJUAN_PEMINJAMAN) {
+                            inclusive = false
+                        }
+                        launchSingleTop = true
+                    }
                 }
             )
         }
@@ -482,7 +550,9 @@ fun NavGraph(
                 },
                 onVerifikasiDone = {
                     navController.navigate(Routes.PERSETUJUAN_PEMINJAMAN) {
-                        popUpTo(Routes.PERSETUJUAN_PEMINJAMAN) { inclusive = false }
+                        popUpTo(Routes.PERSETUJUAN_PEMINJAMAN) {
+                            inclusive = false
+                        }
                         launchSingleTop = true
                     }
                 }
@@ -497,6 +567,7 @@ fun NavGraph(
                 },
                 onLogoutDone = {
                     currentIsAdmin = false
+                    onAuthStateChanged(false, false)
 
                     navController.navigate(Routes.LOGIN) {
                         popUpTo(0) { inclusive = true }
@@ -507,7 +578,7 @@ fun NavGraph(
                     navController.navigateSingleTop(Routes.BERANDA_USER)
                 },
                 onKatalogClick = {
-                    navController.navigateSingleTop(Routes.BERANDA_USER)
+                    navController.navigateSingleTop(Routes.KATALOG_USER)
                 },
                 onRiwayatClick = {
                     navController.navigateSingleTop(Routes.RIWAYAT_PEMINJAMAN)

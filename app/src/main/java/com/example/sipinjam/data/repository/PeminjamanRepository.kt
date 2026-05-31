@@ -59,12 +59,71 @@ class PeminjamanRepository {
                     trySend(emptyList())
                     return@addSnapshotListener
                 }
+
                 val list = snapshot
-                    ?.toObjects(Peminjaman::class.java)
+                    ?.documents
+                    ?.mapNotNull { document ->
+                        document.toObject(Peminjaman::class.java)?.copy(id = document.id)
+                    }
                     ?.sortedByDescending { it.createdAt }
                     ?: emptyList()
+
                 trySend(list)
             }
+
         awaitClose { listener.remove() }
+    }
+
+    suspend fun getPeminjamanById(id: String): Result<Peminjaman> {
+        return try {
+            val document = collection.document(id).get().await()
+
+            val peminjaman = document.toObject(Peminjaman::class.java)
+                ?.copy(id = document.id)
+                ?: return Result.failure(Exception("Data peminjaman tidak ditemukan"))
+
+            Result.success(peminjaman)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    suspend fun setujuiDenganKurangiStok(peminjaman: Peminjaman): Result<Unit> {
+        return try {
+            val peminjamanRef = collection.document(peminjaman.id)
+            val barangRef = db.collection("items").document(peminjaman.barangId)
+
+            db.runTransaction { transaction ->
+                val barangSnapshot = transaction.get(barangRef)
+
+                val stokSaatIni = barangSnapshot.getLong("stok")?.toInt() ?: 0
+
+                if (stokSaatIni <= 0) {
+                    throw IllegalStateException("Stok barang sudah habis")
+                }
+
+                val stokBaru = stokSaatIni - 1
+
+                transaction.update(
+                    barangRef,
+                    mapOf(
+                        "stok" to stokBaru,
+                        "tersedia" to (stokBaru > 0)
+                    )
+                )
+
+                transaction.update(
+                    peminjamanRef,
+                    "status",
+                    "Disetujui"
+                )
+
+                Unit
+            }.await()
+
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
     }
 }
