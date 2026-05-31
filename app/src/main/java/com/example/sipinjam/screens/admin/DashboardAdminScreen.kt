@@ -22,19 +22,23 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import coil.compose.AsyncImage
 import com.example.sipinjam.ui.components.AdminBottomNavBar
 import com.example.sipinjam.ui.theme.*
 
 data class PermintaanItem(
+    val id: String = "",
     val nama: String,
     val namaBarang: String,
     val waktu: String,
+    val fotoUserUrl: String = "",
 )
 
 @Composable
@@ -280,12 +284,21 @@ private fun PermintaanCard(
                 .background(InputBg),
             contentAlignment = Alignment.Center
         ) {
-            Icon(
-                imageVector = Icons.Filled.Person,
-                contentDescription = null,
-                tint = TextSecondary,
-                modifier = Modifier.size(22.dp)
-            )
+            if (item.fotoUserUrl.isNotBlank()) {
+                AsyncImage(
+                    model = item.fotoUserUrl,
+                    contentDescription = "Foto profil peminjam",
+                    modifier = Modifier.fillMaxSize(),
+                    contentScale = ContentScale.Crop
+                )
+            } else {
+                Icon(
+                    imageVector = Icons.Filled.Person,
+                    contentDescription = null,
+                    tint = TextSecondary,
+                    modifier = Modifier.size(22.dp)
+                )
+            }
         }
 
         Column(modifier = Modifier.weight(1f)) {

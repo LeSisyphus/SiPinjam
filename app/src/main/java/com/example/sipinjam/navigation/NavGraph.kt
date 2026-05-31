@@ -394,10 +394,14 @@ fun NavGraph(
         composable(Routes.DASHBOARD_ADMIN) {
             DashboardAdminScreen(
                 onLihatSemua = {
-                    navController.navigateSingleTop(Routes.KELOLA_BARANG)
-                },
-                onTinjau = {
                     navController.navigateSingleTop(Routes.PERSETUJUAN_PEMINJAMAN)
+                },
+                onTinjau = { item ->
+                    if (item.id.isNotBlank()) {
+                        navController.navigate(Routes.detailPengajuan(item.id))
+                    } else {
+                        navController.navigateSingleTop(Routes.PERSETUJUAN_PEMINJAMAN)
+                    }
                 },
                 onDashboardClick = {},
                 onBarangClick = {
