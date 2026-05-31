@@ -57,10 +57,10 @@ class VerifikasiPengembalianViewModel : ViewModel() {
                     return@collect
                 }
 
-                if (data.status == "Ditolak") {
-                    _catatanTolak.value = data.catatanAdmin
+                _catatanTolak.value = if (data.status == "Ditolak") {
+                    data.catatanAdmin
                 } else {
-                    _catatanTolak.value = null
+                    null
                 }
             }
         }
@@ -108,7 +108,6 @@ class VerifikasiPengembalianViewModel : ViewModel() {
                         throw IllegalStateException("Data barang tidak ditemukan")
                     }
 
-                    val statusSaatIni = pengembalianSnap.getString("status") ?: ""
                     val peminjamanId = pengembalianSnap.getString("peminjamanId")
                         ?: dataSaatIni.peminjamanId
 
@@ -123,17 +122,19 @@ class VerifikasiPengembalianViewModel : ViewModel() {
                         throw IllegalStateException("Data peminjaman tidak ditemukan")
                     }
 
+                    val statusSaatIni = pengembalianSnap.getString("status") ?: ""
+
                     when (statusSaatIni) {
+                        "Menunggu Verifikasi" -> {
+                            // Status valid, lanjut verifikasi.
+                        }
+
                         "Terverifikasi" -> {
                             throw IllegalStateException("Pengembalian ini sudah diverifikasi sebelumnya")
                         }
 
                         "Ditolak" -> {
                             throw IllegalStateException("Pengembalian ini sudah ditolak sebelumnya")
-                        }
-
-                        "Menunggu Verifikasi" -> {
-                            // Status valid, lanjut proses verifikasi.
                         }
 
                         else -> {
@@ -180,6 +181,13 @@ class VerifikasiPengembalianViewModel : ViewModel() {
         }
     }
 
+    fun tolak(pengembalianId: String, catatan: String) {
+        tolakPengembalian(
+            pengembalianId = pengembalianId,
+            catatan = catatan
+        )
+    }
+
     fun tolakPengembalian(pengembalianId: String, catatan: String) {
         viewModelScope.launch {
             if (catatan.isBlank()) {
@@ -214,7 +222,6 @@ class VerifikasiPengembalianViewModel : ViewModel() {
                         throw IllegalStateException("Data pengembalian tidak ditemukan")
                     }
 
-                    val statusSaatIni = pengembalianSnap.getString("status") ?: ""
                     val peminjamanId = pengembalianSnap.getString("peminjamanId")
                         ?: dataSaatIni.peminjamanId
 
@@ -229,17 +236,19 @@ class VerifikasiPengembalianViewModel : ViewModel() {
                         throw IllegalStateException("Data peminjaman tidak ditemukan")
                     }
 
+                    val statusSaatIni = pengembalianSnap.getString("status") ?: ""
+
                     when (statusSaatIni) {
+                        "Menunggu Verifikasi" -> {
+                            // Status valid, lanjut tolak.
+                        }
+
                         "Ditolak" -> {
                             throw IllegalStateException("Pengembalian ini sudah ditolak sebelumnya")
                         }
 
                         "Terverifikasi" -> {
                             throw IllegalStateException("Pengembalian yang sudah terverifikasi tidak bisa ditolak")
-                        }
-
-                        "Menunggu Verifikasi" -> {
-                            // Status valid, lanjut proses penolakan.
                         }
 
                         else -> {
@@ -274,6 +283,12 @@ class VerifikasiPengembalianViewModel : ViewModel() {
                 _isLoading.value = false
             }
         }
+    }
+
+    fun resetState() {
+        _sukses.value = false
+        _errorMessage.value = null
+        _isLoading.value = false
     }
 
     fun resetSukses() {
