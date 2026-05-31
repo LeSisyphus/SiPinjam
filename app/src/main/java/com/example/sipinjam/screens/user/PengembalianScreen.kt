@@ -6,16 +6,47 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.filled.Info
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.LocalTextStyle
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -30,7 +61,16 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
-import com.example.sipinjam.ui.theme.*
+import com.example.sipinjam.ui.theme.BackgroundGray
+import com.example.sipinjam.ui.theme.CardWhite
+import com.example.sipinjam.ui.theme.DarkImageBg
+import com.example.sipinjam.ui.theme.InfoOrangeBg
+import com.example.sipinjam.ui.theme.InputBg
+import com.example.sipinjam.ui.theme.SiPinjamBlue
+import com.example.sipinjam.ui.theme.StatusOrange
+import com.example.sipinjam.ui.theme.StatusRed
+import com.example.sipinjam.ui.theme.TextPrimary
+import com.example.sipinjam.ui.theme.TextSecondary
 
 @Composable
 fun PengembalianScreen(
@@ -45,19 +85,34 @@ fun PengembalianScreen(
     viewModel: PengembalianViewModel = viewModel()
 ) {
     val context = LocalContext.current
+
     var fotoUri by remember { mutableStateOf<Uri?>(null) }
     var catatan by rememberSaveable { mutableStateOf("") }
     var showDialog by remember { mutableStateOf(false) }
 
+    val barang by viewModel.barang.collectAsState()
+    val isBarangLoading by viewModel.isBarangLoading.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
     val sukses by viewModel.sukses.collectAsState()
     val errorMessage by viewModel.errorMessage.collectAsState()
     val catatanAdmin by viewModel.catatanAdmin.collectAsState()
 
+    val namaBarangTampil = barang?.nama
+        ?.takeIf { it.isNotBlank() }
+        ?: namaBarang
+
+    val fotoBarangUrl = barang?.fotoUrl.orEmpty()
+
     LaunchedEffect(sukses) {
         if (sukses) {
             onKirimPengembalian()
             viewModel.resetState()
+        }
+    }
+
+    LaunchedEffect(barangId) {
+        if (barangId.isNotBlank()) {
+            viewModel.muatBarang(barangId)
         }
     }
 
@@ -69,7 +124,11 @@ fun PengembalianScreen(
 
     val galleryLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
-    ) { uri -> if (uri != null) fotoUri = uri }
+    ) { uri ->
+        if (uri != null) {
+            fotoUri = uri
+        }
+    }
 
     if (showDialog) {
         AlertDialog(
@@ -93,14 +152,15 @@ fun PengembalianScreen(
                 Button(
                     onClick = {
                         showDialog = false
-                        fotoUri?.let {
+
+                        fotoUri?.let { uri ->
                             viewModel.kirimPengembalian(
-                                context      = context,
+                                context = context,
                                 peminjamanId = peminjamanId,
-                                barangId     = barangId,
-                                userId       = userId,
-                                fotoUri      = it,
-                                catatan      = catatan
+                                barangId = barangId,
+                                userId = userId,
+                                fotoUri = uri,
+                                catatan = catatan
                             )
                         }
                     },
@@ -140,6 +200,7 @@ fun PengembalianScreen(
                             tint = TextPrimary
                         )
                     }
+
                     Text(
                         text = "Kembalikan Barang",
                         color = TextPrimary,
@@ -155,10 +216,12 @@ fun PengembalianScreen(
                 color = CardWhite,
                 shadowElevation = 8.dp
             ) {
-                Column(modifier = Modifier.padding(horizontal = 20.dp, vertical = 16.dp)) {
-                    if (errorMessage != null) {
+                Column(
+                    modifier = Modifier.padding(horizontal = 20.dp, vertical = 16.dp)
+                ) {
+                    if (!errorMessage.isNullOrBlank()) {
                         Text(
-                            text = errorMessage ?: "",
+                            text = errorMessage.orEmpty(),
                             color = StatusRed,
                             fontSize = 12.sp,
                             textAlign = TextAlign.Center,
@@ -167,6 +230,7 @@ fun PengembalianScreen(
                                 .padding(bottom = 8.dp)
                         )
                     }
+
                     Button(
                         onClick = { showDialog = true },
                         enabled = fotoUri != null && !isLoading,
@@ -215,21 +279,23 @@ fun PengembalianScreen(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(14.dp)
                 ) {
-                    Box(
-                        modifier = Modifier
-                            .size(56.dp)
-                            .clip(RoundedCornerShape(10.dp))
-                            .background(DarkImageBg),
-                        contentAlignment = Alignment.Center
-                    ) { }
+                    BarangImage(
+                        imageUrl = fotoBarangUrl,
+                        isLoading = isBarangLoading,
+                        modifier = Modifier.size(56.dp)
+                    )
 
-                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Column(
+                        modifier = Modifier.weight(1f),
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
                         Text(
-                            text = namaBarang,
+                            text = namaBarangTampil,
                             color = TextPrimary,
                             fontSize = 15.sp,
                             fontWeight = FontWeight.Bold
                         )
+
                         Row(horizontalArrangement = Arrangement.spacedBy(24.dp)) {
                             Column {
                                 Text(
@@ -239,6 +305,7 @@ fun PengembalianScreen(
                                     fontWeight = FontWeight.SemiBold,
                                     letterSpacing = 0.5.sp
                                 )
+
                                 Text(
                                     text = tanggalPinjam,
                                     color = TextPrimary,
@@ -246,6 +313,7 @@ fun PengembalianScreen(
                                     fontWeight = FontWeight.Medium
                                 )
                             }
+
                             Column {
                                 Text(
                                     text = "JATUH TEMPO",
@@ -254,6 +322,7 @@ fun PengembalianScreen(
                                     fontWeight = FontWeight.SemiBold,
                                     letterSpacing = 0.5.sp
                                 )
+
                                 Text(
                                     text = tanggalJatuhTempo,
                                     color = TextPrimary,
@@ -273,6 +342,7 @@ fun PengembalianScreen(
                     fontSize = 14.sp,
                     fontWeight = FontWeight.SemiBold
                 )
+
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -306,12 +376,14 @@ fun PengembalianScreen(
                                     modifier = Modifier.size(28.dp)
                                 )
                             }
+
                             Text(
                                 text = "Foto Kondisi Barang",
                                 color = TextPrimary,
                                 fontSize = 14.sp,
                                 fontWeight = FontWeight.SemiBold
                             )
+
                             Text(
                                 text = "Ketuk untuk ambil foto atau unggah",
                                 color = TextSecondary,
@@ -327,6 +399,7 @@ fun PengembalianScreen(
                                 .clip(RoundedCornerShape(14.dp)),
                             contentScale = ContentScale.Crop
                         )
+
                         Box(
                             modifier = Modifier
                                 .align(Alignment.BottomEnd)
@@ -354,9 +427,14 @@ fun PengembalianScreen(
                     fontSize = 14.sp,
                     fontWeight = FontWeight.SemiBold
                 )
+
                 OutlinedTextField(
                     value = catatan,
-                    onValueChange = { if (it.length <= 200) catatan = it },
+                    onValueChange = {
+                        if (it.length <= 200) {
+                            catatan = it
+                        }
+                    },
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(120.dp),
@@ -373,9 +451,12 @@ fun PengembalianScreen(
                         unfocusedBorderColor = Color.Transparent,
                         focusedBorderColor = SiPinjamBlue,
                         unfocusedContainerColor = InputBg,
-                        focusedContainerColor = InputBg,
+                        focusedContainerColor = InputBg
                     ),
-                    textStyle = LocalTextStyle.current.copy(fontSize = 14.sp, color = TextPrimary)
+                    textStyle = LocalTextStyle.current.copy(
+                        fontSize = 14.sp,
+                        color = TextPrimary
+                    )
                 )
             }
 
@@ -394,6 +475,7 @@ fun PengembalianScreen(
                     tint = StatusOrange,
                     modifier = Modifier.size(18.dp)
                 )
+
                 Text(
                     text = "Pastikan foto jelas dan barang dalam kondisi bersih.",
                     color = StatusOrange,
@@ -409,6 +491,48 @@ fun PengembalianScreen(
                     fontSize = 13.sp,
                     fontWeight = FontWeight.Medium,
                     modifier = Modifier.fillMaxWidth()
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun BarangImage(
+    imageUrl: String,
+    isLoading: Boolean,
+    modifier: Modifier = Modifier
+) {
+    Box(
+        modifier = modifier
+            .clip(RoundedCornerShape(10.dp))
+            .background(DarkImageBg),
+        contentAlignment = Alignment.Center
+    ) {
+        when {
+            isLoading -> {
+                CircularProgressIndicator(
+                    color = SiPinjamBlue,
+                    modifier = Modifier.size(20.dp),
+                    strokeWidth = 2.dp
+                )
+            }
+
+            imageUrl.isNotBlank() -> {
+                AsyncImage(
+                    model = imageUrl,
+                    contentDescription = "Foto barang",
+                    modifier = Modifier.fillMaxSize(),
+                    contentScale = ContentScale.Crop
+                )
+            }
+
+            else -> {
+                Icon(
+                    imageVector = Icons.Filled.Image,
+                    contentDescription = null,
+                    tint = SiPinjamBlue,
+                    modifier = Modifier.size(26.dp)
                 )
             }
         }
