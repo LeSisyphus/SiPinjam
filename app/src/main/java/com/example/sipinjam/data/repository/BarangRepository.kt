@@ -14,15 +14,24 @@ class BarangRepository {
     fun getAllBarangRealTime(): Flow<List<Barang>> = callbackFlow {
         val listener = itemsCollection.addSnapshotListener { snapshot, error ->
             if (error != null) {
-                close(error)
+                trySend(emptyList())
                 return@addSnapshotListener
             }
-
             val barangList = snapshot?.documents?.mapNotNull { document ->
                 document.toObject(Barang::class.java)?.copy(id = document.id)
             } ?: emptyList()
-
             trySend(barangList)
+        }
+        awaitClose { listener.remove() }
+    }
+
+    fun getBarangByIdRealTime(id: String): Flow<Barang?> = callbackFlow {
+        val listener = itemsCollection.document(id).addSnapshotListener { snapshot, error ->
+            if (error != null) {
+                trySend(null)
+                return@addSnapshotListener
+            }
+            trySend(snapshot?.toObject(Barang::class.java)?.copy(id = snapshot.id))
         }
         awaitClose { listener.remove() }
     }
@@ -49,7 +58,6 @@ class BarangRepository {
 
     suspend fun updateBarang(barang: Barang): Boolean {
         if (barang.id.isBlank()) return false
-        
         return try {
             itemsCollection.document(barang.id).set(barang).await()
             true

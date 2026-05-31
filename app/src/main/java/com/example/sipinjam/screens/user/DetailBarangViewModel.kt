@@ -26,25 +26,26 @@ class DetailBarangViewModel : ViewModel() {
         _uiState.update { it.copy(isLoading = true) }
 
         viewModelScope.launch {
-            val barangDoc = repository.getBarangById(barangId)
-            if (barangDoc != null) {
-                val detailMapped = DetailBarang(
-                    id = barangDoc.id,
-                    nama = barangDoc.nama,
-                    kategori = barangDoc.kategori.uppercase(),
-                    totalUnit = barangDoc.stok,
-                    tersedia = barangDoc.stok > 0,
-                    kondisi = barangDoc.kondisi,
-                    jumlahTersedia = barangDoc.stok,
-                    lokasi = barangDoc.lokasi,
-                    maksimalPinjam = "${barangDoc.maksimalPinjam} Hari",
-                    deskripsi = barangDoc.deskripsi,
-                    imageUrl = barangDoc.fotoUrl
-                )
-                _uiState.update { it.copy(barang = detailMapped, isLoading = false) }
-            } else {
-                _uiState.update {
-                    it.copy(isLoading = false, errorMessage = "Barang tidak ditemukan atau gagal dimuat.")
+            repository.getBarangByIdRealTime(barangId).collect { barangDoc ->
+                if (barangDoc != null) {
+                    val detailMapped = DetailBarang(
+                        id = barangDoc.id,
+                        nama = barangDoc.nama,
+                        kategori = barangDoc.kategori.uppercase(),
+                        totalUnit = barangDoc.stok,
+                        tersedia = barangDoc.stok > 0,
+                        kondisi = barangDoc.kondisi,
+                        jumlahTersedia = barangDoc.stok,
+                        lokasi = barangDoc.lokasi,
+                        maksimalPinjam = "${barangDoc.maksimalPinjam} Hari",
+                        deskripsi = barangDoc.deskripsi,
+                        imageUrl = barangDoc.fotoUrl
+                    )
+                    _uiState.update { it.copy(barang = detailMapped, isLoading = false) }
+                } else {
+                    _uiState.update {
+                        it.copy(isLoading = false, errorMessage = "Barang tidak ditemukan atau gagal dimuat.")
+                    }
                 }
             }
         }

@@ -9,6 +9,7 @@ import com.cloudinary.android.callback.ErrorInfo
 import com.cloudinary.android.callback.UploadCallback
 import com.example.sipinjam.data.model.Barang
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.ListenerRegistration
 import com.google.firebase.firestore.SetOptions
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -45,6 +46,7 @@ data class KelolaBarangUiState(
 class KelolaBarangViewModel : ViewModel() {
 
     private val firestore = FirebaseFirestore.getInstance()
+    private var barangListener: ListenerRegistration? = null
 
     private val _uiState = MutableStateFlow(KelolaBarangUiState())
     val uiState: StateFlow<KelolaBarangUiState> = _uiState.asStateFlow()
@@ -55,10 +57,14 @@ class KelolaBarangViewModel : ViewModel() {
 
     fun muatSemuaBarang() {
         _uiState.update { it.copy(isLoading = true) }
-        viewModelScope.launch {
-            try {
-                val snapshot = firestore.collection("items").get().await()
-                val listBarang = snapshot.documents.map { document ->
+        barangListener?.remove()
+        barangListener = firestore.collection("items")
+            .addSnapshotListener { snapshot, error ->
+                if (error != null) {
+                    _uiState.update { it.copy(isLoading = false, errorMessage = error.localizedMessage) }
+                    return@addSnapshotListener
+                }
+                val listBarang = snapshot?.documents?.map { document ->
                     BarangAdmin(
                         id = document.id,
                         nama = document.getString("nama") ?: "Tanpa Nama",
@@ -67,12 +73,9 @@ class KelolaBarangViewModel : ViewModel() {
                         tersedia = document.getBoolean("tersedia") ?: true,
                         imageUrl = document.getString("fotoUrl") ?: ""
                     )
-                }
+                } ?: emptyList()
                 _uiState.update { it.copy(daftarBarang = listBarang, isLoading = false) }
-            } catch (e: Exception) {
-                _uiState.update { it.copy(isLoading = false, errorMessage = e.localizedMessage) }
             }
-        }
     }
 
     private suspend fun uploadKeCloudinary(context: Context, imageUri: Uri): String = suspendCancellableCoroutine { continuation ->
@@ -130,7 +133,6 @@ class KelolaBarangViewModel : ViewModel() {
                 )
                 docRef.set(barangBaru).await()
 
-                muatSemuaBarang()
                 _uiState.update { it.copy(isLoading = false, isSuccess = true) }
             } catch (e: Exception) {
                 _uiState.update { it.copy(isLoading = false, errorMessage = e.localizedMessage) }
@@ -177,7 +179,6 @@ class KelolaBarangViewModel : ViewModel() {
                     .set(updateData, SetOptions.merge())
                     .await()
 
-                muatSemuaBarang()
                 _uiState.update { it.copy(isLoading = false, showEditDialog = false, barangToEdit = null) }
             } catch (e: Exception) {
                 _uiState.update { it.copy(isLoading = false, errorMessage = e.localizedMessage) }
@@ -200,7 +201,6 @@ class KelolaBarangViewModel : ViewModel() {
         viewModelScope.launch {
             try {
                 firestore.collection("items").document(barang.id).delete().await()
-                muatSemuaBarang()
                 _uiState.update { it.copy(isLoading = false, showDeleteDialog = false, barangToDelete = null) }
             } catch (e: Exception) {
                 _uiState.update { it.copy(isLoading = false, errorMessage = e.localizedMessage) }
@@ -210,4 +210,9 @@ class KelolaBarangViewModel : ViewModel() {
 
     fun onSearchChange(query: String) { _uiState.update { it.copy(searchQuery = query) } }
     fun onKategoriChange(kategori: String) { _uiState.update { it.copy(selectedKategori = kategori) } }
+
+    override fun onCleared() {
+        super.onCleared()
+        barangListener?.remove()
+    }
 }

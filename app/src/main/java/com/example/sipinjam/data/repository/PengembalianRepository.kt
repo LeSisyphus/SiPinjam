@@ -2,11 +2,11 @@ package com.example.sipinjam.data.repository
 
 import com.example.sipinjam.data.model.Pengembalian
 import com.google.firebase.firestore.FirebaseFirestore
-import kotlinx.coroutines.tasks.await
 import com.google.firebase.firestore.ListenerRegistration
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.tasks.await
 
 class PengembalianRepository {
 
@@ -70,12 +70,24 @@ class PengembalianRepository {
         }
     }
 
+    fun listenPengembalianById(id: String): Flow<Pengembalian?> = callbackFlow {
+        val listener: ListenerRegistration = collection.document(id)
+            .addSnapshotListener { snapshot, error ->
+                if (error != null) {
+                    trySend(null)
+                    return@addSnapshotListener
+                }
+                trySend(snapshot?.toObject(Pengembalian::class.java))
+            }
+        awaitClose { listener.remove() }
+    }
+
     fun listenSemuaPengembalian(): Flow<List<Pengembalian>> = callbackFlow {
         val listener: ListenerRegistration = collection
             .orderBy("createdAt", com.google.firebase.firestore.Query.Direction.DESCENDING)
             .addSnapshotListener { snapshot, error ->
                 if (error != null) {
-                    close(error)
+                    trySend(emptyList())
                     return@addSnapshotListener
                 }
                 val list = snapshot?.toObjects(Pengembalian::class.java) ?: emptyList()

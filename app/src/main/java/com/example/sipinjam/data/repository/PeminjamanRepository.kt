@@ -24,35 +24,6 @@ class PeminjamanRepository {
         }
     }
 
-    suspend fun getPeminjamanByUser(userId: String): Result<List<Peminjaman>> {
-        return try {
-            val snapshot = collection
-                .whereEqualTo("userId", userId)
-                .get()
-                .await()
-            val list = snapshot
-                .toObjects(Peminjaman::class.java)
-                .sortedByDescending { it.createdAt }
-            Result.success(list)
-        } catch (e: Exception) {
-            Result.failure(e)
-        }
-    }
-
-    suspend fun semuaPeminjaman(): Result<List<Peminjaman>> {
-        return try {
-            val snapshot = collection
-                .get()
-                .await()
-            val list = snapshot
-                .toObjects(Peminjaman::class.java)
-                .sortedByDescending { it.createdAt }
-            Result.success(list)
-        } catch (e: Exception) {
-            Result.failure(e)
-        }
-    }
-
     suspend fun updateStatus(id: String, statusBaru: String): Result<Unit> {
         return try {
             collection.document(id)
@@ -69,7 +40,7 @@ class PeminjamanRepository {
             .whereEqualTo("userId", userId)
             .addSnapshotListener { snapshot, error ->
                 if (error != null) {
-                    close(error)
+                    trySend(emptyList())
                     return@addSnapshotListener
                 }
                 val list = snapshot
@@ -85,7 +56,7 @@ class PeminjamanRepository {
         val listener: ListenerRegistration = collection
             .addSnapshotListener { snapshot, error ->
                 if (error != null) {
-                    close(error)
+                    trySend(emptyList())
                     return@addSnapshotListener
                 }
                 val list = snapshot
