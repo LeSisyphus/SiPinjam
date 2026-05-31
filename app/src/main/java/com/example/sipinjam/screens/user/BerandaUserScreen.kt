@@ -62,6 +62,7 @@ data class ItemDikembalikan(
     val lokasi: String,
     val tanggalPinjam: String,
     val tanggalJatuhTempo: String,
+    val imageUrl: String = "",
     val icon: ImageVector = Icons.Filled.SwapVert,
 )
 
@@ -419,12 +420,21 @@ private fun KembalikanCard(
                 .background(InputBg),
             contentAlignment = Alignment.Center
         ) {
-            Icon(
-                imageVector = item.icon,
-                contentDescription = null,
-                tint = SiPinjamBlue,
-                modifier = Modifier.size(22.dp)
-            )
+            if (item.imageUrl.isNotBlank()) {
+                AsyncImage(
+                    model = item.imageUrl,
+                    contentDescription = item.nama,
+                    modifier = Modifier.fillMaxSize(),
+                    contentScale = ContentScale.Crop
+                )
+            } else {
+                Icon(
+                    imageVector = item.icon,
+                    contentDescription = null,
+                    tint = SiPinjamBlue,
+                    modifier = Modifier.size(22.dp)
+                )
+            }
         }
 
         Spacer(Modifier.width(12.dp))

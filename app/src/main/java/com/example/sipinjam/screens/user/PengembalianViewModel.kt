@@ -4,7 +4,9 @@ import android.content.Context
 import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.sipinjam.data.model.Barang
 import com.example.sipinjam.data.model.Pengembalian
+import com.example.sipinjam.data.repository.BarangRepository
 import com.example.sipinjam.data.repository.PengembalianRepository
 import com.example.sipinjam.data.repository.StorageRepository
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -18,6 +20,13 @@ import java.util.Locale
 class PengembalianViewModel : ViewModel() {
 
     private val pengembalianRepository = PengembalianRepository()
+    private val barangRepository = BarangRepository()
+
+    private val _barang = MutableStateFlow<Barang?>(null)
+    val barang: StateFlow<Barang?> = _barang.asStateFlow()
+
+    private val _isBarangLoading = MutableStateFlow(false)
+    val isBarangLoading: StateFlow<Boolean> = _isBarangLoading.asStateFlow()
 
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
@@ -31,16 +40,34 @@ class PengembalianViewModel : ViewModel() {
     private val _catatanAdmin = MutableStateFlow<String?>(null)
     val catatanAdmin: StateFlow<String?> = _catatanAdmin.asStateFlow()
 
+    fun muatBarang(barangId: String) {
+        if (barangId.isBlank()) {
+            _barang.value = null
+            return
+        }
+
+        viewModelScope.launch {
+            _isBarangLoading.value = true
+
+            val data = barangRepository.getBarangById(barangId)
+            _barang.value = data
+
+            _isBarangLoading.value = false
+        }
+    }
+
     fun muatCatatanAdmin(peminjamanId: String) {
         viewModelScope.launch {
             val result = pengembalianRepository.getPengembalianByPeminjamanId(peminjamanId)
 
             result.onSuccess { pengembalian ->
-                if (
+                _catatanAdmin.value = if (
                     pengembalian?.status.equals("Ditolak", ignoreCase = true) &&
                     !pengembalian?.catatanAdmin.isNullOrBlank()
                 ) {
-                    _catatanAdmin.value = pengembalian?.catatanAdmin
+                    pengembalian?.catatanAdmin
+                } else {
+                    null
                 }
             }
         }

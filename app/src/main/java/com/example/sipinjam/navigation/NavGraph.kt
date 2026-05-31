@@ -311,9 +311,6 @@ fun NavGraph(
 
         composable(Routes.RIWAYAT_PEMINJAMAN) {
             RiwayatPeminjamanScreen(
-                onBackClick = {
-                    navController.popBackStack()
-                },
                 onBerandaClick = {
                     navController.navigateSingleTop(Routes.BERANDA_USER)
                 },

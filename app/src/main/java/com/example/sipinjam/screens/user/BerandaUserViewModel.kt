@@ -103,10 +103,12 @@ class BerandaUserViewModel : ViewModel() {
                                     peminjamanId = peminjaman.id,
                                     barangId = peminjaman.barangId,
                                     userId = peminjaman.userId,
-                                    nama = peminjaman.namaBarang,
+                                    nama = barang?.nama?.takeIf { it.isNotBlank() }
+                                        ?: peminjaman.namaBarang.ifBlank { "Barang" },
                                     lokasi = barang?.lokasi?.takeIf { it.isNotBlank() } ?: "-",
                                     tanggalPinjam = peminjaman.tanggalPinjam,
-                                    tanggalJatuhTempo = peminjaman.tanggalKembali
+                                    tanggalJatuhTempo = peminjaman.tanggalKembali,
+                                    imageUrl = barang?.fotoUrl.orEmpty()
                                 )
                             }
                         }

@@ -17,6 +17,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.ChevronRight
+import androidx.compose.material.icons.filled.Image
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -38,12 +39,15 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.sipinjam.data.model.Peminjaman
+import coil.compose.AsyncImage
 import com.example.sipinjam.ui.components.UserBottomNavBar
 import com.example.sipinjam.ui.theme.BackgroundGray
 import com.example.sipinjam.ui.theme.CardWhite
@@ -68,19 +72,27 @@ fun RiwayatPeminjamanScreen(
     onKatalogClick: () -> Unit = {},
     onRiwayatClick: () -> Unit = {},
     onProfilClick: () -> Unit = {},
-    onPengembalianClick: (peminjamanId: String, barangId: String, userId: String, namaBarang: String, tanggalPinjam: String, tanggalJatuhTempo: String) -> Unit = { _, _, _, _, _, _ -> },
+    onPengembalianClick: (
+        peminjamanId: String,
+        barangId: String,
+        userId: String,
+        namaBarang: String,
+        tanggalPinjam: String,
+        tanggalJatuhTempo: String
+    ) -> Unit = { _, _, _, _, _, _ -> },
     viewModel: RiwayatPeminjamanViewModel = viewModel()
 ) {
     val daftarPeminjaman by viewModel.daftarPeminjaman.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
+    val errorMessage by viewModel.errorMessage.collectAsState()
 
     var filterAktif by remember { mutableStateOf("Semua") }
-    val filterList = listOf("Semua", "Diproses", "Disetujui", "Ditolak", "Dikembalikan", "Selesai")
+    val filterList = listOf("Semua", "Diproses", "Disetujui", "Dipinjam", "Menunggu Verifikasi", "Ditolak", "Selesai")
 
     val filtered = if (filterAktif == "Semua") {
         daftarPeminjaman
     } else {
-        daftarPeminjaman.filter { it.status == filterAktif }
+        daftarPeminjaman.filter { it.status.equals(filterAktif, ignoreCase = true) }
     }
 
     LaunchedEffect(Unit) {
@@ -97,16 +109,11 @@ fun RiwayatPeminjamanScreen(
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 8.dp, vertical = 12.dp),
+                        .padding(start = 15.dp, end = 15.dp, top = 30.dp, bottom = 10.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    IconButton(onClick = onBackClick) {
-                        Icon(
-                            imageVector = Icons.Filled.ArrowBack,
-                            contentDescription = "Kembali",
-                            tint = TextPrimary
-                        )
-                    }
+
+
                     Text(
                         text = "Riwayat Peminjaman",
                         color = TextPrimary,
@@ -132,7 +139,7 @@ fun RiwayatPeminjamanScreen(
                 .padding(innerPadding)
         ) {
             ScrollableTabRow(
-                selectedTabIndex = filterList.indexOf(filterAktif),
+                selectedTabIndex = filterList.indexOf(filterAktif).coerceAtLeast(0),
                 containerColor = CardWhite,
                 contentColor = SiPinjamBlue,
                 edgePadding = 16.dp,
@@ -155,36 +162,57 @@ fun RiwayatPeminjamanScreen(
                 }
             }
 
-            if (isLoading) {
-                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    CircularProgressIndicator(color = SiPinjamBlue)
+            when {
+                isLoading -> {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator(color = SiPinjamBlue)
+                    }
                 }
-            } else if (filtered.isEmpty()) {
-                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    Text(text = "Belum ada riwayat peminjaman", color = TextSecondary, fontSize = 14.sp)
-                }
-            } else {
-                LazyColumn(
-                    modifier = Modifier.fillMaxSize(),
-                    contentPadding = PaddingValues(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    items(filtered) { peminjaman ->
-                        RiwayatCard(
-                            peminjaman = peminjaman,
-                            onClick = if (peminjaman.status == "Disetujui" || peminjaman.status == "Dipinjam") {
-                                {
-                                    onPengembalianClick(
-                                        peminjaman.id,
-                                        peminjaman.barangId,
-                                        peminjaman.userId,
-                                        peminjaman.namaBarang,
-                                        peminjaman.tanggalPinjam,
-                                        peminjaman.tanggalKembali
-                                    )
-                                }
-                            } else null
+
+                filtered.isEmpty() -> {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = errorMessage ?: "Belum ada riwayat peminjaman",
+                            color = TextSecondary,
+                            fontSize = 14.sp
                         )
+                    }
+                }
+
+                else -> {
+                    LazyColumn(
+                        modifier = Modifier.fillMaxSize(),
+                        contentPadding = PaddingValues(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        items(filtered, key = { it.id }) { item ->
+                            RiwayatCard(
+                                item = item,
+                                onClick = if (
+                                    item.status.equals("Disetujui", ignoreCase = true) ||
+                                    item.status.equals("Dipinjam", ignoreCase = true)
+                                ) {
+                                    {
+                                        onPengembalianClick(
+                                            item.id,
+                                            item.barangId,
+                                            item.userId,
+                                            item.namaBarang,
+                                            item.tanggalPinjam,
+                                            item.tanggalKembali
+                                        )
+                                    }
+                                } else {
+                                    null
+                                }
+                            )
+                        }
                     }
                 }
             }
@@ -194,7 +222,7 @@ fun RiwayatPeminjamanScreen(
 
 @Composable
 fun RiwayatCard(
-    peminjaman: Peminjaman,
+    item: RiwayatPeminjamanUiItem,
     onClick: (() -> Unit)? = null
 ) {
     Card(
@@ -219,18 +247,37 @@ fun RiwayatCard(
                     .clip(RoundedCornerShape(10.dp))
                     .background(DarkImageBg),
                 contentAlignment = Alignment.Center
-            ) { }
+            ) {
+                if (item.fotoBarangUrl.isNotBlank()) {
+                    AsyncImage(
+                        model = item.fotoBarangUrl,
+                        contentDescription = item.namaBarang,
+                        modifier = Modifier.fillMaxSize(),
+                        contentScale = ContentScale.Crop
+                    )
+                } else {
+                    Icon(
+                        imageVector = Icons.Filled.Image,
+                        contentDescription = null,
+                        tint = Color.White.copy(alpha = 0.4f),
+                        modifier = Modifier.size(24.dp)
+                    )
+                }
+            }
 
             Column(
                 modifier = Modifier.weight(1f),
                 verticalArrangement = Arrangement.spacedBy(4.dp)
             ) {
                 Text(
-                    text = peminjaman.namaBarang,
+                    text = item.namaBarang,
                     color = TextPrimary,
                     fontSize = 14.sp,
-                    fontWeight = FontWeight.SemiBold
+                    fontWeight = FontWeight.SemiBold,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
                 )
+
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(4.dp)
@@ -241,13 +288,17 @@ fun RiwayatCard(
                         tint = TextSecondary,
                         modifier = Modifier.size(12.dp)
                     )
+
                     Text(
-                        text = "${peminjaman.tanggalPinjam} - ${peminjaman.tanggalKembali}",
+                        text = "${item.tanggalPinjam} - ${item.tanggalKembali}",
                         color = TextSecondary,
-                        fontSize = 12.sp
+                        fontSize = 12.sp,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
                     )
                 }
-                StatusBadge(status = peminjaman.status)
+
+                StatusBadge(status = item.status)
             }
 
             if (onClick != null) {
@@ -265,13 +316,15 @@ fun RiwayatCard(
 @Composable
 fun StatusBadge(status: String) {
     val (bgColor, textColor) = when (status) {
-        "Diproses"     -> Pair(StatusOrangeBg, StatusOrange)
-        "Disetujui"    -> Pair(StatusGreenBg, StatusGreen)
-        "Ditolak"      -> Pair(StatusRedLightBg, StatusRed)
-        "Dikembalikan" -> Pair(StatusBlueBg, StatusBlue)
-        "Dipinjam"     -> Pair(StatusOrangeBg, StatusOrange)
-        else           -> Pair(InputBg, TextSecondary)
+        "Diproses" -> Pair(StatusOrangeBg, StatusOrange)
+        "Disetujui" -> Pair(StatusGreenBg, StatusGreen)
+        "Dipinjam" -> Pair(StatusOrangeBg, StatusOrange)
+        "Menunggu Verifikasi" -> Pair(StatusBlueBg, StatusBlue)
+        "Ditolak" -> Pair(StatusRedLightBg, StatusRed)
+        "Selesai" -> Pair(StatusGreenBg, StatusGreen)
+        else -> Pair(InputBg, TextSecondary)
     }
+
     Box(
         modifier = Modifier
             .clip(RoundedCornerShape(4.dp))
