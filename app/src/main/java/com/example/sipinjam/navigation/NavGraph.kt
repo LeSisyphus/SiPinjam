@@ -418,7 +418,7 @@ fun NavGraph(
 
         composable(Routes.KELOLA_BARANG) {
             val context = LocalContext.current
-            val adminViewModel: KelolaBarangViewModel = viewModel()
+            val adminViewModel: com.example.sipinjam.screens.admin.KelolaBarangViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
             val adminUiState by adminViewModel.uiState.collectAsState()
 
             KelolaBarangScreen(
@@ -429,60 +429,26 @@ fun NavGraph(
                 barangToDelete = adminUiState.barangToDelete,
                 isLoading = adminUiState.isLoading,
                 isSuccess = adminUiState.isSuccess,
+                isEditSuccess = adminUiState.isEditSuccess, // 🔥 Aliran data baru untuk Pop-up Edit
+                isDeleteSuccess = adminUiState.isDeleteSuccess,
                 onTambahConfirm = { nama, kategori, stok, kondisi, lokasi, maksPinjam, deskripsi, imageUri ->
-                    adminViewModel.onTambahBarangCloudinary(
-                        context = context,
-                        nama = nama,
-                        kategori = kategori,
-                        stok = stok,
-                        kondisi = kondisi,
-                        lokasi = lokasi,
-                        maksimalPinjam = maksPinjam,
-                        deskripsi = deskripsi,
-                        imageUri = imageUri
-                    )
+                    adminViewModel.onTambahBarangCloudinary(context, nama, kategori, stok, kondisi, lokasi, maksPinjam, deskripsi, imageUri)
                 },
-                onEditClick = { barang ->
-                    adminViewModel.onEditRequest(barang)
-                },
+                onEditClick = { barang -> adminViewModel.onEditRequest(barang) },
                 onEditConfirm = { id, nama, kategori, stok, imageUri ->
-                    adminViewModel.onEditBarangFirestore(
-                        context = context,
-                        id = id,
-                        nama = nama,
-                        kategori = kategori,
-                        stok = stok,
-                        imageUri = imageUri
-                    )
+                    adminViewModel.onEditBarangFirestore(context, id, nama, kategori, stok, imageUri)
                 },
-                onEditDismiss = {
-                    adminViewModel.onEditDismiss()
-                },
-                onDeleteClick = { barang ->
-                    adminViewModel.onDeleteRequest(barang)
-                },
-                onDeleteConfirm = {
-                    adminViewModel.onDeleteConfirm()
-                },
-                onDeleteDismiss = {
-                    adminViewModel.onDeleteDismiss()
-                },
-                onSuccessDismiss = {
-                    adminViewModel.resetSuccessState()
-                },
-                onDashboardClick = {
-                    navController.navigateSingleTop(Routes.DASHBOARD_ADMIN)
-                },
-                onBarangClick = {},
-                onPermintaanClick = {
-                    navController.navigateSingleTop(Routes.PERSETUJUAN_PEMINJAMAN)
-                },
-                onProfilClick = {
-                    navController.navigateSingleTop(Routes.PROFIL)
-                }
+                onEditDismiss = { adminViewModel.onEditDismiss() },
+                onDeleteClick = { barang -> adminViewModel.onDeleteRequest(barang) },
+                onDeleteConfirm = { adminViewModel.onDeleteConfirm() },
+                onDeleteDismiss = { adminViewModel.onDeleteDismiss() },
+                onSuccessDismiss = { adminViewModel.resetSuccessState() },
+                onDashboardClick  = { navController.navigate(Routes.DASHBOARD_ADMIN) { popUpTo(Routes.DASHBOARD_ADMIN) { inclusive = true } } },
+                onBarangClick     = {},
+                onPermintaanClick = { navController.navigate(Routes.PERSETUJUAN_PEMINJAMAN) },
+                onProfilClick     = { navController.navigate(Routes.PROFIL) }
             )
         }
-
         composable(Routes.PERSETUJUAN_PEMINJAMAN) {
             PersetujuanPeminjamanScreen(
                 onDashboardClick = {
