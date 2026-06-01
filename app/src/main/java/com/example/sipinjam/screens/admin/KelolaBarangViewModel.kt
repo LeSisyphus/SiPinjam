@@ -30,7 +30,9 @@ data class KelolaBarangUiState(
     val barangToEdit: BarangAdmin? = null,
     val isLoading: Boolean = false,
     val errorMessage: String? = null,
-    val isSuccess: Boolean = false
+    val isSuccess: Boolean = false,
+    val isEditSuccess: Boolean = false,
+    val isDeleteSuccess: Boolean = false
 ) {
     val filteredBarang: List<BarangAdmin>
         get() = daftarBarang.filter { barang ->
@@ -77,6 +79,11 @@ class KelolaBarangViewModel : ViewModel() {
 
     private suspend fun uploadKeCloudinary(context: Context, imageUri: Uri): String = suspendCancellableCoroutine { continuation ->
         try {
+            try {
+                MediaManager.get()
+            } catch (e: IllegalStateException) {
+            }
+
             MediaManager.get().upload(imageUri)
                 .callback(object : UploadCallback {
                     override fun onStart(requestId: String) {}
@@ -110,7 +117,6 @@ class KelolaBarangViewModel : ViewModel() {
         viewModelScope.launch {
             try {
                 var finalImageUrl = ""
-
                 if (imageUri != null) {
                     finalImageUrl = uploadKeCloudinary(context, imageUri)
                 }
@@ -139,7 +145,7 @@ class KelolaBarangViewModel : ViewModel() {
     }
 
     fun resetSuccessState() {
-        _uiState.update { it.copy(isSuccess = false) }
+        _uiState.update { it.copy(isSuccess = false, isEditSuccess = false, isDeleteSuccess = false) }
     }
 
     fun onEditRequest(barang: BarangAdmin) {
@@ -178,7 +184,14 @@ class KelolaBarangViewModel : ViewModel() {
                     .await()
 
                 muatSemuaBarang()
-                _uiState.update { it.copy(isLoading = false, showEditDialog = false, barangToEdit = null) }
+                _uiState.update {
+                    it.copy(
+                        isLoading = false,
+                        showEditDialog = false,
+                        barangToEdit = null,
+                        isEditSuccess = true
+                    )
+                }
             } catch (e: Exception) {
                 _uiState.update { it.copy(isLoading = false, errorMessage = e.localizedMessage) }
             }
@@ -201,7 +214,7 @@ class KelolaBarangViewModel : ViewModel() {
             try {
                 firestore.collection("items").document(barang.id).delete().await()
                 muatSemuaBarang()
-                _uiState.update { it.copy(isLoading = false, showDeleteDialog = false, barangToDelete = null) }
+                _uiState.update { it.copy(isLoading = false, showDeleteDialog = false, barangToDelete = null, isDeleteSuccess = true) }
             } catch (e: Exception) {
                 _uiState.update { it.copy(isLoading = false, errorMessage = e.localizedMessage) }
             }
