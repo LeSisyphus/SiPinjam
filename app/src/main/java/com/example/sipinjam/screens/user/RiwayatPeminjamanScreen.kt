@@ -1,5 +1,8 @@
 package com.example.sipinjam.screens.user
 
+import com.example.sipinjam.R
+import androidx.compose.ui.res.stringResource
+import com.example.sipinjam.data.model.BorrowingStatus
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -48,6 +51,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
+import com.example.sipinjam.ui.components.StatusChip
 import com.example.sipinjam.ui.components.UserBottomNavBar
 import com.example.sipinjam.ui.theme.BackgroundGray
 import com.example.sipinjam.ui.theme.CardWhite
@@ -87,7 +91,7 @@ fun RiwayatPeminjamanScreen(
     val errorMessage by viewModel.errorMessage.collectAsState()
 
     var filterAktif by remember { mutableStateOf("Semua") }
-    val filterList = listOf("Semua", "Diproses", "Disetujui", "Dipinjam", "Menunggu Verifikasi", "Ditolak", "Selesai")
+    val filterList = listOf("Semua", BorrowingStatus.DIPROSES, BorrowingStatus.DISETUJUI_LEGACY, BorrowingStatus.DIPINJAM, BorrowingStatus.MENUNGGU_VERIFIKASI, BorrowingStatus.DITOLAK, BorrowingStatus.SELESAI)
 
     val filtered = if (filterAktif == "Semua") {
         daftarPeminjaman
@@ -115,7 +119,7 @@ fun RiwayatPeminjamanScreen(
 
 
                     Text(
-                        text = "Riwayat Peminjaman",
+                        text = stringResource(R.string.screen_history),
                         color = TextPrimary,
                         fontSize = 17.sp,
                         fontWeight = FontWeight.SemiBold
@@ -195,8 +199,7 @@ fun RiwayatPeminjamanScreen(
                             RiwayatCard(
                                 item = item,
                                 onClick = if (
-                                    item.status.equals("Disetujui", ignoreCase = true) ||
-                                    item.status.equals("Dipinjam", ignoreCase = true)
+                                    BorrowingStatus.canRequestReturn(item.status)
                                 ) {
                                     {
                                         onPengembalianClick(
@@ -298,7 +301,7 @@ fun RiwayatCard(
                     )
                 }
 
-                StatusBadge(status = item.status)
+                StatusChip(status = item.status)
             }
 
             if (onClick != null) {
@@ -310,33 +313,6 @@ fun RiwayatCard(
                 )
             }
         }
-    }
-}
-
-@Composable
-fun StatusBadge(status: String) {
-    val (bgColor, textColor) = when (status) {
-        "Diproses" -> Pair(StatusOrangeBg, StatusOrange)
-        "Disetujui" -> Pair(StatusGreenBg, StatusGreen)
-        "Dipinjam" -> Pair(StatusOrangeBg, StatusOrange)
-        "Menunggu Verifikasi" -> Pair(StatusBlueBg, StatusBlue)
-        "Ditolak" -> Pair(StatusRedLightBg, StatusRed)
-        "Selesai" -> Pair(StatusGreenBg, StatusGreen)
-        else -> Pair(InputBg, TextSecondary)
-    }
-
-    Box(
-        modifier = Modifier
-            .clip(RoundedCornerShape(4.dp))
-            .background(bgColor)
-            .padding(horizontal = 8.dp, vertical = 3.dp)
-    ) {
-        Text(
-            text = status,
-            color = textColor,
-            fontSize = 11.sp,
-            fontWeight = FontWeight.Bold
-        )
     }
 }
 

@@ -1,5 +1,6 @@
 package com.example.sipinjam.screens.user
 
+import com.example.sipinjam.data.model.BorrowingStatus
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.sipinjam.data.model.Barang
@@ -150,7 +151,7 @@ class PeminjamanViewModel : ViewModel() {
                 tanggalPinjam = tanggalPinjam,
                 tanggalKembali = tanggalKembali,
                 keperluan = keperluan.trim(),
-                status = "Diproses",
+                status = BorrowingStatus.DIPROSES,
                 createdAt = System.currentTimeMillis()
             )
 

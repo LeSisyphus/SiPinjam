@@ -1,5 +1,7 @@
 package com.example.sipinjam.screens.user
 
+import com.example.sipinjam.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -61,6 +63,9 @@ import com.example.sipinjam.ui.theme.StatusRed
 import com.example.sipinjam.ui.theme.TextPrimary
 import com.example.sipinjam.ui.theme.TextSecondary
 import com.example.sipinjam.ui.theme.ToggleBg
+import com.example.sipinjam.ui.theme.StatusRedBg
+import com.example.sipinjam.ui.theme.StatusBlue
+import com.example.sipinjam.ui.theme.StatusBlueBg
 
 @Composable
 fun KatalogScreen(
@@ -172,7 +177,7 @@ private fun KatalogHeader() {
         modifier = Modifier
             .fillMaxWidth()
             .height(72.dp)
-            .background(Color(0xFFEFF4FC))
+            .background(StatusBlueBg)
             .padding(horizontal = 32.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -186,7 +191,7 @@ private fun KatalogHeader() {
         Spacer(modifier = Modifier.width(18.dp))
 
         Text(
-            text = "SiPinjam",
+            text = stringResource(R.string.app_name),
             color = SiPinjamBlue,
             fontSize = 20.sp,
             fontWeight = FontWeight.Bold
@@ -214,7 +219,7 @@ private fun SearchAndFilterSection(
                 .height(56.dp),
             placeholder = {
                 Text(
-                    text = "Search equipment...",
+                    text = stringResource(R.string.hint_search_katalog),
                     color = TextSecondary.copy(alpha = 0.55f),
                     fontSize = 16.sp
                 )
@@ -295,7 +300,7 @@ private fun KategoriChip(
     ) {
         Text(
             text = text,
-            color = if (selected) Color.White else Color(0xFF4B5563),
+            color = if (selected) Color.White else TextSecondary,
             fontSize = 14.sp,
             fontWeight = if (selected) FontWeight.Bold else FontWeight.Medium
         )
@@ -422,13 +427,13 @@ private fun KatalogMessageCard(
         modifier = modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(14.dp))
-            .background(if (isError) Color(0xFFFFEBEE) else CardWhite)
+            .background(if (isError) StatusRedBg else CardWhite)
             .padding(horizontal = 16.dp, vertical = 18.dp),
         contentAlignment = Alignment.Center
     ) {
         Text(
             text = message,
-            color = if (isError) Color(0xFFD32F2F) else TextSecondary,
+            color = if (isError) StatusRed else TextSecondary,
             fontSize = 13.sp
         )
     }

@@ -1,5 +1,7 @@
 package com.example.sipinjam.screens.user
 
+import com.example.sipinjam.data.model.ReturnStatus
+import com.example.sipinjam.data.model.BorrowingStatus
 import android.content.Context
 import android.net.Uri
 import androidx.lifecycle.ViewModel
@@ -62,7 +64,7 @@ class PengembalianViewModel : ViewModel() {
 
             result.onSuccess { pengembalian ->
                 _catatanAdmin.value = if (
-                    pengembalian?.status.equals("Ditolak", ignoreCase = true) &&
+                    pengembalian?.status.equals(ReturnStatus.DITOLAK, ignoreCase = true) &&
                     !pengembalian?.catatanAdmin.isNullOrBlank()
                 ) {
                     pengembalian?.catatanAdmin
@@ -109,7 +111,7 @@ class PengembalianViewModel : ViewModel() {
                 catatanAdmin = "",
                 kondisiBarang = "",
                 tanggalKembali = tanggalKembali,
-                status = "Menunggu Verifikasi"
+                status = ReturnStatus.MENUNGGU_VERIFIKASI
             )
 
             val result = pengembalianRepository.ajukanPengembalianDanUpdatePeminjaman(

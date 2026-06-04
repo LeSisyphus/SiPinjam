@@ -1,5 +1,7 @@
 package com.example.sipinjam.screens.user
 
+import com.example.sipinjam.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -46,6 +48,8 @@ import com.example.sipinjam.ui.theme.StatusGreen
 import com.example.sipinjam.ui.theme.StatusGreenBg
 import com.example.sipinjam.ui.theme.TextPrimary
 import com.example.sipinjam.ui.theme.TextSecondary
+import com.example.sipinjam.ui.theme.StatusRed
+import com.example.sipinjam.ui.theme.StatusRedBg
 
 data class BarangTersedia(
     val id: String,
@@ -185,7 +189,7 @@ fun BerandaUserScreen(
 
             item {
                 Text(
-                    text = "Perlu Dikembalikan",
+                    text = stringResource(R.string.screen_home_return_needed),
                     color = TextPrimary,
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold,
@@ -257,7 +261,7 @@ private fun HeaderSection() {
         Spacer(Modifier.width(8.dp))
 
         Text(
-            text = "SiPinjam",
+            text = stringResource(R.string.app_name),
             color = SiPinjamBlue,
             fontSize = 20.sp,
             fontWeight = FontWeight.Bold
@@ -286,7 +290,7 @@ private fun SearchSection() {
         Spacer(Modifier.width(10.dp))
 
         Text(
-            text = "Cari barang yang ingin kamu pinjam",
+            text = stringResource(R.string.screen_home_search_prompt),
             color = TextSecondary.copy(alpha = 0.6f),
             fontSize = 14.sp
         )
@@ -370,7 +374,7 @@ private fun BarangCard(
                         .padding(horizontal = 6.dp, vertical = 2.dp)
                 ) {
                     Text(
-                        text = "TERSEDIA",
+                        text = stringResource(R.string.status_tersedia_upper),
                         color = StatusGreen,
                         fontSize = 9.sp,
                         fontWeight = FontWeight.Bold,
@@ -464,7 +468,7 @@ private fun KembalikanCard(
                 .padding(horizontal = 14.dp, vertical = 7.dp)
         ) {
             Text(
-                text = "Kembalikan",
+                text = stringResource(R.string.btn_kembalikan),
                 color = Color.White,
                 fontSize = 12.sp,
                 fontWeight = FontWeight.SemiBold
@@ -503,13 +507,13 @@ private fun ErrorCard(
         modifier = modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(14.dp))
-            .background(Color(0xFFFFEBEE))
+            .background(StatusRedBg)
             .padding(horizontal = 16.dp, vertical = 14.dp),
         contentAlignment = Alignment.CenterStart
     ) {
         Text(
             text = message,
-            color = Color(0xFFD32F2F),
+            color = StatusRed,
             fontSize = 13.sp
         )
     }

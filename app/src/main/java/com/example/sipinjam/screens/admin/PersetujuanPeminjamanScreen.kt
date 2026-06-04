@@ -1,5 +1,7 @@
 package com.example.sipinjam.screens.admin
 
+import com.example.sipinjam.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -58,26 +60,47 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import com.example.sipinjam.ui.components.AdminBottomNavBar
+import com.example.sipinjam.ui.components.CloudinaryImage
 import com.example.sipinjam.ui.theme.CardWhite
+import com.example.sipinjam.ui.theme.StatusOrange
+import com.example.sipinjam.ui.theme.StatusOrangeBg
+import com.example.sipinjam.ui.theme.StatusBlue
+import com.example.sipinjam.ui.theme.DividerColor
+import com.example.sipinjam.ui.theme.InputBg
+import com.example.sipinjam.ui.theme.StatusBlueBg
+import com.example.sipinjam.ui.theme.BackgroundGray
 import com.example.sipinjam.ui.theme.SiPinjamBlue
 import com.example.sipinjam.ui.theme.TextPrimary
 import com.example.sipinjam.ui.theme.TextSecondary
 
-private val RequestPageBg = Color(0xFFF7F7FF)
-private val SoftBlueBg = Color(0xFFDCEBFF)
-private val SoftItemBg = Color(0xFFF0F2FB)
-private val DividerSoft = Color(0xFFE6E8F2)
+private val RequestPageBg: Color
+    @Composable get() = BackgroundGray
+private val SoftBlueBg: Color
+    @Composable get() = StatusBlueBg
+private val SoftItemBg: Color
+    @Composable get() = InputBg
+private val DividerSoft: Color
+    @Composable get() = DividerColor
 
-private val RoleBlueBg = Color(0xFFD8E9FF)
-private val RoleBlueText = Color(0xFF4F74A6)
-private val RoleCyanBg = Color(0xFFD8F0FF)
-private val RoleCyanText = Color(0xFF156D9E)
-private val RoleOrangeBg = Color(0xFFFFE5C2)
-private val RoleOrangeText = Color(0xFFA76012)
+private val RoleBlueBg: Color
+    @Composable get() = StatusBlueBg
+private val RoleBlueText: Color
+    @Composable get() = StatusBlue
+private val RoleCyanBg: Color
+    @Composable get() = StatusBlueBg
+private val RoleCyanText: Color
+    @Composable get() = StatusBlue
+private val RoleOrangeBg: Color
+    @Composable get() = StatusOrangeBg
+private val RoleOrangeText: Color
+    @Composable get() = StatusOrange
 
-private val WaitingBg = Color(0xFFFFF1DA)
-private val WaitingBorder = Color(0xFFEAB676)
-private val WaitingText = Color(0xFF9A5B00)
+private val WaitingBg: Color
+    @Composable get() = StatusOrangeBg
+private val WaitingBorder: Color
+    @Composable get() = StatusOrange
+private val WaitingText: Color
+    @Composable get() = StatusOrange
 
 @Composable
 fun PersetujuanPeminjamanScreen(
@@ -229,7 +252,7 @@ private fun HeaderSiPinjam() {
         )
 
         Text(
-            text = "SiPinjam",
+            text = stringResource(R.string.app_name),
             color = SiPinjamBlue,
             fontSize = 20.sp,
             fontWeight = FontWeight.Bold
@@ -252,13 +275,13 @@ private fun RequestTabs(
             verticalAlignment = Alignment.Bottom
         ) {
             RequestTabItem(
-                title = "Persetujuan",
+                title = stringResource(R.string.tab_persetujuan),
                 selected = selectedTab == 0,
                 onClick = { onTabSelected(0) }
             )
 
             RequestTabItem(
-                title = "Pengembalian",
+                title = stringResource(R.string.tab_pengembalian),
                 selected = selectedTab == 1,
                 onClick = { onTabSelected(1) }
             )
@@ -348,7 +371,7 @@ private fun PersetujuanCardModern(
                 elevation = ButtonDefaults.buttonElevation(defaultElevation = 0.dp)
             ) {
                 Text(
-                    text = "Detail Pengajuan",
+                    text = stringResource(R.string.screen_approval_detail),
                     color = Color.White,
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold
@@ -406,7 +429,7 @@ private fun PengembalianRequestCard(
                 elevation = ButtonDefaults.buttonElevation(defaultElevation = 0.dp)
             ) {
                 Text(
-                    text = "Detail Pengembalian",
+                    text = stringResource(R.string.screen_return_detail),
                     color = Color.White,
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold
@@ -574,28 +597,13 @@ private fun AvatarImage(
     imageUrl: String,
     modifier: Modifier = Modifier
 ) {
-    Box(
-        modifier = modifier
-            .clip(RoundedCornerShape(14.dp))
-            .background(SoftBlueBg),
-        contentAlignment = Alignment.Center
-    ) {
-        if (imageUrl.isNotBlank()) {
-            AsyncImage(
-                model = imageUrl,
-                contentDescription = "Foto peminjam",
-                modifier = Modifier.fillMaxSize(),
-                contentScale = ContentScale.Crop
-            )
-        } else {
-            Icon(
-                imageVector = Icons.Filled.Person,
-                contentDescription = null,
-                tint = SiPinjamBlue,
-                modifier = Modifier.size(24.dp)
-            )
-        }
-    }
+    CloudinaryImage(
+        imageUrl = imageUrl,
+        contentDescription = "Foto peminjam",
+        modifier = modifier,
+        shape = RoundedCornerShape(14.dp),
+        placeholderSize = 24.dp,
+    )
 }
 
 @Composable
@@ -603,28 +611,13 @@ private fun ItemImage(
     imageUrl: String,
     modifier: Modifier = Modifier
 ) {
-    Box(
-        modifier = modifier
-            .clip(RoundedCornerShape(8.dp))
-            .background(Color.White),
-        contentAlignment = Alignment.Center
-    ) {
-        if (imageUrl.isNotBlank()) {
-            AsyncImage(
-                model = imageUrl,
-                contentDescription = "Foto barang",
-                modifier = Modifier.fillMaxSize(),
-                contentScale = ContentScale.Crop
-            )
-        } else {
-            Icon(
-                imageVector = Icons.Filled.Image,
-                contentDescription = null,
-                tint = SiPinjamBlue,
-                modifier = Modifier.size(26.dp)
-            )
-        }
-    }
+    CloudinaryImage(
+        imageUrl = imageUrl,
+        contentDescription = "Foto barang",
+        modifier = modifier,
+        shape = RoundedCornerShape(8.dp),
+        placeholderSize = 26.dp,
+    )
 }
 
 @Composable

@@ -1,5 +1,8 @@
 package com.example.sipinjam.screens.admin
 
+import com.example.sipinjam.R
+import androidx.compose.ui.res.stringResource
+import com.example.sipinjam.data.model.BorrowingStatus
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -62,6 +65,9 @@ import com.example.sipinjam.ui.theme.StatusGreen
 import com.example.sipinjam.ui.theme.StatusRed
 import com.example.sipinjam.ui.theme.TextPrimary
 import com.example.sipinjam.ui.theme.TextSecondary
+import com.example.sipinjam.ui.theme.InputBg
+import com.example.sipinjam.ui.theme.StatusBlue
+import com.example.sipinjam.ui.theme.StatusBlueBg
 import java.text.SimpleDateFormat
 import java.util.Locale
 import java.util.concurrent.TimeUnit
@@ -89,7 +95,7 @@ fun DetailPengajuanScreen(
         containerColor = BackgroundGray,
         topBar = {
             DetailPengajuanTopBar(
-                title = "Detail Pengajuan",
+                title = stringResource(R.string.screen_approval_detail),
                 onBackClick = onBackClick
             )
         },
@@ -252,7 +258,7 @@ private fun InformasiBarangCard(
                     modifier = Modifier
                         .size(80.dp)
                         .clip(RoundedCornerShape(10.dp))
-                        .background(Color(0xFFE2E6EE)),
+                        .background(InputBg),
                     contentAlignment = Alignment.Center
                 ) {
                     if (!barang?.fotoUrl.isNullOrBlank()) {
@@ -324,12 +330,12 @@ private fun KategoriChip(kategori: String) {
     Box(
         modifier = Modifier
             .clip(RoundedCornerShape(5.dp))
-            .background(Color(0xFFDCEBFF))
+            .background(StatusBlueBg)
             .padding(horizontal = 10.dp, vertical = 4.dp)
     ) {
         Text(
             text = kategori.uppercase(),
-            color = Color(0xFF2F6EA3),
+            color = StatusBlue,
             fontSize = 11.sp,
             fontWeight = FontWeight.Medium
         )
@@ -359,13 +365,13 @@ private fun DetailPeminjamanCard(
             )
 
             DetailInfoRow(
-                label = "Tanggal Pinjam",
+                label = stringResource(R.string.label_tanggal_pinjam),
                 value = peminjaman.tanggalPinjam.ifBlank { "-" },
                 valueColor = TextPrimary
             )
 
             DetailInfoRow(
-                label = "Tanggal Kembali",
+                label = stringResource(R.string.label_tanggal_kembali),
                 value = peminjaman.tanggalKembali.ifBlank { "-" },
                 valueColor = TextPrimary
             )
@@ -385,7 +391,7 @@ private fun DetailPeminjamanCard(
             )
 
             Text(
-                text = "Alasan Peminjaman",
+                text = stringResource(R.string.label_alasan_peminjaman),
                 color = TextPrimary,
                 fontSize = 15.sp,
                 fontWeight = FontWeight.Medium
@@ -437,7 +443,7 @@ private fun DetailPengajuanBottomAction(
     onTolakClick: () -> Unit,
     onSetujuiClick: () -> Unit
 ) {
-    val canTakeAction = status.equals("Diproses", ignoreCase = true)
+    val canTakeAction = status.equals(BorrowingStatus.DIPROSES, ignoreCase = true)
 
     Surface(
         modifier = Modifier
@@ -492,7 +498,7 @@ private fun DetailPengajuanBottomAction(
                     Spacer(modifier = Modifier.width(6.dp))
 
                     Text(
-                        text = "Tolak",
+                        text = stringResource(R.string.btn_tolak),
                         fontSize = 15.sp,
                         fontWeight = FontWeight.Bold
                     )
@@ -527,7 +533,7 @@ private fun DetailPengajuanBottomAction(
                         Spacer(modifier = Modifier.width(6.dp))
 
                         Text(
-                            text = "Setujui",
+                            text = stringResource(R.string.btn_setujui),
                             color = Color.White,
                             fontSize = 15.sp,
                             fontWeight = FontWeight.Bold

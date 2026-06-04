@@ -1,5 +1,6 @@
 package com.example.sipinjam.screens.admin
 
+import com.example.sipinjam.data.model.BorrowingStatus
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.firestore.DocumentSnapshot
@@ -89,15 +90,13 @@ class DashboardAdminViewModel : ViewModel() {
 
                 val permintaanMasuk = semuaPeminjaman.filter { document ->
                     document.getString("status")
-                        .equals("Diproses", ignoreCase = true)
+                        .equals(BorrowingStatus.DIPROSES, ignoreCase = true)
                 }
 
                 val dipinjamCount = semuaPeminjaman.count { document ->
                     val status = document.getString("status").orEmpty()
 
-                    status.equals("Dipinjam", ignoreCase = true) ||
-                            status.equals("Disetujui", ignoreCase = true) ||
-                            status.equals("Menunggu Verifikasi", ignoreCase = true)
+                    BorrowingStatus.isBorrowed(status)
                 }
 
                 viewModelScope.launch {

@@ -1,5 +1,7 @@
 package com.example.sipinjam.screens.user
 
+import com.example.sipinjam.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -80,7 +82,7 @@ fun PeminjamanScreen(
     barangId: String = "",
     namaBarang: String = "MacBook Pro M2 14-inch",
     kategoriBarang: String = "ELEKTRONIK",
-    statusBarang: String = "TERSEDIA",
+    statusBarang: String = "Tersedia",
     onBackClick: () -> Unit = {},
     onKirimPermohonan: (tanggalPinjam: String, tanggalKembali: String, keperluan: String) -> Unit = { _, _, _ -> },
     viewModel: PeminjamanViewModel = viewModel()
@@ -103,13 +105,13 @@ fun PeminjamanScreen(
 
     val isBarangAvailable = barang?.let {
         it.stok > 0 && it.tersedia
-    } ?: statusBarang.equals("TERSEDIA", ignoreCase = true)
+    } ?: statusBarang.equals("Tersedia", ignoreCase = true)
 
     val statusLabel = when {
-        isBarangLoading -> "MEMUAT"
+        isBarangLoading -> stringResource(R.string.loading_upper)
         barang == null -> statusBarang.uppercase()
-        isBarangAvailable -> "TERSEDIA"
-        else -> "TIDAK TERSEDIA"
+        isBarangAvailable -> stringResource(R.string.status_tersedia_upper)
+        else -> stringResource(R.string.status_tidak_tersedia_upper)
     }
 
     val canSubmit = !isLoading &&
@@ -147,7 +149,7 @@ fun PeminjamanScreen(
                     }
                 ) {
                     Text(
-                        text = "OK",
+                        text = stringResource(R.string.btn_ok),
                         color = SiPinjamBlue
                     )
                 }
@@ -159,7 +161,7 @@ fun PeminjamanScreen(
                     }
                 ) {
                     Text(
-                        text = "Batal",
+                        text = stringResource(R.string.btn_batal),
                         color = TextSecondary
                     )
                 }
@@ -185,7 +187,7 @@ fun PeminjamanScreen(
                     }
                 ) {
                     Text(
-                        text = "OK",
+                        text = stringResource(R.string.btn_ok),
                         color = SiPinjamBlue
                     )
                 }
@@ -197,7 +199,7 @@ fun PeminjamanScreen(
                     }
                 ) {
                     Text(
-                        text = "Batal",
+                        text = stringResource(R.string.btn_batal),
                         color = TextSecondary
                     )
                 }
@@ -220,7 +222,7 @@ fun PeminjamanScreen(
             },
             title = {
                 Text(
-                    text = "Permohonan Terkirim!",
+                    text = stringResource(R.string.screen_borrow_success_title),
                     fontWeight = FontWeight.Bold,
                     textAlign = TextAlign.Center,
                     color = TextPrimary
@@ -228,7 +230,7 @@ fun PeminjamanScreen(
             },
             text = {
                 Text(
-                    text = "Permohonan peminjaman kamu sudah berhasil dikirim. Admin akan memproses dalam 1×24 jam.",
+                    text = stringResource(R.string.screen_borrow_success_subtitle),
                     textAlign = TextAlign.Center,
                     color = TextSecondary,
                     fontSize = 14.sp,
@@ -246,7 +248,7 @@ fun PeminjamanScreen(
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Text(
-                        text = "Kembali ke Beranda",
+                        text = stringResource(R.string.btn_kembali_beranda),
                         color = Color.White
                     )
                 }
@@ -278,7 +280,7 @@ fun PeminjamanScreen(
                     }
 
                     Text(
-                        text = "Ajukan Peminjaman",
+                        text = stringResource(R.string.screen_borrow_item),
                         color = TextPrimary,
                         fontSize = 17.sp,
                         fontWeight = FontWeight.SemiBold
@@ -335,7 +337,7 @@ fun PeminjamanScreen(
                             )
                         } else {
                             Text(
-                                text = "Kirim Permohonan",
+                                text = stringResource(R.string.btn_kirim_permohonan),
                                 fontSize = 16.sp,
                                 fontWeight = FontWeight.SemiBold,
                                 color = Color.White
@@ -346,7 +348,7 @@ fun PeminjamanScreen(
                     Spacer(modifier = Modifier.height(10.dp))
 
                     Text(
-                        text = "Permohonan akan diproses oleh admin dalam 1×24 jam. Pastikan data yang anda masukkan sudah benar.",
+                        text = stringResource(R.string.screen_borrow_info),
                         color = TextSecondary,
                         fontSize = 12.sp,
                         textAlign = TextAlign.Center,
@@ -475,7 +477,7 @@ fun PeminjamanScreen(
                         .padding(14.dp)
                 ) {
                     Text(
-                        text = "Barang ini sedang tidak tersedia atau stok sudah habis, sehingga tidak dapat diajukan untuk peminjaman.",
+                        text = stringResource(R.string.msg_item_unavailable),
                         color = StatusRed,
                         fontSize = 13.sp,
                         lineHeight = 19.sp
@@ -487,7 +489,7 @@ fun PeminjamanScreen(
                 verticalArrangement = Arrangement.spacedBy(6.dp)
             ) {
                 Text(
-                    text = "Tanggal Pinjam",
+                    text = stringResource(R.string.label_tanggal_pinjam),
                     color = TextPrimary,
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Medium
@@ -500,7 +502,7 @@ fun PeminjamanScreen(
                     modifier = Modifier.fillMaxWidth(),
                     placeholder = {
                         Text(
-                            text = "cth: 1 Juni 2026",
+                            text = stringResource(R.string.hint_tanggal_pinjam),
                             color = TextSecondary.copy(alpha = 0.6f),
                             fontSize = 14.sp
                         )
@@ -537,7 +539,7 @@ fun PeminjamanScreen(
                 verticalArrangement = Arrangement.spacedBy(6.dp)
             ) {
                 Text(
-                    text = "Tanggal Kembali",
+                    text = stringResource(R.string.label_tanggal_kembali),
                     color = TextPrimary,
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Medium
@@ -550,7 +552,7 @@ fun PeminjamanScreen(
                     modifier = Modifier.fillMaxWidth(),
                     placeholder = {
                         Text(
-                            text = "cth: 5 Juni 2026",
+                            text = stringResource(R.string.hint_tanggal_kembali),
                             color = TextSecondary.copy(alpha = 0.6f),
                             fontSize = 14.sp
                         )
@@ -587,7 +589,7 @@ fun PeminjamanScreen(
                 verticalArrangement = Arrangement.spacedBy(6.dp)
             ) {
                 Text(
-                    text = "Keperluan/Alasan",
+                    text = stringResource(R.string.label_keperluan_alasan),
                     color = TextPrimary,
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Medium
@@ -605,7 +607,7 @@ fun PeminjamanScreen(
                         .height(140.dp),
                     placeholder = {
                         Text(
-                            text = "Tulis alasan peminjaman...",
+                            text = stringResource(R.string.hint_alasan_peminjaman),
                             color = TextSecondary.copy(alpha = 0.6f),
                             fontSize = 14.sp
                         )

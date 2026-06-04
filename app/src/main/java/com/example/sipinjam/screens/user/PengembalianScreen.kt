@@ -1,5 +1,7 @@
 package com.example.sipinjam.screens.user
 
+import com.example.sipinjam.R
+import androidx.compose.ui.res.stringResource
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -135,14 +137,14 @@ fun PengembalianScreen(
             onDismissRequest = { showDialog = false },
             title = {
                 Text(
-                    text = "Konfirmasi Pengembalian",
+                    text = stringResource(R.string.screen_return_confirm_title),
                     fontWeight = FontWeight.Bold,
                     textAlign = TextAlign.Center
                 )
             },
             text = {
                 Text(
-                    text = "Pastikan foto kondisi barang sudah jelas. Pengembalian akan diverifikasi oleh admin.",
+                    text = stringResource(R.string.screen_return_confirm_subtitle),
                     textAlign = TextAlign.Center,
                     color = TextSecondary,
                     fontSize = 14.sp
@@ -167,12 +169,12 @@ fun PengembalianScreen(
                     colors = ButtonDefaults.buttonColors(containerColor = SiPinjamBlue),
                     shape = RoundedCornerShape(10.dp)
                 ) {
-                    Text("Ya, Kembalikan", color = Color.White)
+                    Text(stringResource(R.string.btn_ya_kembalikan), color = Color.White)
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showDialog = false }) {
-                    Text("Batal", color = TextSecondary)
+                    Text(stringResource(R.string.btn_batal), color = TextSecondary)
                 }
             },
             shape = RoundedCornerShape(16.dp),
@@ -202,7 +204,7 @@ fun PengembalianScreen(
                     }
 
                     Text(
-                        text = "Kembalikan Barang",
+                        text = stringResource(R.string.screen_return_item),
                         color = TextPrimary,
                         fontSize = 17.sp,
                         fontWeight = FontWeight.SemiBold
@@ -248,7 +250,7 @@ fun PengembalianScreen(
                             )
                         } else {
                             Text(
-                                text = "KONFIRMASI PENGEMBALIAN",
+                                text = stringResource(R.string.screen_return_confirmation_section),
                                 fontSize = 15.sp,
                                 fontWeight = FontWeight.Bold,
                                 color = Color.White,
@@ -299,7 +301,7 @@ fun PengembalianScreen(
                         Row(horizontalArrangement = Arrangement.spacedBy(24.dp)) {
                             Column {
                                 Text(
-                                    text = "PINJAM",
+                                    text = stringResource(R.string.label_pinjam),
                                     color = TextSecondary,
                                     fontSize = 11.sp,
                                     fontWeight = FontWeight.SemiBold,
@@ -316,7 +318,7 @@ fun PengembalianScreen(
 
                             Column {
                                 Text(
-                                    text = "JATUH TEMPO",
+                                    text = stringResource(R.string.label_jatuh_tempo),
                                     color = TextSecondary,
                                     fontSize = 11.sp,
                                     fontWeight = FontWeight.SemiBold,
@@ -337,7 +339,7 @@ fun PengembalianScreen(
 
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 Text(
-                    text = "Foto Kondisi Barang",
+                    text = stringResource(R.string.label_foto_kondisi_barang),
                     color = TextPrimary,
                     fontSize = 14.sp,
                     fontWeight = FontWeight.SemiBold
@@ -378,14 +380,14 @@ fun PengembalianScreen(
                             }
 
                             Text(
-                                text = "Foto Kondisi Barang",
+                                text = stringResource(R.string.label_foto_kondisi_barang),
                                 color = TextPrimary,
                                 fontSize = 14.sp,
                                 fontWeight = FontWeight.SemiBold
                             )
 
                             Text(
-                                text = "Ketuk untuk ambil foto atau unggah",
+                                text = stringResource(R.string.hint_foto_kondisi),
                                 color = TextSecondary,
                                 fontSize = 12.sp
                             )
@@ -410,7 +412,7 @@ fun PengembalianScreen(
                                 .padding(horizontal = 12.dp, vertical = 6.dp)
                         ) {
                             Text(
-                                text = "Ganti Foto",
+                                text = stringResource(R.string.btn_ganti_foto),
                                 color = Color.White,
                                 fontSize = 12.sp,
                                 fontWeight = FontWeight.Medium
@@ -422,7 +424,7 @@ fun PengembalianScreen(
 
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 Text(
-                    text = "Catatan Kondisi",
+                    text = stringResource(R.string.label_catatan_kondisi),
                     color = TextPrimary,
                     fontSize = 14.sp,
                     fontWeight = FontWeight.SemiBold
@@ -440,7 +442,7 @@ fun PengembalianScreen(
                         .height(120.dp),
                     placeholder = {
                         Text(
-                            text = "Jelaskan kondisi barang saat ini...",
+                            text = stringResource(R.string.hint_catatan_kondisi),
                             color = TextSecondary.copy(alpha = 0.6f),
                             fontSize = 14.sp
                         )
@@ -477,7 +479,7 @@ fun PengembalianScreen(
                 )
 
                 Text(
-                    text = "Pastikan foto jelas dan barang dalam kondisi bersih.",
+                    text = stringResource(R.string.msg_return_photo_reminder),
                     color = StatusOrange,
                     fontSize = 13.sp,
                     lineHeight = 20.sp

@@ -1,5 +1,7 @@
 package com.example.sipinjam.screens.user
 
+import com.example.sipinjam.R
+import androidx.compose.ui.res.stringResource
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -106,7 +108,7 @@ fun ProfilScreen(
                 )
                 Spacer(Modifier.width(8.dp))
                 Text(
-                    text = "SiPinjam",
+                    text = stringResource(R.string.app_name),
                     color = SiPinjamBlue,
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold
@@ -162,7 +164,7 @@ fun ProfilScreen(
                     ) {
                         Icon(
                             imageVector = Icons.Filled.CameraAlt,
-                            contentDescription = "Ganti Foto",
+                            contentDescription = stringResource(R.string.btn_ganti_foto),
                             tint = SiPinjamBlue,
                             modifier = Modifier.size(16.dp)
                         )
@@ -204,7 +206,7 @@ fun ProfilScreen(
             Spacer(Modifier.height(28.dp))
 
             // Informasi Personal
-            SectionLabel("Informasi Personal")
+            SectionLabel(stringResource(R.string.label_informasi_personal))
 
             Spacer(Modifier.height(10.dp))
 
@@ -221,14 +223,14 @@ fun ProfilScreen(
                     verticalArrangement = Arrangement.spacedBy(14.dp)
                 ) {
                     ProfilTextField(
-                        label = "NAMA LENGKAP",
+                        label = stringResource(R.string.label_nama_lengkap),
                         value = uiState.namaInput,
                         icon = Icons.Filled.Person,
                         onValueChange = { viewModel.onNamaChange(it) }
                     )
                     HorizontalDivider(color = DividerColor)
                     ProfilTextField(
-                        label = "NOMOR TELEPON",
+                        label = stringResource(R.string.label_nomor_telepon),
                         value = uiState.nomorTeleponInput,
                         icon = Icons.Filled.Phone,
                         keyboardType = KeyboardType.Phone,
@@ -260,7 +262,7 @@ fun ProfilScreen(
                             )
                         } else {
                             Text(
-                                text = "Simpan",
+                                text = stringResource(R.string.btn_simpan),
                                 fontSize = 14.sp,
                                 fontWeight = FontWeight.SemiBold,
                                 color = Color.White
@@ -308,7 +310,7 @@ fun ProfilScreen(
                         )
                     }
                     Text(
-                        text = "Ganti Password",
+                        text = stringResource(R.string.screen_profile_change_password),
                         color = TextPrimary,
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Medium,
@@ -326,7 +328,7 @@ fun ProfilScreen(
             Spacer(Modifier.height(24.dp))
 
             // Preferensi
-            SectionLabel("Preferensi")
+            SectionLabel(stringResource(R.string.label_preferensi))
 
             Spacer(Modifier.height(10.dp))
 
@@ -362,7 +364,7 @@ fun ProfilScreen(
                             )
                         }
                         Text(
-                            text = "Dark Mode",
+                            text = stringResource(R.string.screen_profile_dark_mode),
                             color = TextPrimary,
                             fontSize = 14.sp,
                             fontWeight = FontWeight.Medium,
@@ -408,7 +410,7 @@ fun ProfilScreen(
                                 )
                             }
                             Text(
-                                text = "Bahasa",
+                                text = stringResource(R.string.screen_profile_language),
                                 color = TextPrimary,
                                 fontSize = 14.sp,
                                 fontWeight = FontWeight.Medium
@@ -461,7 +463,7 @@ fun ProfilScreen(
                 border = androidx.compose.foundation.BorderStroke(1.dp, StatusRed)
             ) {
                 Text(
-                    text = "Keluar",
+                    text = stringResource(R.string.screen_profile_logout),
                     fontSize = 15.sp,
                     fontWeight = FontWeight.SemiBold,
                     color = StatusRed

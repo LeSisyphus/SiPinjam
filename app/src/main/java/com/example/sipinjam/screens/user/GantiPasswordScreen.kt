@@ -1,5 +1,7 @@
 package com.example.sipinjam.screens.user
 
+import com.example.sipinjam.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -57,7 +59,7 @@ fun GantiPasswordScreen(
             },
             title = {
                 Text(
-                    text = "Password Berhasil Diubah",
+                    text = stringResource(R.string.screen_password_changed_title),
                     fontWeight = FontWeight.Bold,
                     fontSize = 16.sp,
                     color = TextPrimary
@@ -65,7 +67,7 @@ fun GantiPasswordScreen(
             },
             text = {
                 Text(
-                    text = "Password kamu sudah diperbarui. Silakan gunakan password baru untuk login berikutnya.",
+                    text = stringResource(R.string.screen_password_changed_subtitle),
                     color = TextSecondary,
                     fontSize = 14.sp,
                     lineHeight = 21.sp
@@ -84,7 +86,7 @@ fun GantiPasswordScreen(
                     colors = ButtonDefaults.buttonColors(containerColor = SiPinjamBlue)
                 ) {
                     Text(
-                        text = "Oke",
+                        text = stringResource(R.string.btn_oke),
                         fontWeight = FontWeight.SemiBold,
                         color = Color.White
                     )
@@ -114,7 +116,7 @@ fun GantiPasswordScreen(
                         )
                     }
                     Text(
-                        text = "Ganti Password",
+                        text = stringResource(R.string.screen_profile_change_password),
                         color = TextPrimary,
                         fontSize = 17.sp,
                         fontWeight = FontWeight.SemiBold
@@ -158,14 +160,14 @@ fun GantiPasswordScreen(
                 }
                 Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
                     Text(
-                        text = "Gunakan minimal 8 karakter\ndengan kombinasi huruf dan\nangka",
+                        text = stringResource(R.string.screen_password_change_instruction),
                         color = TextPrimary,
                         fontSize = 13.sp,
                         lineHeight = 20.sp,
                         fontWeight = FontWeight.Medium
                     )
                     Text(
-                        text = "SECURITY PROTOCOL",
+                        text = stringResource(R.string.label_security_protocol),
                         color = TextSecondary,
                         fontSize = 10.sp,
                         fontWeight = FontWeight.SemiBold,
@@ -233,7 +235,7 @@ fun GantiPasswordScreen(
                     )
                 } else {
                     Text(
-                        text = "Simpan Perubahan",
+                        text = stringResource(R.string.btn_simpan_perubahan),
                         fontSize = 15.sp,
                         fontWeight = FontWeight.SemiBold,
                         color = Color.White

@@ -1,5 +1,8 @@
 package com.example.sipinjam.screens.admin
 
+import com.example.sipinjam.R
+import com.example.sipinjam.ui.components.CloudinaryImage
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -57,6 +60,10 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import com.example.sipinjam.ui.theme.BackgroundGray
+import com.example.sipinjam.ui.theme.StatusOrange
+import com.example.sipinjam.ui.theme.StatusOrangeBg
+import com.example.sipinjam.ui.theme.StatusBlue
+import com.example.sipinjam.ui.theme.StatusBlueBg
 import com.example.sipinjam.ui.theme.CardWhite
 import com.example.sipinjam.ui.theme.DarkImageBg
 import com.example.sipinjam.ui.theme.InputBg
@@ -65,16 +72,25 @@ import com.example.sipinjam.ui.theme.StatusRed
 import com.example.sipinjam.ui.theme.TextPrimary
 import com.example.sipinjam.ui.theme.TextSecondary
 
-private val SoftBlueBg = Color(0xFFDCEBFF)
-private val SoftItemBg = Color(0xFFF0F2FB)
-private val NoteBg = Color(0xFFF6F8FF)
+private val SoftBlueBg: Color
+    @Composable get() = StatusBlueBg
+private val SoftItemBg: Color
+    @Composable get() = InputBg
+private val NoteBg: Color
+    @Composable get() = InputBg
 
-private val RoleBlueBg = Color(0xFFD8E9FF)
-private val RoleBlueText = Color(0xFF4F74A6)
-private val RoleCyanBg = Color(0xFFD8F0FF)
-private val RoleCyanText = Color(0xFF156D9E)
-private val RoleOrangeBg = Color(0xFFFFE5C2)
-private val RoleOrangeText = Color(0xFFA76012)
+private val RoleBlueBg: Color
+    @Composable get() = StatusBlueBg
+private val RoleBlueText: Color
+    @Composable get() = StatusBlue
+private val RoleCyanBg: Color
+    @Composable get() = StatusBlueBg
+private val RoleCyanText: Color
+    @Composable get() = StatusBlue
+private val RoleOrangeBg: Color
+    @Composable get() = StatusOrangeBg
+private val RoleOrangeText: Color
+    @Composable get() = StatusOrange
 
 @Composable
 fun VerifikasiPengembalianScreen(
@@ -129,7 +145,7 @@ fun VerifikasiPengembalianScreen(
                     }
 
                     Text(
-                        text = "Verifikasi Pengembalian",
+                        text = stringResource(R.string.screen_verify_return),
                         color = TextPrimary,
                         fontSize = 17.sp,
                         fontWeight = FontWeight.SemiBold
@@ -178,7 +194,7 @@ fun VerifikasiPengembalianScreen(
                             )
                         } else {
                             Text(
-                                text = "Verifikasi",
+                                text = stringResource(R.string.btn_verifikasi),
                                 fontSize = 15.sp,
                                 fontWeight = FontWeight.Bold,
                                 color = Color.White
@@ -202,7 +218,7 @@ fun VerifikasiPengembalianScreen(
                         border = BorderStroke(1.dp, StatusRed)
                     ) {
                         Text(
-                            text = "Tolak Pengembalian",
+                            text = stringResource(R.string.screen_reject_return),
                             fontSize = 15.sp,
                             fontWeight = FontWeight.Bold,
                             color = StatusRed
@@ -370,7 +386,7 @@ private fun FotoKondisiCard(
         Column(modifier = Modifier.padding(14.dp)) {
             AsyncImage(
                 model = imageUrl,
-                contentDescription = "Foto Kondisi Barang",
+                contentDescription = stringResource(R.string.label_foto_kondisi_barang),
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(200.dp)
@@ -404,7 +420,7 @@ private fun CatatanPeminjamCard(
             verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
             Text(
-                text = "CATATAN PENGEMBALIAN PEMINJAM",
+                text = stringResource(R.string.label_catatan_pengembalian_peminjam),
                 color = TextSecondary,
                 fontSize = 11.sp,
                 fontWeight = FontWeight.SemiBold,
@@ -452,7 +468,7 @@ private fun KondisiBarangCard(
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             Text(
-                text = "KONDISI BARANG",
+                text = stringResource(R.string.label_kondisi_barang_upper),
                 color = TextSecondary,
                 fontSize = 11.sp,
                 fontWeight = FontWeight.SemiBold,
@@ -503,7 +519,7 @@ private fun CatatanVerifikasiCard(
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             Text(
-                text = "CATATAN VERIFIKASI ADMIN",
+                text = stringResource(R.string.label_catatan_verifikasi_admin),
                 color = TextSecondary,
                 fontSize = 11.sp,
                 fontWeight = FontWeight.SemiBold,
@@ -518,7 +534,7 @@ private fun CatatanVerifikasiCard(
                     .height(120.dp),
                 placeholder = {
                     Text(
-                        text = "Tambahkan catatan jika ada kendala...",
+                        text = stringResource(R.string.hint_catatan_verifikasi),
                         color = TextSecondary.copy(alpha = 0.6f),
                         fontSize = 14.sp
                     )
@@ -545,28 +561,13 @@ private fun UserImage(
     imageUrl: String,
     modifier: Modifier = Modifier
 ) {
-    Box(
-        modifier = modifier
-            .clip(RoundedCornerShape(12.dp))
-            .background(SoftBlueBg),
-        contentAlignment = Alignment.Center
-    ) {
-        if (imageUrl.isNotBlank()) {
-            AsyncImage(
-                model = imageUrl,
-                contentDescription = "Foto Peminjam",
-                modifier = Modifier.fillMaxSize(),
-                contentScale = ContentScale.Crop
-            )
-        } else {
-            Icon(
-                imageVector = Icons.Filled.Person,
-                contentDescription = null,
-                tint = SiPinjamBlue,
-                modifier = Modifier.size(24.dp)
-            )
-        }
-    }
+    CloudinaryImage(
+        imageUrl = imageUrl,
+        contentDescription = "Foto Peminjam",
+        modifier = modifier,
+        shape = RoundedCornerShape(12.dp),
+        placeholderSize = 24.dp,
+    )
 }
 
 @Composable
@@ -574,28 +575,13 @@ private fun BarangImage(
     imageUrl: String,
     modifier: Modifier = Modifier
 ) {
-    Box(
-        modifier = modifier
-            .clip(RoundedCornerShape(8.dp))
-            .background(DarkImageBg),
-        contentAlignment = Alignment.Center
-    ) {
-        if (imageUrl.isNotBlank()) {
-            AsyncImage(
-                model = imageUrl,
-                contentDescription = "Foto Barang",
-                modifier = Modifier.fillMaxSize(),
-                contentScale = ContentScale.Crop
-            )
-        } else {
-            Icon(
-                imageVector = Icons.Filled.Image,
-                contentDescription = null,
-                tint = SiPinjamBlue,
-                modifier = Modifier.size(24.dp)
-            )
-        }
-    }
+    CloudinaryImage(
+        imageUrl = imageUrl,
+        contentDescription = stringResource(R.string.label_foto_barang),
+        modifier = modifier,
+        shape = RoundedCornerShape(8.dp),
+        placeholderSize = 24.dp,
+    )
 }
 
 @Composable

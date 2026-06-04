@@ -1,5 +1,7 @@
 package com.example.sipinjam.screens.admin
 
+import com.example.sipinjam.data.model.BorrowingStatus
+import com.example.sipinjam.data.model.ReturnStatus
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.sipinjam.data.model.Barang
@@ -75,7 +77,7 @@ class PersetujuanPeminjamanViewModel(
                 }
                 .collect { list ->
                     val filtered = list
-                        .filter { it.status.equals("Diproses", ignoreCase = true) }
+                        .filter { it.status.equals(BorrowingStatus.DIPROSES, ignoreCase = true) }
                         .sortedByDescending { it.createdAt }
 
                     val uiItems = mutableListOf<AdminPeminjamanUiItem>()
@@ -97,7 +99,7 @@ class PersetujuanPeminjamanViewModel(
                 }
                 .collect { list ->
                     val filtered = list
-                        .filter { it.status.equals("Menunggu Verifikasi", ignoreCase = true) }
+                        .filter { it.status.equals(ReturnStatus.MENUNGGU_VERIFIKASI, ignoreCase = true) }
                         .sortedByDescending { it.createdAt }
 
                     val uiItems = mutableListOf<AdminPengembalianUiItem>()
@@ -145,7 +147,7 @@ class PersetujuanPeminjamanViewModel(
             namaBarang = barang?.nama?.takeIf { it.isNotBlank() } ?: "Barang",
             fotoBarangUrl = barang?.fotoUrl.orEmpty(),
             tanggalLabel = tanggalKembali.ifBlank { "-" },
-            status = status.ifBlank { "Menunggu Verifikasi" }
+            status = status.ifBlank { ReturnStatus.MENUNGGU_VERIFIKASI }
         )
     }
 
