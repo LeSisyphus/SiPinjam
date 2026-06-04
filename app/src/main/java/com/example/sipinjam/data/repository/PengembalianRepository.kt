@@ -1,6 +1,8 @@
 package com.example.sipinjam.data.repository
 
+import com.example.sipinjam.data.model.BorrowingStatus
 import com.example.sipinjam.data.model.Pengembalian
+import com.example.sipinjam.data.model.ReturnStatus
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
 import com.google.firebase.firestore.Query
@@ -41,11 +43,11 @@ class PengembalianRepository {
 
                 val dataPengembalian = pengembalian.copy(
                     id = pengembalianRef.id,
-                    status = "Menunggu Verifikasi"
+                    status = ReturnStatus.MENUNGGU_VERIFIKASI
                 )
 
                 transaction.set(pengembalianRef, dataPengembalian)
-                transaction.update(peminjamanRef, "status", "Menunggu Verifikasi")
+                transaction.update(peminjamanRef, "status", BorrowingStatus.MENUNGGU_VERIFIKASI)
 
                 Unit
             }.await()
@@ -132,7 +134,7 @@ class PengembalianRepository {
                     ?.copy(id = pengembalianSnapshot.id)
                     ?: throw IllegalStateException("Data pengembalian tidak valid")
 
-                if (!pengembalian.status.equals("Menunggu Verifikasi", ignoreCase = true)) {
+                if (!pengembalian.status.equals(ReturnStatus.MENUNGGU_VERIFIKASI, ignoreCase = true)) {
                     throw IllegalStateException("Pengembalian ini sudah diproses")
                 }
 
@@ -156,7 +158,7 @@ class PengembalianRepository {
                 transaction.update(
                     pengembalianRef,
                     mapOf(
-                        "status" to "Terverifikasi",
+                        "status" to ReturnStatus.TERVERIFIKASI,
                         "catatanAdmin" to catatanAdmin,
                         "kondisiBarang" to kondisiBarang
                     )
@@ -165,7 +167,7 @@ class PengembalianRepository {
                 transaction.update(
                     peminjamanRef,
                     "status",
-                    "Selesai"
+                    BorrowingStatus.SELESAI
                 )
 
                 transaction.update(
@@ -207,7 +209,7 @@ class PengembalianRepository {
                     ?.copy(id = pengembalianSnapshot.id)
                     ?: throw IllegalStateException("Data pengembalian tidak valid")
 
-                if (!pengembalian.status.equals("Menunggu Verifikasi", ignoreCase = true)) {
+                if (!pengembalian.status.equals(ReturnStatus.MENUNGGU_VERIFIKASI, ignoreCase = true)) {
                     throw IllegalStateException("Pengembalian ini sudah diproses")
                 }
 
@@ -221,7 +223,7 @@ class PengembalianRepository {
                 transaction.update(
                     pengembalianRef,
                     mapOf(
-                        "status" to "Ditolak",
+                        "status" to ReturnStatus.DITOLAK,
                         "catatanAdmin" to catatanAdmin,
                         "kondisiBarang" to ""
                     )
@@ -230,7 +232,7 @@ class PengembalianRepository {
                 transaction.update(
                     peminjamanRef,
                     "status",
-                    "Dipinjam"
+                    BorrowingStatus.DIPINJAM
                 )
 
                 Unit

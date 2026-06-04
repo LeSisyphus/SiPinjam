@@ -10,6 +10,6 @@ data class Pengembalian(
     val catatanAdmin: String = "",
     val kondisiBarang: String = "",
     val tanggalKembali: String = "",
-    val status: String = "Menunggu Verifikasi",
+    val status: String = ReturnStatus.MENUNGGU_VERIFIKASI,
     val createdAt: Long = System.currentTimeMillis(),
 )
