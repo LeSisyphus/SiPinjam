@@ -15,6 +15,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.example.sipinjam.SiPinjamApplication
 import com.example.sipinjam.screens.admin.DashboardAdminScreen
 import com.example.sipinjam.screens.admin.DetailPengajuanScreen
 import com.example.sipinjam.screens.admin.KelolaBarangScreen
@@ -25,6 +26,7 @@ import com.example.sipinjam.screens.auth.ForgotPasswordScreen
 import com.example.sipinjam.screens.auth.LoginScreen
 import com.example.sipinjam.screens.auth.RegisterScreen
 import com.example.sipinjam.screens.user.BerandaUserScreen
+import com.example.sipinjam.screens.user.BerandaUserViewModel
 import com.example.sipinjam.screens.user.DetailBarangScreen
 import com.example.sipinjam.screens.user.GantiPasswordScreen
 import com.example.sipinjam.screens.user.KatalogScreen
@@ -184,7 +186,14 @@ fun NavGraph(
         }
 
         composable(Routes.BERANDA_USER) {
+            val context = LocalContext.current
+            val appContainer = (context.applicationContext as SiPinjamApplication).appContainer
+            val berandaViewModel: BerandaUserViewModel = viewModel(
+                factory = appContainer.berandaUserViewModelFactory
+            )
+
             BerandaUserScreen(
+                viewModel = berandaViewModel,
                 onLihatSemuaBarang = {
                     navController.navigateSingleTop(Routes.KATALOG_USER)
                 },
