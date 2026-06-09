@@ -1,5 +1,7 @@
 package com.example.sipinjam.screens.auth
 
+import com.example.sipinjam.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -50,7 +52,7 @@ fun LoginScreen(
             Spacer(Modifier.height(72.dp))
 
             Text(
-                text = "SiPinjam",
+                text = stringResource(R.string.app_name),
                 color = SiPinjamBlue,
                 fontSize = 22.sp,
                 fontWeight = FontWeight.Bold,
@@ -60,7 +62,7 @@ fun LoginScreen(
             Spacer(Modifier.height(24.dp))
 
             Text(
-                text = "Selamat Datang",
+                text = stringResource(R.string.screen_login_welcome),
                 color = TextPrimary,
                 fontSize = 30.sp,
                 fontWeight = FontWeight.ExtraBold
@@ -69,7 +71,7 @@ fun LoginScreen(
             Spacer(Modifier.height(8.dp))
 
             Text(
-                text = "Sistem informasi peminjaman barang\ninventaris kampus ULM.",
+                text = stringResource(R.string.screen_login_subtitle),
                 color = TextSecondary,
                 fontSize = 14.sp,
                 textAlign = TextAlign.Center,
@@ -92,7 +94,7 @@ fun LoginScreen(
                 ) {
                     Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
                         Text(
-                            text = "EMAIL",
+                            text = stringResource(R.string.label_email),
                             fontSize = 11.sp,
                             fontWeight = FontWeight.SemiBold,
                             color = TextSecondary,
@@ -104,7 +106,7 @@ fun LoginScreen(
                             modifier = Modifier.fillMaxWidth(),
                             placeholder = {
                                 Text(
-                                    "nama@mhs.ulm.ac.id",
+                                    stringResource(R.string.hint_email_mahasiswa),
                                     color = TextSecondary.copy(alpha = 0.6f),
                                     fontSize = 14.sp
                                 )
@@ -124,7 +126,7 @@ fun LoginScreen(
 
                     Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
                         Text(
-                            text = "PASSWORD",
+                            text = stringResource(R.string.label_password),
                             fontSize = 11.sp,
                             fontWeight = FontWeight.SemiBold,
                             color = TextSecondary,
@@ -168,7 +170,7 @@ fun LoginScreen(
                         contentAlignment = Alignment.CenterEnd
                     ) {
                         Text(
-                            text = "Lupa Password?",
+                            text = stringResource(R.string.screen_forgot_password_title),
                             color = SiPinjamBlue,
                             fontSize = 13.sp,
                             fontWeight = FontWeight.Medium,
@@ -203,7 +205,7 @@ fun LoginScreen(
                             )
                         } else {
                             Text(
-                                text = "Masuk",
+                                text = stringResource(R.string.btn_masuk),
                                 fontSize = 16.sp,
                                 fontWeight = FontWeight.SemiBold,
                                 color = CardWhite
@@ -218,7 +220,7 @@ fun LoginScreen(
                     ) {
                         HorizontalDivider(modifier = Modifier.weight(1f), color = DividerColor)
                         Text(
-                            text = "ATAU",
+                            text = stringResource(R.string.msg_or),
                             color = TextSecondary,
                             fontSize = 11.sp,
                             letterSpacing = 0.8.sp
@@ -235,7 +237,7 @@ fun LoginScreen(
                         colors = ButtonDefaults.outlinedButtonColors(contentColor = SiPinjamBlue)
                     ) {
                         Text(
-                            text = "Daftar Akun",
+                            text = stringResource(R.string.btn_daftar_akun),
                             fontSize = 16.sp,
                             fontWeight = FontWeight.SemiBold
                         )

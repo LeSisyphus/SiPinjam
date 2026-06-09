@@ -1,5 +1,6 @@
 package com.example.sipinjam.screens.user
 
+import com.example.sipinjam.data.model.BorrowingStatus
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.sipinjam.data.repository.AuthRepository
@@ -92,8 +93,7 @@ class BerandaUserViewModel : ViewModel() {
                 .collect { daftarPeminjaman ->
                     val daftarPerluDikembalikan = daftarPeminjaman
                         .filter { peminjaman ->
-                            peminjaman.status.equals("Disetujui", ignoreCase = true) ||
-                                    peminjaman.status.equals("Dipinjam", ignoreCase = true)
+                            BorrowingStatus.canRequestReturn(peminjaman.status)
                         }
                         .map { peminjaman ->
                             async {

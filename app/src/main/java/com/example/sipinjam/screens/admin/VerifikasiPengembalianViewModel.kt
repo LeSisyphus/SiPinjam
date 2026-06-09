@@ -1,5 +1,7 @@
 package com.example.sipinjam.screens.admin
 
+import com.example.sipinjam.data.model.ReturnStatus
+import com.example.sipinjam.data.model.BorrowingStatus
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.sipinjam.data.model.Barang
@@ -83,7 +85,7 @@ class VerifikasiPengembalianViewModel : ViewModel() {
                     catatanPeminjam = data.catatan
                 )
 
-                _catatanTolak.value = if (data.status.equals("Ditolak", ignoreCase = true)) {
+                _catatanTolak.value = if (data.status.equals(ReturnStatus.DITOLAK, ignoreCase = true)) {
                     data.catatanAdmin
                 } else {
                     null

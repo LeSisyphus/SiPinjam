@@ -4,6 +4,7 @@ import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.sipinjam.data.model.User
+import com.example.sipinjam.data.preferences.AppPreferences
 import com.example.sipinjam.data.repository.AuthRepository
 import com.example.sipinjam.data.repository.StorageRepository
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -13,6 +14,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
+import java.util.Locale
 
 data class ProfilUiState(
     val user: User = User(),
@@ -38,6 +40,13 @@ class ProfilViewModel(
     val uiState: StateFlow<ProfilUiState> = _uiState.asStateFlow()
 
     init {
+        AppPreferences.load(application)
+        _uiState.update {
+            it.copy(
+                selectedLang = AppPreferences.languageCode.uppercase(Locale.ROOT),
+                isDarkMode = AppPreferences.isDarkMode
+            )
+        }
         loadUser()
     }
 
@@ -69,11 +78,14 @@ class ProfilViewModel(
     }
 
     fun onLangChange(lang: String) {
-        _uiState.update { it.copy(selectedLang = lang) }
+        AppPreferences.setLanguage(getApplication(), lang.lowercase(Locale.ROOT))
+        _uiState.update { it.copy(selectedLang = AppPreferences.languageCode.uppercase(Locale.ROOT)) }
     }
 
     fun onDarkModeToggle() {
-        _uiState.update { it.copy(isDarkMode = !it.isDarkMode) }
+        val nextValue = !_uiState.value.isDarkMode
+        AppPreferences.setDarkMode(getApplication(), nextValue)
+        _uiState.update { it.copy(isDarkMode = nextValue) }
     }
 
     fun onSimpanProfil() {

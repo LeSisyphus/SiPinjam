@@ -1,5 +1,7 @@
 package com.example.sipinjam.screens.auth
 
+import com.example.sipinjam.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -41,6 +43,7 @@ import com.example.sipinjam.ui.theme.CardWhite
 import com.example.sipinjam.ui.theme.SiPinjamBlue
 import com.example.sipinjam.ui.theme.TextPrimary
 import com.example.sipinjam.ui.theme.TextSecondary
+import com.example.sipinjam.ui.theme.InputBg
 
 @Composable
 fun ForgotPasswordScreen(
@@ -90,7 +93,7 @@ fun ForgotPasswordScreen(
             Spacer(modifier = Modifier.height(28.dp))
 
             Text(
-                text = "Lupa Password?",
+                text = stringResource(R.string.screen_forgot_password_title),
                 color = TextPrimary,
                 fontSize = 28.sp,
                 fontWeight = FontWeight.ExtraBold
@@ -99,7 +102,7 @@ fun ForgotPasswordScreen(
             Spacer(modifier = Modifier.height(10.dp))
 
             Text(
-                text = "Untuk keamanan akun, reset password hanya dapat dilakukan melalui admin SiPinjam.",
+                text = stringResource(R.string.screen_forgot_password_subtitle),
                 color = TextSecondary,
                 fontSize = 14.sp,
                 textAlign = TextAlign.Center,
@@ -121,14 +124,14 @@ fun ForgotPasswordScreen(
                     verticalArrangement = Arrangement.spacedBy(18.dp)
                 ) {
                     Text(
-                        text = "Hubungi Admin",
+                        text = stringResource(R.string.screen_forgot_password_contact_admin),
                         color = TextPrimary,
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Bold
                     )
 
                     Text(
-                        text = "Silakan hubungi admin melalui nomor atau email berikut untuk meminta bantuan reset password akun Anda.",
+                        text = stringResource(R.string.screen_forgot_password_instruction),
                         color = TextSecondary,
                         fontSize = 14.sp,
                         lineHeight = 22.sp
@@ -165,7 +168,7 @@ fun ForgotPasswordScreen(
                 colors = ButtonDefaults.buttonColors(containerColor = SiPinjamBlue)
             ) {
                 Text(
-                    text = "Kembali ke Login",
+                    text = stringResource(R.string.btn_kembali_login),
                     fontSize = 15.sp,
                     fontWeight = FontWeight.SemiBold,
                     color = Color.White
@@ -179,13 +182,13 @@ fun ForgotPasswordScreen(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "Sudah ingat password?  ",
+                    text = stringResource(R.string.screen_forgot_password_remember),
                     color = TextSecondary,
                     fontSize = 14.sp
                 )
 
                 Text(
-                    text = "Masuk Sekarang",
+                    text = stringResource(R.string.btn_masuk_sekarang),
                     color = SiPinjamBlue,
                     fontSize = 14.sp,
                     fontWeight = FontWeight.SemiBold,
@@ -207,7 +210,7 @@ private fun ContactInfoItem(
         modifier = Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(14.dp))
-            .background(Color(0xFFF4F7FB))
+            .background(InputBg)
             .clickable { onClick() }
             .padding(horizontal = 14.dp, vertical = 14.dp),
         verticalAlignment = Alignment.CenterVertically

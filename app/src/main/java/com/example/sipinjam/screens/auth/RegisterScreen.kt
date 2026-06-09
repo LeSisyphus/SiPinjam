@@ -1,5 +1,7 @@
 package com.example.sipinjam.screens.auth
 
+import com.example.sipinjam.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -86,7 +88,7 @@ fun RegisterScreen(
             Spacer(Modifier.height(16.dp))
 
             Text(
-                text = "Daftar",
+                text = stringResource(R.string.screen_register_title),
                 color = TextPrimary,
                 fontSize = 28.sp,
                 fontWeight = FontWeight.ExtraBold
@@ -95,7 +97,7 @@ fun RegisterScreen(
             Spacer(Modifier.height(6.dp))
 
             Text(
-                text = "Buat akun kurator inventaris kampus\nAnda.",
+                text = stringResource(R.string.screen_register_subtitle),
                 color = TextSecondary,
                 fontSize = 14.sp,
                 textAlign = TextAlign.Center,
@@ -120,7 +122,7 @@ fun RegisterScreen(
                     // Pilih Peran
                     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                         Text(
-                            text = "PILIH PERAN",
+                            text = stringResource(R.string.label_pilih_peran),
                             fontSize = 11.sp,
                             fontWeight = FontWeight.SemiBold,
                             color = TextSecondary,
@@ -159,7 +161,7 @@ fun RegisterScreen(
                     // Nama Lengkap
                     Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
                         Text(
-                            text = "NAMA LENGKAP",
+                            text = stringResource(R.string.label_nama_lengkap),
                             fontSize = 11.sp,
                             fontWeight = FontWeight.SemiBold,
                             color = TextSecondary,
@@ -171,7 +173,7 @@ fun RegisterScreen(
                             modifier = Modifier.fillMaxWidth(),
                             placeholder = {
                                 Text(
-                                    "John Doe",
+                                    stringResource(R.string.hint_nama),
                                     color = TextSecondary.copy(alpha = 0.6f),
                                     fontSize = 14.sp
                                 )
@@ -199,7 +201,7 @@ fun RegisterScreen(
                     // Email
                     Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
                         Text(
-                            text = "EMAIL",
+                            text = stringResource(R.string.label_email),
                             fontSize = 11.sp,
                             fontWeight = FontWeight.SemiBold,
                             color = TextSecondary,
@@ -211,7 +213,7 @@ fun RegisterScreen(
                             modifier = Modifier.fillMaxWidth(),
                             placeholder = {
                                 Text(
-                                    "nama@kampus.ac.id",
+                                    stringResource(R.string.hint_email_kampus),
                                     color = TextSecondary.copy(alpha = 0.6f),
                                     fontSize = 14.sp
                                 )
@@ -240,7 +242,7 @@ fun RegisterScreen(
                     // Password
                     Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
                         Text(
-                            text = "PASSWORD",
+                            text = stringResource(R.string.label_password),
                             fontSize = 11.sp,
                             fontWeight = FontWeight.SemiBold,
                             color = TextSecondary,
@@ -316,7 +318,7 @@ fun RegisterScreen(
                             )
                         } else {
                             Text(
-                                text = "Buat Akun",
+                                text = stringResource(R.string.btn_buat_akun),
                                 fontSize = 16.sp,
                                 fontWeight = FontWeight.SemiBold,
                                 color = Color.White
@@ -334,12 +336,12 @@ fun RegisterScreen(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "Sudah punya akun? ",
+                    text = stringResource(R.string.msg_have_account),
                     color = TextSecondary,
                     fontSize = 14.sp
                 )
                 Text(
-                    text = "Masuk",
+                    text = stringResource(R.string.btn_masuk),
                     color = SiPinjamBlue,
                     fontSize = 14.sp,
                     fontWeight = FontWeight.SemiBold,

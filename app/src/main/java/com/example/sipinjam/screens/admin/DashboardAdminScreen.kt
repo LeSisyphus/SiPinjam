@@ -1,5 +1,7 @@
 package com.example.sipinjam.screens.admin
 
+import com.example.sipinjam.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -87,7 +89,7 @@ fun DashboardAdminScreen(
                     )
                     Spacer(Modifier.width(8.dp))
                     Text(
-                        text = "SiPinjam",
+                        text = stringResource(R.string.app_name),
                         color = SiPinjamBlue,
                         fontSize = 20.sp,
                         fontWeight = FontWeight.Bold
@@ -113,7 +115,7 @@ fun DashboardAdminScreen(
                     ) {
                         Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                             Text(
-                                text = "Permintaan Masuk",
+                                text = stringResource(R.string.screen_dashboard_requests),
                                 color = TextSecondary,
                                 fontSize = 14.sp
                             )
@@ -152,7 +154,7 @@ fun DashboardAdminScreen(
                     horizontalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     StatusCard(
-                        label = "TERSEDIA",
+                        label = stringResource(R.string.status_tersedia_upper),
                         jumlah = uiState.jumlahTersedia,
                         icon = Icons.Filled.CheckCircle,
                         iconColor = StatusGreen,
@@ -181,13 +183,13 @@ fun DashboardAdminScreen(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = "Permintaan Terbaru",
+                        text = stringResource(R.string.screen_dashboard_recent_requests),
                         color = TextPrimary,
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Bold
                     )
                     Text(
-                        text = "Lihat Semua",
+                        text = stringResource(R.string.btn_lihat_semua),
                         color = SiPinjamBlue,
                         fontSize = 13.sp,
                         fontWeight = FontWeight.Medium,
@@ -320,7 +322,7 @@ private fun PermintaanCard(
                 .padding(horizontal = 14.dp, vertical = 7.dp)
         ) {
             Text(
-                text = "Tinjau",
+                text = stringResource(R.string.btn_tinjau),
                 color = Color.White,
                 fontSize = 12.sp,
                 fontWeight = FontWeight.SemiBold

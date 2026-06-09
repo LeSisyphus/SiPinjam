@@ -1,5 +1,7 @@
 package com.example.sipinjam.screens.user
 
+import com.example.sipinjam.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -81,7 +83,7 @@ fun DetailBarangScreen(
                         )
                     }
                     Text(
-                        text = "Detail Barang",
+                        text = stringResource(R.string.screen_item_detail),
                         color = TextPrimary,
                         fontSize = 17.sp,
                         fontWeight = FontWeight.SemiBold,
@@ -92,6 +94,8 @@ fun DetailBarangScreen(
         },
         bottomBar = {
             uiState.barang?.let { barang ->
+                val statusBarangRoute = if (barang.tersedia) "Tersedia" else "Tidak Tersedia"
+
                 Surface(
                     modifier = Modifier.fillMaxWidth(),
                     color = CardWhite,
@@ -103,7 +107,7 @@ fun DetailBarangScreen(
                                 barang.id,
                                 barang.nama,
                                 barang.kategori,
-                                if (barang.tersedia) "TERSEDIA" else "DIPINJAM"
+                                statusBarangRoute
                             )
                         },
                         enabled = barang.tersedia,
@@ -115,7 +119,11 @@ fun DetailBarangScreen(
                         colors = ButtonDefaults.buttonColors(containerColor = SiPinjamBlue)
                     ) {
                         Text(
-                            text = if (barang.tersedia) "Ajukan Peminjaman" else "Tidak Tersedia",
+                            text = if (barang.tersedia) {
+                                stringResource(R.string.screen_borrow_item)
+                            } else {
+                                stringResource(R.string.status_tidak_tersedia)
+                            },
                             fontSize = 16.sp,
                             fontWeight = FontWeight.SemiBold,
                             color = Color.White
@@ -250,7 +258,7 @@ fun DetailBarangScreen(
                             ) {
                                 Column(modifier = Modifier.padding(16.dp)) {
                                     Text(
-                                        text = "SPESIFIKASI DETAIL",
+                                        text = stringResource(R.string.label_spesifikasi_detail),
                                         color = TextSecondary,
                                         fontSize = 11.sp,
                                         fontWeight = FontWeight.SemiBold,
@@ -298,7 +306,7 @@ fun DetailBarangScreen(
                                         verticalAlignment = Alignment.CenterVertically
                                     ) {
                                         Text(
-                                            text = "Deskripsi Barang",
+                                            text = stringResource(R.string.label_deskripsi_barang),
                                             color = TextPrimary,
                                             fontSize = 15.sp,
                                             fontWeight = FontWeight.SemiBold

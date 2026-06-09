@@ -1,5 +1,6 @@
 package com.example.sipinjam.screens.admin
 
+import com.example.sipinjam.data.model.BorrowingStatus
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.sipinjam.data.model.Barang
@@ -138,7 +139,7 @@ class DetailPengajuanViewModel : ViewModel() {
 
             val result = peminjamanRepository.updateStatus(
                 id = peminjaman.id,
-                statusBaru = "Ditolak"
+                statusBaru = BorrowingStatus.DITOLAK
             )
 
             if (result.isSuccess) {

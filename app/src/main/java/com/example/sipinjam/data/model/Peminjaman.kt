@@ -9,6 +9,6 @@ data class Peminjaman(
     val tanggalPinjam: String = "",
     val tanggalKembali: String = "",
     val keperluan: String = "",
-    val status: String = "Diproses",
+    val status: String = BorrowingStatus.DIPROSES,
     val createdAt: Long = System.currentTimeMillis(),
 )

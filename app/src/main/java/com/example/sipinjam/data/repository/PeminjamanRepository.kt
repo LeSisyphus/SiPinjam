@@ -1,5 +1,6 @@
 package com.example.sipinjam.data.repository
 
+import com.example.sipinjam.data.model.BorrowingStatus
 import com.example.sipinjam.data.model.Peminjaman
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
@@ -144,7 +145,7 @@ class PeminjamanRepository {
                 transaction.update(
                     peminjamanRef,
                     "status",
-                    "Disetujui"
+                    BorrowingStatus.DIPINJAM
                 )
 
                 Unit

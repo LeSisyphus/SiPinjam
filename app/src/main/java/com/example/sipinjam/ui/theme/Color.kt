@@ -1,23 +1,100 @@
 package com.example.sipinjam.ui.theme
 
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.ui.graphics.Color
 
-val SiPinjamBlue    = Color(0xFF2196F3)
-val BackgroundGray  = Color(0xFFF0F2F5)
-val CardWhite       = Color(0xFFFFFFFF)
-val InputBg         = Color(0xFFF3F4F6)
-val TextPrimary     = Color(0xFF1A1A2E)
-val TextSecondary   = Color(0xFF6B7280)
-val DividerColor    = Color(0xFFE5E7EB)
-val ToggleBg        = Color(0xFFE2E8F0)
-val StatusGreen     = Color(0xFF16A34A)
-val StatusGreenBg   = Color(0xFFDCFCE7)
-val StatusOrange    = Color(0xFFD97706)
-val StatusOrangeBg  = Color(0xFFFEF3C7)
-val StatusRed       = Color(0xFFDC2626)
-val StatusRedBg     = Color(0xFFFEE2E2)
-val DarkImageBg     = Color(0xFF1A1A2E)
-val InfoOrangeBg    = Color(0xFFFFF7ED)
-val StatusBlueBg    = Color(0xFFE3F2FD)
-val StatusBlue      = Color(0xFF1E88E5)
-val StatusRedLightBg = Color(0xFFFFEBEE)
+val SiPinjamBlue: Color
+    @Composable
+    @ReadOnlyComposable
+    get() = LocalAppColors.current.primary
+
+val BackgroundGray: Color
+    @Composable
+    @ReadOnlyComposable
+    get() = LocalAppColors.current.background
+
+val CardWhite: Color
+    @Composable
+    @ReadOnlyComposable
+    get() = LocalAppColors.current.card
+
+val InputBg: Color
+    @Composable
+    @ReadOnlyComposable
+    get() = LocalAppColors.current.inputBackground
+
+val TextPrimary: Color
+    @Composable
+    @ReadOnlyComposable
+    get() = LocalAppColors.current.textPrimary
+
+val TextSecondary: Color
+    @Composable
+    @ReadOnlyComposable
+    get() = LocalAppColors.current.textSecondary
+
+val DividerColor: Color
+    @Composable
+    @ReadOnlyComposable
+    get() = LocalAppColors.current.divider
+
+val ToggleBg: Color
+    @Composable
+    @ReadOnlyComposable
+    get() = LocalAppColors.current.toggleBackground
+
+val StatusGreen: Color
+    @Composable
+    @ReadOnlyComposable
+    get() = LocalAppColors.current.statusGreen
+
+val StatusGreenBg: Color
+    @Composable
+    @ReadOnlyComposable
+    get() = LocalAppColors.current.statusGreenBackground
+
+val StatusOrange: Color
+    @Composable
+    @ReadOnlyComposable
+    get() = LocalAppColors.current.statusOrange
+
+val StatusOrangeBg: Color
+    @Composable
+    @ReadOnlyComposable
+    get() = LocalAppColors.current.statusOrangeBackground
+
+val StatusRed: Color
+    @Composable
+    @ReadOnlyComposable
+    get() = LocalAppColors.current.statusRed
+
+val StatusRedBg: Color
+    @Composable
+    @ReadOnlyComposable
+    get() = LocalAppColors.current.statusRedBackground
+
+val DarkImageBg: Color
+    @Composable
+    @ReadOnlyComposable
+    get() = LocalAppColors.current.imageBackground
+
+val InfoOrangeBg: Color
+    @Composable
+    @ReadOnlyComposable
+    get() = LocalAppColors.current.infoOrangeBackground
+
+val StatusBlueBg: Color
+    @Composable
+    @ReadOnlyComposable
+    get() = LocalAppColors.current.statusBlueBackground
+
+val StatusBlue: Color
+    @Composable
+    @ReadOnlyComposable
+    get() = LocalAppColors.current.statusBlue
+
+val StatusRedLightBg: Color
+    @Composable
+    @ReadOnlyComposable
+    get() = LocalAppColors.current.statusRedBackground

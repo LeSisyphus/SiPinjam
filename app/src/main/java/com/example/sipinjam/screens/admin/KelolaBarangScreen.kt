@@ -1,5 +1,6 @@
 package com.example.sipinjam.screens.admin
 
+import androidx.compose.ui.res.stringResource
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -33,7 +34,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
@@ -41,6 +41,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
 import com.example.sipinjam.R
+import com.example.sipinjam.ui.theme.*
 
 data class BarangAdmin(
 
@@ -83,19 +84,26 @@ fun KelolaBarangScreen(
     onPermintaanClick: () -> Unit = {},
     onProfilClick: () -> Unit = {},
 ) {
-    val sipinjamBlue   = colorResource(R.color.sipinjam_blue)
-    val backgroundGray = colorResource(R.color.background_gray)
-    val cardWhite      = colorResource(R.color.card_white)
-    val inputBg        = colorResource(R.color.input_bg)
-    val textPrimary    = colorResource(R.color.text_primary)
-    val textSecondary  = colorResource(R.color.text_secondary)
-    val statusGreen    = colorResource(R.color.status_green)
-    val statusGreenBg  = colorResource(R.color.status_green_bg)
-    val statusRed      = colorResource(R.color.status_red)
-    val statusRedBg    = colorResource(R.color.status_red_bg)
+    val sipinjamBlue = SiPinjamBlue
+    val backgroundGray = BackgroundGray
+    val cardWhite = CardWhite
+    val inputBg = InputBg
+    val textPrimary = TextPrimary
+    val textSecondary = TextSecondary
+    val statusGreen = StatusGreen
+    val statusGreenBg = StatusGreenBg
+    val statusRed = StatusRed
+    val statusRedBg = StatusRedBg
 
-    val kategoriList = listOf("Semua", "Elektronik", "Optik", "Kabel")
-    var selectedKategori by remember { mutableStateOf("Semua") }
+    val semuaKategori = stringResource(R.string.filter_all)
+    val kategoriList = remember(daftarBarang, semuaKategori) {
+        listOf(semuaKategori) + daftarBarang
+            .map { it.kategori }
+            .filter { it.isNotBlank() }
+            .distinct()
+            .sorted()
+    }
+    var selectedKategori by remember(semuaKategori) { mutableStateOf(semuaKategori) }
     var searchQuery by remember { mutableStateOf("") }
 
     var showTambahDialog by remember { mutableStateOf(false) }
@@ -121,7 +129,7 @@ fun KelolaBarangScreen(
     var editStok by remember(barangToEdit) { mutableStateOf(barangToEdit?.stok?.toString() ?: "") }
 
     val filteredBarang = daftarBarang.filter { barang ->
-        val matchKategori = selectedKategori == "Semua" ||
+        val matchKategori = selectedKategori == semuaKategori ||
                 barang.kategori.equals(selectedKategori, ignoreCase = true)
         val matchSearch = barang.nama.contains(searchQuery, ignoreCase = true) ||
                 barang.id.contains(searchQuery, ignoreCase = true)
@@ -144,7 +152,7 @@ fun KelolaBarangScreen(
                     horizontalArrangement = Arrangement.spacedBy(6.dp)
                 ) {
                     Icon(imageVector = Icons.Filled.Add, contentDescription = null, tint = Color.White)
-                    Text(text = "Tambah", color = Color.White, fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
+                    Text(text = stringResource(R.string.btn_tambah), color = Color.White, fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
                 }
             }
         },
@@ -188,7 +196,7 @@ fun KelolaBarangScreen(
                     textStyle = LocalTextStyle.current.copy(fontSize = 14.sp, color = textPrimary),
                     decorationBox = { innerTextField ->
                         if (searchQuery.isEmpty()) {
-                            Text(text = "Cari nama barang atau ID...", color = textSecondary.copy(alpha = 0.6f), fontSize = 14.sp)
+                            Text(text = stringResource(R.string.hint_search_barang), color = textSecondary.copy(alpha = 0.6f), fontSize = 14.sp)
                         }
                         innerTextField()
                     }
@@ -202,7 +210,7 @@ fun KelolaBarangScreen(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(text = "KATEGORI", color = textSecondary, fontSize = 11.sp, fontWeight = FontWeight.SemiBold, letterSpacing = 0.6.sp)
+                Text(text = stringResource(R.string.label_kategori), color = textSecondary, fontSize = 11.sp, fontWeight = FontWeight.SemiBold, letterSpacing = 0.6.sp)
                 Box(
                     modifier = Modifier.clip(RoundedCornerShape(20.dp)).background(sipinjamBlue.copy(alpha = 0.1f)).padding(horizontal = 12.dp, vertical = 4.dp)
                 ) {
@@ -268,13 +276,13 @@ fun KelolaBarangScreen(
     if (showTambahDialog) {
         AlertDialog(
             onDismissRequest = { if (!isLoading) showTambahDialog = false },
-            title = { Text("Tambah Barang Baru", fontWeight = FontWeight.Bold, fontSize = 18.sp, color = textPrimary) },
+            title = { Text(stringResource(R.string.screen_manage_add_item), fontWeight = FontWeight.Bold, fontSize = 18.sp, color = textPrimary) },
             text = {
                 Column(
                     modifier = Modifier.fillMaxWidth().heightIn(max = 400.dp).verticalScroll(rememberScrollState()),
                     verticalArrangement = Arrangement.spacedBy(14.dp)
                 ) {
-                    Text("Foto Barang", fontSize = 13.sp, fontWeight = FontWeight.SemiBold, color = textSecondary)
+                    Text(stringResource(R.string.label_foto_barang), fontSize = 13.sp, fontWeight = FontWeight.SemiBold, color = textSecondary)
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -296,7 +304,7 @@ fun KelolaBarangScreen(
                             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                                 Icon(imageVector = Icons.Filled.Image, contentDescription = null, tint = sipinjamBlue.copy(alpha = 0.6f), modifier = Modifier.size(36.dp))
                                 Spacer(Modifier.height(8.dp))
-                                Text("Pilih Foto dari Galeri", color = sipinjamBlue, fontSize = 12.sp, fontWeight = FontWeight.Medium)
+                                Text(stringResource(R.string.btn_pilih_foto_galeri), color = sipinjamBlue, fontSize = 12.sp, fontWeight = FontWeight.Medium)
                             }
                         }
                     }
@@ -309,13 +317,13 @@ fun KelolaBarangScreen(
                         unfocusedLabelColor = textSecondary
                     )
 
-                    OutlinedTextField(value = inputNama, onValueChange = { inputNama = it }, label = { Text("Nama Barang") }, modifier = Modifier.fillMaxWidth(), shape = textFieldShape, colors = customTextFieldColors, enabled = !isLoading)
-                    OutlinedTextField(value = inputKategori, onValueChange = { inputKategori = it }, label = { Text("Kategori") }, modifier = Modifier.fillMaxWidth(), shape = textFieldShape, colors = customTextFieldColors, enabled = !isLoading)
-                    OutlinedTextField(value = inputStok, onValueChange = { inputStok = it }, label = { Text("Jumlah Stok") }, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number), modifier = Modifier.fillMaxWidth(), shape = textFieldShape, colors = customTextFieldColors, enabled = !isLoading)
-                    OutlinedTextField(value = inputKondisi, onValueChange = { inputKondisi = it }, label = { Text("Kondisi Barang") }, modifier = Modifier.fillMaxWidth(), shape = textFieldShape, colors = customTextFieldColors, enabled = !isLoading)
-                    OutlinedTextField(value = inputLokasi, onValueChange = { inputLokasi = it }, label = { Text("Lokasi Penyimpanan") }, modifier = Modifier.fillMaxWidth(), shape = textFieldShape, colors = customTextFieldColors, enabled = !isLoading)
-                    OutlinedTextField(value = inputMaksimalPinjam, onValueChange = { inputMaksimalPinjam = it }, label = { Text("Maksimal Hari Pinjam") }, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number), modifier = Modifier.fillMaxWidth(), shape = textFieldShape, colors = customTextFieldColors, enabled = !isLoading)
-                    OutlinedTextField(value = inputDeskripsi, onValueChange = { inputDeskripsi = it }, label = { Text("Deskripsi Lengkap") }, modifier = Modifier.fillMaxWidth(), minLines = 3, shape = textFieldShape, colors = customTextFieldColors, enabled = !isLoading)
+                    OutlinedTextField(value = inputNama, onValueChange = { inputNama = it }, label = { Text(stringResource(R.string.label_nama_barang)) }, modifier = Modifier.fillMaxWidth(), shape = textFieldShape, colors = customTextFieldColors, enabled = !isLoading)
+                    OutlinedTextField(value = inputKategori, onValueChange = { inputKategori = it }, label = { Text(stringResource(R.string.label_kategori_title)) }, modifier = Modifier.fillMaxWidth(), shape = textFieldShape, colors = customTextFieldColors, enabled = !isLoading)
+                    OutlinedTextField(value = inputStok, onValueChange = { inputStok = it }, label = { Text(stringResource(R.string.label_jumlah_stok)) }, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number), modifier = Modifier.fillMaxWidth(), shape = textFieldShape, colors = customTextFieldColors, enabled = !isLoading)
+                    OutlinedTextField(value = inputKondisi, onValueChange = { inputKondisi = it }, label = { Text(stringResource(R.string.label_kondisi_barang)) }, modifier = Modifier.fillMaxWidth(), shape = textFieldShape, colors = customTextFieldColors, enabled = !isLoading)
+                    OutlinedTextField(value = inputLokasi, onValueChange = { inputLokasi = it }, label = { Text(stringResource(R.string.label_lokasi_penyimpanan)) }, modifier = Modifier.fillMaxWidth(), shape = textFieldShape, colors = customTextFieldColors, enabled = !isLoading)
+                    OutlinedTextField(value = inputMaksimalPinjam, onValueChange = { inputMaksimalPinjam = it }, label = { Text(stringResource(R.string.label_maksimal_hari_pinjam)) }, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number), modifier = Modifier.fillMaxWidth(), shape = textFieldShape, colors = customTextFieldColors, enabled = !isLoading)
+                    OutlinedTextField(value = inputDeskripsi, onValueChange = { inputDeskripsi = it }, label = { Text(stringResource(R.string.label_deskripsi_lengkap)) }, modifier = Modifier.fillMaxWidth(), minLines = 3, shape = textFieldShape, colors = customTextFieldColors, enabled = !isLoading)
                 }
             },
             confirmButton = {
@@ -339,13 +347,13 @@ fun KelolaBarangScreen(
                     if (isLoading) {
                         CircularProgressIndicator(color = Color.White, modifier = Modifier.size(18.dp), strokeWidth = 2.dp)
                     } else {
-                        Text("Simpan Barang", color = Color.White, fontWeight = FontWeight.SemiBold)
+                        Text(stringResource(R.string.btn_simpan_barang), color = Color.White, fontWeight = FontWeight.SemiBold)
                     }
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showTambahDialog = false }, enabled = !isLoading) {
-                    Text("Batal", color = textSecondary, fontWeight = FontWeight.Medium)
+                    Text(stringResource(R.string.btn_batal), color = textSecondary, fontWeight = FontWeight.Medium)
                 }
             },
             shape = RoundedCornerShape(16.dp),
@@ -358,15 +366,15 @@ fun KelolaBarangScreen(
         AlertDialog(
             onDismissRequest = {},
             icon = { Icon(imageVector = Icons.Filled.CheckCircle, contentDescription = null, tint = sipinjamBlue, modifier = Modifier.size(48.dp)) },
-            title = { Text(text = "Barang Ditambahkan!", fontWeight = FontWeight.Bold, textAlign = TextAlign.Center, color = textPrimary) },
-            text = { Text(text = "Data inventaris barang baru telah berhasil disimpan dan diunggah ke dalam sistem database.", textAlign = TextAlign.Center, color = textSecondary, fontSize = 14.sp, lineHeight = 20.sp) },
+            title = { Text(text = stringResource(R.string.success_item_added_title), fontWeight = FontWeight.Bold, textAlign = TextAlign.Center, color = textPrimary) },
+            text = { Text(text = stringResource(R.string.success_item_added_message), textAlign = TextAlign.Center, color = textSecondary, fontSize = 14.sp, lineHeight = 20.sp) },
             confirmButton = {
                 Button(
                     onClick = onSuccessDismiss,
                     colors = ButtonDefaults.buttonColors(containerColor = sipinjamBlue),
                     shape = RoundedCornerShape(10.dp),
                     modifier = Modifier.fillMaxWidth()
-                ) { Text("Selesai", color = Color.White) }
+                ) { Text(stringResource(R.string.btn_selesai), color = Color.White) }
             },
             shape = RoundedCornerShape(16.dp),
             containerColor = cardWhite
@@ -378,15 +386,15 @@ fun KelolaBarangScreen(
         AlertDialog(
             onDismissRequest = {},
             icon = { Icon(imageVector = Icons.Filled.CheckCircle, contentDescription = null, tint = sipinjamBlue, modifier = Modifier.size(48.dp)) },
-            title = { Text(text = "Perubahan Disimpan!", fontWeight = FontWeight.Bold, textAlign = TextAlign.Center, color = textPrimary) },
-            text = { Text(text = "Data spesifikasi inventaris barang telah berhasil diperbarui secara real-time ke dalam sistem.", textAlign = TextAlign.Center, color = textSecondary, fontSize = 14.sp, lineHeight = 20.sp) },
+            title = { Text(text = stringResource(R.string.success_item_updated_title), fontWeight = FontWeight.Bold, textAlign = TextAlign.Center, color = textPrimary) },
+            text = { Text(text = stringResource(R.string.success_item_updated_message), textAlign = TextAlign.Center, color = textSecondary, fontSize = 14.sp, lineHeight = 20.sp) },
             confirmButton = {
                 Button(
                     onClick = onSuccessDismiss,
                     colors = ButtonDefaults.buttonColors(containerColor = sipinjamBlue),
                     shape = RoundedCornerShape(10.dp),
                     modifier = Modifier.fillMaxWidth()
-                ) { Text("Selesai", color = Color.White) }
+                ) { Text(stringResource(R.string.btn_selesai), color = Color.White) }
             },
             shape = RoundedCornerShape(16.dp),
             containerColor = cardWhite
@@ -398,15 +406,15 @@ fun KelolaBarangScreen(
         AlertDialog(
             onDismissRequest = {},
             icon = { Icon(imageVector = Icons.Filled.CheckCircle, contentDescription = null, tint = statusRed, modifier = Modifier.size(48.dp)) },
-            title = { Text(text = "Barang Dihapus!", fontWeight = FontWeight.Bold, textAlign = TextAlign.Center, color = textPrimary) },
-            text = { Text(text = "Data inventaris barang telah berhasil dihapus sepenuhnya dari sistem database.", textAlign = TextAlign.Center, color = textSecondary, fontSize = 14.sp, lineHeight = 20.sp) },
+            title = { Text(text = stringResource(R.string.success_item_deleted_title), fontWeight = FontWeight.Bold, textAlign = TextAlign.Center, color = textPrimary) },
+            text = { Text(text = stringResource(R.string.success_item_deleted_message), textAlign = TextAlign.Center, color = textSecondary, fontSize = 14.sp, lineHeight = 20.sp) },
             confirmButton = {
                 Button(
                     onClick = onSuccessDismiss,
                     colors = ButtonDefaults.buttonColors(containerColor = statusRed),
                     shape = RoundedCornerShape(10.dp),
                     modifier = Modifier.fillMaxWidth()
-                ) { Text("Selesai", color = Color.White) }
+                ) { Text(stringResource(R.string.btn_selesai), color = Color.White) }
             },
             shape = RoundedCornerShape(16.dp),
             containerColor = cardWhite
@@ -417,14 +425,14 @@ fun KelolaBarangScreen(
     if (showEditDialog && barangToEdit != null) {
         AlertDialog(
             onDismissRequest = { if (!isLoading) onEditDismiss() },
-            title = { Text("Edit Data Barang", fontWeight = FontWeight.Bold, fontSize = 18.sp, color = textPrimary) },
+            title = { Text(stringResource(R.string.screen_manage_edit_item), fontWeight = FontWeight.Bold, fontSize = 18.sp, color = textPrimary) },
             text = {
                 Column(
                     modifier = Modifier.fillMaxWidth().heightIn(max = 400.dp).verticalScroll(rememberScrollState()),
                     verticalArrangement = Arrangement.spacedBy(14.dp)
                 ) {
                     Text("ID Barang: ${barangToEdit.id}", color = textSecondary, fontSize = 12.sp, fontWeight = FontWeight.Medium)
-                    Text("Foto Barang (Klik untuk ganti)", fontSize = 13.sp, fontWeight = FontWeight.SemiBold, color = textSecondary)
+                    Text(stringResource(R.string.label_foto_barang_change), fontSize = 13.sp, fontWeight = FontWeight.SemiBold, color = textSecondary)
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -453,7 +461,7 @@ fun KelolaBarangScreen(
                             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                                 Icon(imageVector = Icons.Filled.Image, contentDescription = null, tint = sipinjamBlue.copy(alpha = 0.6f), modifier = Modifier.size(36.dp))
                                 Spacer(Modifier.height(8.dp))
-                                Text("Pilih Foto Baru", color = sipinjamBlue, fontSize = 12.sp, fontWeight = FontWeight.Medium)
+                                Text(stringResource(R.string.btn_pilih_foto_baru), color = sipinjamBlue, fontSize = 12.sp, fontWeight = FontWeight.Medium)
                             }
                         }
                     }
@@ -466,9 +474,9 @@ fun KelolaBarangScreen(
                         unfocusedLabelColor = textSecondary
                     )
 
-                    OutlinedTextField(value = editNama, onValueChange = { editNama = it }, label = { Text("Nama Barang") }, modifier = Modifier.fillMaxWidth(), shape = textFieldShape, colors = customTextFieldColors, enabled = !isLoading)
-                    OutlinedTextField(value = editKategori, onValueChange = { editKategori = it }, label = { Text("Kategori") }, modifier = Modifier.fillMaxWidth(), shape = textFieldShape, colors = customTextFieldColors, enabled = !isLoading)
-                    OutlinedTextField(value = editStok, onValueChange = { editStok = it }, label = { Text("Jumlah Stok") }, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number), modifier = Modifier.fillMaxWidth(), shape = textFieldShape, colors = customTextFieldColors, enabled = !isLoading)
+                    OutlinedTextField(value = editNama, onValueChange = { editNama = it }, label = { Text(stringResource(R.string.label_nama_barang)) }, modifier = Modifier.fillMaxWidth(), shape = textFieldShape, colors = customTextFieldColors, enabled = !isLoading)
+                    OutlinedTextField(value = editKategori, onValueChange = { editKategori = it }, label = { Text(stringResource(R.string.label_kategori_title)) }, modifier = Modifier.fillMaxWidth(), shape = textFieldShape, colors = customTextFieldColors, enabled = !isLoading)
+                    OutlinedTextField(value = editStok, onValueChange = { editStok = it }, label = { Text(stringResource(R.string.label_jumlah_stok)) }, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number), modifier = Modifier.fillMaxWidth(), shape = textFieldShape, colors = customTextFieldColors, enabled = !isLoading)
                 }
             },
             confirmButton = {
@@ -492,13 +500,13 @@ fun KelolaBarangScreen(
                     if (isLoading) {
                         CircularProgressIndicator(color = Color.White, modifier = Modifier.size(18.dp), strokeWidth = 2.dp)
                     } else {
-                        Text("Simpan Perubahan", color = Color.White, fontWeight = FontWeight.SemiBold)
+                        Text(stringResource(R.string.btn_simpan_perubahan), color = Color.White, fontWeight = FontWeight.SemiBold)
                     }
                 }
             },
             dismissButton = {
                 TextButton(onClick = { selectedImageUri = null; onEditDismiss() }, enabled = !isLoading) {
-                    Text("Batal", color = textSecondary, fontWeight = FontWeight.Medium)
+                    Text(stringResource(R.string.btn_batal), color = textSecondary, fontWeight = FontWeight.Medium)
                 }
             },
             shape = RoundedCornerShape(16.dp),
@@ -510,7 +518,7 @@ fun KelolaBarangScreen(
     if (showDeleteDialog && barangToDelete != null) {
         AlertDialog(
             onDismissRequest = { if (!isLoading) onDeleteDismiss() },
-            title = { Text("Hapus Barang", fontWeight = FontWeight.Bold, fontSize = 18.sp, color = textPrimary) },
+            title = { Text(stringResource(R.string.btn_hapus_barang), fontWeight = FontWeight.Bold, fontSize = 18.sp, color = textPrimary) },
             text = { Text("Apakah Anda yakin ingin menghapus \"${barangToDelete.nama}\" dari sistem?\nTindakan ini tidak dapat dibatalkan.", color = textSecondary) },
             confirmButton = {
                 Button(
@@ -522,12 +530,12 @@ fun KelolaBarangScreen(
                     if (isLoading) {
                         CircularProgressIndicator(color = Color.White, modifier = Modifier.size(18.dp), strokeWidth = 2.dp)
                     } else {
-                        Text("Hapus", color = Color.White)
+                        Text(stringResource(R.string.btn_hapus), color = Color.White)
                     }
                 }
             },
             dismissButton = {
-                TextButton(onClick = onDeleteDismiss, enabled = !isLoading) { Text("Batal", color = textSecondary) }
+                TextButton(onClick = onDeleteDismiss, enabled = !isLoading) { Text(stringResource(R.string.btn_batal), color = textSecondary) }
             },
             shape = RoundedCornerShape(16.dp),
             containerColor = cardWhite
@@ -556,7 +564,7 @@ private fun BarangAdminCard(
         horizontalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         Box(
-            modifier = Modifier.size(56.dp).clip(RoundedCornerShape(10.dp)).background(Color(0xFF1A1A2E)),
+            modifier = Modifier.size(56.dp).clip(RoundedCornerShape(10.dp)).background(DarkImageBg),
             contentAlignment = Alignment.Center
         ) {
             if (barang.imageUrl.isNotEmpty()) {
@@ -589,7 +597,7 @@ private fun BarangAdminCard(
                 Icon(imageVector = Icons.Filled.Edit, contentDescription = "Edit", tint = sipinjamBlue, modifier = Modifier.size(18.dp))
             }
             Box(modifier = Modifier.size(34.dp).clip(RoundedCornerShape(8.dp)).background(statusRedBg).clickable { onDeleteClick() }, contentAlignment = Alignment.Center) {
-                Icon(imageVector = Icons.Filled.Delete, contentDescription = "Hapus", tint = statusRed, modifier = Modifier.size(18.dp))
+                Icon(imageVector = Icons.Filled.Delete, contentDescription = stringResource(R.string.btn_hapus), tint = statusRed, modifier = Modifier.size(18.dp))
             }
         }
     }
@@ -630,28 +638,28 @@ private fun AdminBottomNavBar(
             selected = selected == 0,
             onClick = onDashboardClick,
             icon = { Icon(Icons.Filled.Dashboard, contentDescription = null) },
-            label = { Text("DASHBOARD", fontSize = 10.sp) },
+            label = { Text(stringResource(R.string.nav_dashboard), fontSize = 10.sp) },
             colors = NavigationBarItemDefaults.colors(selectedIconColor = sipinjamBlue, selectedTextColor = sipinjamBlue, unselectedIconColor = textSecondary, unselectedTextColor = textSecondary, indicatorColor = cardWhite)
         )
         NavigationBarItem(
             selected = selected == 1,
             onClick = onBarangClick,
             icon = { Icon(Icons.Filled.Inventory, contentDescription = null) },
-            label = { Text("BARANG", fontSize = 10.sp) },
+            label = { Text(stringResource(R.string.nav_barang), fontSize = 10.sp) },
             colors = NavigationBarItemDefaults.colors(selectedIconColor = sipinjamBlue, selectedTextColor = sipinjamBlue, unselectedIconColor = textSecondary, unselectedTextColor = textSecondary, indicatorColor = cardWhite)
         )
         NavigationBarItem(
             selected = selected == 2,
             onClick = onPermintaanClick,
             icon = { Icon(Icons.Filled.RequestPage, contentDescription = null) },
-            label = { Text("PERMINTAAN", fontSize = 10.sp) },
+            label = { Text(stringResource(R.string.nav_permintaan), fontSize = 10.sp) },
             colors = NavigationBarItemDefaults.colors(selectedIconColor = sipinjamBlue, selectedTextColor = sipinjamBlue, unselectedIconColor = textSecondary, unselectedTextColor = textSecondary, indicatorColor = cardWhite)
         )
         NavigationBarItem(
             selected = selected == 3,
             onClick = onProfilClick,
             icon = { Icon(Icons.Filled.Person, contentDescription = null) },
-            label = { Text("PROFIL", fontSize = 10.sp) },
+            label = { Text(stringResource(R.string.nav_profil), fontSize = 10.sp) },
             colors = NavigationBarItemDefaults.colors(selectedIconColor = sipinjamBlue, selectedTextColor = sipinjamBlue, unselectedIconColor = textSecondary, unselectedTextColor = textSecondary, indicatorColor = cardWhite)
         )
     }

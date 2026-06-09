@@ -1,5 +1,7 @@
 package com.example.sipinjam.ui.components
 
+import com.example.sipinjam.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Dashboard
 import androidx.compose.material.icons.filled.Inventory
@@ -33,7 +35,7 @@ fun AdminBottomNavBar(
             selected = selected == 0,
             onClick = onDashboardClick,
             icon = { Icon(Icons.Filled.Dashboard, contentDescription = null) },
-            label = { Text("DASHBOARD", fontSize = 10.sp) },
+            label = { Text(stringResource(R.string.nav_dashboard), fontSize = 10.sp) },
             colors = NavigationBarItemDefaults.colors(
                 selectedIconColor = SiPinjamBlue,
                 selectedTextColor = SiPinjamBlue,
@@ -46,7 +48,7 @@ fun AdminBottomNavBar(
             selected = selected == 1,
             onClick = onBarangClick,
             icon = { Icon(Icons.Filled.Inventory, contentDescription = null) },
-            label = { Text("BARANG", fontSize = 10.sp) },
+            label = { Text(stringResource(R.string.nav_barang), fontSize = 10.sp) },
             colors = NavigationBarItemDefaults.colors(
                 selectedIconColor = SiPinjamBlue,
                 selectedTextColor = SiPinjamBlue,
@@ -59,7 +61,7 @@ fun AdminBottomNavBar(
             selected = selected == 2,
             onClick = onPermintaanClick,
             icon = { Icon(Icons.Filled.RequestPage, contentDescription = null) },
-            label = { Text("PERMINTAAN", fontSize = 10.sp) },
+            label = { Text(stringResource(R.string.nav_permintaan), fontSize = 10.sp) },
             colors = NavigationBarItemDefaults.colors(
                 selectedIconColor = SiPinjamBlue,
                 selectedTextColor = SiPinjamBlue,
@@ -72,7 +74,7 @@ fun AdminBottomNavBar(
             selected = selected == 3,
             onClick = onProfilClick,
             icon = { Icon(Icons.Filled.Person, contentDescription = null) },
-            label = { Text("PROFIL", fontSize = 10.sp) },
+            label = { Text(stringResource(R.string.nav_profil), fontSize = 10.sp) },
             colors = NavigationBarItemDefaults.colors(
                 selectedIconColor = SiPinjamBlue,
                 selectedTextColor = SiPinjamBlue,
