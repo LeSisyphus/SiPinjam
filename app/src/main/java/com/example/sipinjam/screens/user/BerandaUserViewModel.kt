@@ -1,11 +1,16 @@
 package com.example.sipinjam.screens.user
 
-import com.example.sipinjam.data.model.BorrowingStatus
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.sipinjam.data.repository.AuthRepository
 import com.example.sipinjam.data.repository.BarangRepository
 import com.example.sipinjam.data.repository.PeminjamanRepository
+import com.example.sipinjam.domain.model.Holiday
+import com.example.sipinjam.domain.model.HolidayStatus
+import com.example.sipinjam.domain.usecase.holiday.GetTodayHolidayUseCase
+import com.example.sipinjam.domain.usecase.holiday.ObserveMonthlyHolidaysUseCase
+import com.example.sipinjam.domain.usecase.holiday.RefreshMonthlyHolidaysUseCase
+import java.util.Calendar
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -18,15 +23,22 @@ import kotlinx.coroutines.launch
 data class BerandaUiState(
     val barangTersedia: List<BarangTersedia> = emptyList(),
     val itemDikembalikan: List<ItemDikembalikan> = emptyList(),
+    val todayHolidayStatus: HolidayStatus? = null,
+    val monthlyHolidays: List<Holiday> = emptyList(),
     val isLoading: Boolean = false,
+    val isHolidayLoading: Boolean = false,
     val errorMessage: String? = null,
+    val holidayErrorMessage: String? = null,
 )
 
-class BerandaUserViewModel : ViewModel() {
-
-    private val barangRepository = BarangRepository()
-    private val peminjamanRepository = PeminjamanRepository()
-    private val authRepository = AuthRepository()
+class BerandaUserViewModel(
+    private val getTodayHolidayUseCase: GetTodayHolidayUseCase? = null,
+    private val observeMonthlyHolidaysUseCase: ObserveMonthlyHolidaysUseCase? = null,
+    private val refreshMonthlyHolidaysUseCase: RefreshMonthlyHolidaysUseCase? = null,
+    private val barangRepository: BarangRepository = BarangRepository(),
+    private val peminjamanRepository: PeminjamanRepository = PeminjamanRepository(),
+    private val authRepository: AuthRepository = AuthRepository(),
+) : ViewModel() {
 
     private val _uiState = MutableStateFlow(BerandaUiState())
     val uiState: StateFlow<BerandaUiState> = _uiState.asStateFlow()
@@ -34,6 +46,63 @@ class BerandaUserViewModel : ViewModel() {
     init {
         fetchBarangRealTime()
         fetchItemPerluDikembalikanRealTime()
+        observeHolidayCache()
+        refreshHolidayInfo()
+    }
+
+    fun refreshHolidayInfo() {
+        val refreshUseCase = refreshMonthlyHolidaysUseCase ?: return
+        val todayUseCase = getTodayHolidayUseCase ?: return
+
+        viewModelScope.launch {
+            val (year, month) = currentYearMonth()
+            _uiState.update {
+                it.copy(
+                    isHolidayLoading = true,
+                    holidayErrorMessage = null,
+                )
+            }
+
+            val refreshResult = refreshUseCase(year, month)
+            val todayResult = todayUseCase()
+
+            _uiState.update { currentState ->
+                currentState.copy(
+                    todayHolidayStatus = todayResult.getOrNull() ?: currentState.todayHolidayStatus,
+                    isHolidayLoading = false,
+                    holidayErrorMessage = when {
+                        refreshResult.isFailure && todayResult.isFailure -> {
+                            refreshResult.exceptionOrNull()?.localizedMessage
+                                ?: todayResult.exceptionOrNull()?.localizedMessage
+                                ?: "Gagal memuat info hari libur"
+                        }
+                        else -> null
+                    }
+                )
+            }
+        }
+    }
+
+    private fun observeHolidayCache() {
+        val observeUseCase = observeMonthlyHolidaysUseCase ?: return
+
+        viewModelScope.launch {
+            val (year, month) = currentYearMonth()
+            observeUseCase(year, month)
+                .catch { exception ->
+                    _uiState.update {
+                        it.copy(
+                            holidayErrorMessage = exception.localizedMessage
+                                ?: "Gagal memuat cache hari libur"
+                        )
+                    }
+                }
+                .collect { cachedHolidays ->
+                    _uiState.update {
+                        it.copy(monthlyHolidays = cachedHolidays)
+                    }
+                }
+        }
     }
 
     private fun fetchBarangRealTime() {
@@ -93,7 +162,8 @@ class BerandaUserViewModel : ViewModel() {
                 .collect { daftarPeminjaman ->
                     val daftarPerluDikembalikan = daftarPeminjaman
                         .filter { peminjaman ->
-                            BorrowingStatus.canRequestReturn(peminjaman.status)
+                            peminjaman.status.equals("Disetujui", ignoreCase = true) ||
+                                    peminjaman.status.equals("Dipinjam", ignoreCase = true)
                         }
                         .map { peminjaman ->
                             async {
@@ -119,5 +189,10 @@ class BerandaUserViewModel : ViewModel() {
                     }
                 }
         }
+    }
+
+    private fun currentYearMonth(): Pair<Int, Int> {
+        val calendar = Calendar.getInstance()
+        return calendar.get(Calendar.YEAR) to (calendar.get(Calendar.MONTH) + 1)
     }
 }

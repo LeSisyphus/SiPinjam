@@ -1,7 +1,5 @@
 package com.example.sipinjam.screens.user
 
-import com.example.sipinjam.R
-import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -38,6 +36,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import com.example.sipinjam.data.model.Barang
+import com.example.sipinjam.domain.model.Holiday
+import com.example.sipinjam.domain.model.HolidayStatus
 import com.example.sipinjam.ui.components.UserBottomNavBar
 import com.example.sipinjam.ui.theme.BackgroundGray
 import com.example.sipinjam.ui.theme.CardWhite
@@ -48,8 +48,6 @@ import com.example.sipinjam.ui.theme.StatusGreen
 import com.example.sipinjam.ui.theme.StatusGreenBg
 import com.example.sipinjam.ui.theme.TextPrimary
 import com.example.sipinjam.ui.theme.TextSecondary
-import com.example.sipinjam.ui.theme.StatusRed
-import com.example.sipinjam.ui.theme.StatusRedBg
 
 data class BarangTersedia(
     val id: String,
@@ -115,6 +113,21 @@ fun BerandaUserScreen(
 
             item {
                 SearchSection()
+            }
+
+            item {
+                Spacer(Modifier.height(16.dp))
+            }
+
+            item {
+                HolidayInfoCard(
+                    todayStatus = uiState.todayHolidayStatus,
+                    monthlyHolidays = uiState.monthlyHolidays,
+                    isLoading = uiState.isHolidayLoading,
+                    errorMessage = uiState.holidayErrorMessage,
+                    onRefreshClick = viewModel::refreshHolidayInfo,
+                    modifier = Modifier.padding(horizontal = 20.dp)
+                )
             }
 
             item {
@@ -189,7 +202,7 @@ fun BerandaUserScreen(
 
             item {
                 Text(
-                    text = stringResource(R.string.screen_home_return_needed),
+                    text = "Perlu Dikembalikan",
                     color = TextPrimary,
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold,
@@ -261,7 +274,7 @@ private fun HeaderSection() {
         Spacer(Modifier.width(8.dp))
 
         Text(
-            text = stringResource(R.string.app_name),
+            text = "SiPinjam",
             color = SiPinjamBlue,
             fontSize = 20.sp,
             fontWeight = FontWeight.Bold
@@ -290,10 +303,124 @@ private fun SearchSection() {
         Spacer(Modifier.width(10.dp))
 
         Text(
-            text = stringResource(R.string.screen_home_search_prompt),
+            text = "Cari barang yang ingin kamu pinjam",
             color = TextSecondary.copy(alpha = 0.6f),
             fontSize = 14.sp
         )
+    }
+}
+
+@Composable
+private fun HolidayInfoCard(
+    todayStatus: HolidayStatus?,
+    monthlyHolidays: List<Holiday>,
+    isLoading: Boolean,
+    errorMessage: String?,
+    onRefreshClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val referenceDate = todayStatus?.date.orEmpty()
+    val nearestHoliday = monthlyHolidays.firstOrNull { holiday ->
+        referenceDate.isBlank() || holiday.date >= referenceDate
+    } ?: monthlyHolidays.firstOrNull()
+
+    Card(
+        modifier = modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(containerColor = CardWhite),
+        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = "Info Hari Libur",
+                        color = TextPrimary,
+                        fontSize = 15.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Text(
+                        text = "Data dari API pihak ketiga + cache Room",
+                        color = TextSecondary,
+                        fontSize = 11.sp
+                    )
+                }
+
+                Text(
+                    text = "REFRESH",
+                    color = SiPinjamBlue,
+                    fontSize = 11.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    modifier = Modifier.clickable { onRefreshClick() }
+                )
+            }
+
+            Spacer(Modifier.height(12.dp))
+
+            when {
+                isLoading -> {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        CircularProgressIndicator(
+                            color = SiPinjamBlue,
+                            modifier = Modifier.size(18.dp),
+                            strokeWidth = 2.dp
+                        )
+                        Spacer(Modifier.width(10.dp))
+                        Text(
+                            text = "Memuat info hari libur...",
+                            color = TextSecondary,
+                            fontSize = 13.sp
+                        )
+                    }
+                }
+
+                errorMessage != null && todayStatus == null && monthlyHolidays.isEmpty() -> {
+                    Text(
+                        text = errorMessage,
+                        color = Color(0xFFD32F2F),
+                        fontSize = 13.sp
+                    )
+                }
+
+                else -> {
+                    val todayText = if (todayStatus?.isHoliday == true) {
+                        "Hari ini libur: ${todayStatus.displayName}"
+                    } else {
+                        "Hari ini bukan hari libur nasional/cuti bersama."
+                    }
+
+                    Text(
+                        text = todayText,
+                        color = TextPrimary,
+                        fontSize = 13.sp,
+                        fontWeight = FontWeight.Medium
+                    )
+
+                    Spacer(Modifier.height(6.dp))
+
+                    Text(
+                        text = nearestHoliday?.let { holiday ->
+                            "Libur terdekat bulan ini: ${holiday.date} • ${holiday.name}"
+                        } ?: "Belum ada data libur pada bulan ini.",
+                        color = TextSecondary,
+                        fontSize = 12.sp
+                    )
+
+                    if (errorMessage != null) {
+                        Spacer(Modifier.height(6.dp))
+                        Text(
+                            text = "Menampilkan cache terakhir karena refresh gagal.",
+                            color = Color(0xFFF57C00),
+                            fontSize = 11.sp
+                        )
+                    }
+                }
+            }
+        }
     }
 }
 
@@ -374,7 +501,7 @@ private fun BarangCard(
                         .padding(horizontal = 6.dp, vertical = 2.dp)
                 ) {
                     Text(
-                        text = stringResource(R.string.status_tersedia_upper),
+                        text = "TERSEDIA",
                         color = StatusGreen,
                         fontSize = 9.sp,
                         fontWeight = FontWeight.Bold,
@@ -468,7 +595,7 @@ private fun KembalikanCard(
                 .padding(horizontal = 14.dp, vertical = 7.dp)
         ) {
             Text(
-                text = stringResource(R.string.btn_kembalikan),
+                text = "Kembalikan",
                 color = Color.White,
                 fontSize = 12.sp,
                 fontWeight = FontWeight.SemiBold
@@ -507,13 +634,13 @@ private fun ErrorCard(
         modifier = modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(14.dp))
-            .background(StatusRedBg)
+            .background(Color(0xFFFFEBEE))
             .padding(horizontal = 16.dp, vertical = 14.dp),
         contentAlignment = Alignment.CenterStart
     ) {
         Text(
             text = message,
-            color = StatusRed,
+            color = Color(0xFFD32F2F),
             fontSize = 13.sp
         )
     }
