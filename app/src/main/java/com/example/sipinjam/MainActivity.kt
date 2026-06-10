@@ -11,14 +11,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.navigation.compose.rememberNavController
 import com.example.sipinjam.data.preferences.AppPreferences
 import com.example.sipinjam.data.repository.AuthRepository
 import com.example.sipinjam.navigation.NavGraph
-import com.example.sipinjam.screens.auth.SplashScreen
 import com.example.sipinjam.ui.theme.SiPinjamLocale
 import com.example.sipinjam.ui.theme.SiPinjamTheme
-import kotlinx.coroutines.delay
 
 class MainActivity : ComponentActivity() {
 
@@ -27,8 +26,12 @@ class MainActivity : ComponentActivity() {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
+        var isReady = false
 
+        val splashScreen = installSplashScreen()
+        splashScreen.setKeepOnScreenCondition { !isReady }
+
+        super.onCreate(savedInstanceState)
         AppPreferences.load(this)
         enableEdgeToEdge()
 
@@ -38,21 +41,15 @@ class MainActivity : ComponentActivity() {
             CompositionLocalProvider(
                 LocalActivityResultRegistryOwner provides activityResultRegistryOwner
             ) {
-                SiPinjamTheme(
-                    darkTheme = AppPreferences.isDarkMode
-                ) {
-                    SiPinjamLocale(
-                        languageCode = AppPreferences.languageCode
-                    ) {
+                SiPinjamTheme(darkTheme = AppPreferences.isDarkMode) {
+                    SiPinjamLocale(languageCode = AppPreferences.languageCode) {
                         val navController = rememberNavController()
 
                         var isLoggedIn by rememberSaveable { mutableStateOf(false) }
                         var isAdmin by rememberSaveable { mutableStateOf(false) }
-                        var isReady by rememberSaveable { mutableStateOf(false) }
+                        var isNavReady by rememberSaveable { mutableStateOf(false) }
 
                         LaunchedEffect(Unit) {
-                            val startTime = System.currentTimeMillis()
-
                             if (authRepository.isLoggedIn()) {
                                 val user = authRepository.getCurrentUser()
                                 isLoggedIn = user != null
@@ -62,13 +59,11 @@ class MainActivity : ComponentActivity() {
                                 isAdmin = false
                             }
 
-                            val elapsed = System.currentTimeMillis() - startTime
-                            if (elapsed < 1500) delay(1500 - elapsed)
-
+                            isNavReady = true
                             isReady = true
                         }
 
-                        if (isReady) {
+                        if (isNavReady) {
                             NavGraph(
                                 navController = navController,
                                 isLoggedIn = isLoggedIn,
@@ -78,8 +73,6 @@ class MainActivity : ComponentActivity() {
                                     isAdmin = admin
                                 }
                             )
-                        } else {
-                            SplashScreen()
                         }
                     }
                 }

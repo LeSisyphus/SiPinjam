@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
     <style name="Theme.SiPinjam2" parent="android:Theme.Material.Light.NoActionBar" />
+
+    <style name="Theme.SiPinjam2.Splash" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">@color/card_white</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_splash_book</item>
+        <item name="postSplashScreenTheme">@style/Theme.SiPinjam2</item>
+    </style>
 </resources>
