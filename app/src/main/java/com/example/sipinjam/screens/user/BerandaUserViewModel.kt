@@ -22,6 +22,8 @@ import kotlinx.coroutines.launch
 
 data class BerandaUiState(
     val barangTersedia: List<BarangTersedia> = emptyList(),
+    val barangTersediaAll: List<BarangTersedia> = emptyList(),
+    val searchQuery: String = "",
     val itemDikembalikan: List<ItemDikembalikan> = emptyList(),
     val todayHolidayStatus: HolidayStatus? = null,
     val monthlyHolidays: List<Holiday> = emptyList(),
@@ -48,6 +50,18 @@ class BerandaUserViewModel(
         fetchItemPerluDikembalikanRealTime()
         observeHolidayCache()
         refreshHolidayInfo()
+    }
+
+    fun onSearchChange(query: String) {
+        val filtered = if (query.isBlank()) {
+            _uiState.value.barangTersediaAll
+        } else {
+            _uiState.value.barangTersediaAll.filter {
+                it.nama.contains(query, ignoreCase = true) ||
+                        it.kategori.contains(query, ignoreCase = true)
+            }
+        }
+        _uiState.update { it.copy(searchQuery = query, barangTersedia = filtered) }
     }
 
     fun refreshHolidayInfo() {
@@ -130,9 +144,20 @@ class BerandaUserViewModel(
                             )
                         }
 
+                    val currentQuery = _uiState.value.searchQuery
+                    val filtered = if (currentQuery.isBlank()) {
+                        barangTersediaMapped
+                    } else {
+                        barangTersediaMapped.filter {
+                            it.nama.contains(currentQuery, ignoreCase = true) ||
+                                    it.kategori.contains(currentQuery, ignoreCase = true)
+                        }
+                    }
+
                     _uiState.update {
                         it.copy(
-                            barangTersedia = barangTersediaMapped,
+                            barangTersediaAll = barangTersediaMapped,
+                            barangTersedia = filtered,
                             isLoading = false
                         )
                     }

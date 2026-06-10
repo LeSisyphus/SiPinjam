@@ -64,6 +64,14 @@ class KatalogViewModel : ViewModel() {
         }
     }
 
+
+    fun setInitialSearchQuery(query: String) {
+        val normalizedQuery = query.trim()
+        if (normalizedQuery == _uiState.value.searchQuery) return
+
+        onSearchQueryChanged(normalizedQuery)
+    }
+
     fun onSearchQueryChanged(query: String) {
         _uiState.update { currentState ->
             currentState.copy(
