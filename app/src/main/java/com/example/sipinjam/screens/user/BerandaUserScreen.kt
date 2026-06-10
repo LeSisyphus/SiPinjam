@@ -112,7 +112,10 @@ fun BerandaUserScreen(
             }
 
             item {
-                SearchSection()
+                SearchSection(
+                    query = uiState.searchQuery,
+                    onQueryChange = viewModel::onSearchChange
+                )
             }
 
             item {
@@ -283,31 +286,46 @@ private fun HeaderSection() {
 }
 
 @Composable
-private fun SearchSection() {
-    Row(
+private fun SearchSection(
+    query: String = "",
+    onQueryChange: (String) -> Unit = {},
+) {
+    androidx.compose.foundation.text.BasicTextField(
+        value = query,
+        onValueChange = onQueryChange,
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 20.dp)
             .clip(RoundedCornerShape(12.dp))
             .background(CardWhite)
             .padding(horizontal = 16.dp, vertical = 14.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Icon(
-            imageVector = Icons.Filled.Search,
-            contentDescription = null,
-            tint = TextSecondary,
-            modifier = Modifier.size(20.dp)
-        )
-
-        Spacer(Modifier.width(10.dp))
-
-        Text(
-            text = "Cari barang yang ingin kamu pinjam",
-            color = TextSecondary.copy(alpha = 0.6f),
-            fontSize = 14.sp
-        )
-    }
+        singleLine = true,
+        textStyle = androidx.compose.ui.text.TextStyle(
+            fontSize = 14.sp,
+            color = TextPrimary
+        ),
+        decorationBox = { innerTextField ->
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(
+                    imageVector = Icons.Filled.Search,
+                    contentDescription = null,
+                    tint = TextSecondary,
+                    modifier = Modifier.size(20.dp)
+                )
+                Spacer(Modifier.width(10.dp))
+                Box {
+                    if (query.isEmpty()) {
+                        Text(
+                            text = "Cari barang yang ingin kamu pinjam",
+                            color = TextSecondary.copy(alpha = 0.6f),
+                            fontSize = 14.sp
+                        )
+                    }
+                    innerTextField()
+                }
+            }
+        }
+    )
 }
 
 @Composable
