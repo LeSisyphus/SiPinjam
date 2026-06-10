@@ -39,6 +39,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -70,6 +71,7 @@ import com.example.sipinjam.ui.theme.StatusBlueBg
 @Composable
 fun KatalogScreen(
     viewModel: KatalogViewModel = viewModel(),
+    initialSearchQuery: String = "",
     onBarangClick: (Barang) -> Unit = {},
     onBerandaClick: () -> Unit = {},
     onKatalogClick: () -> Unit = {},
@@ -77,6 +79,10 @@ fun KatalogScreen(
     onProfilClick: () -> Unit = {},
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    LaunchedEffect(initialSearchQuery) {
+        viewModel.setInitialSearchQuery(initialSearchQuery)
+    }
 
     Scaffold(
         containerColor = BackgroundGray,

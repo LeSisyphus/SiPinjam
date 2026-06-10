@@ -2,6 +2,9 @@ package com.example.sipinjam.screens.user
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
@@ -21,14 +24,18 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -72,6 +79,7 @@ data class ItemDikembalikan(
 fun BerandaUserScreen(
     viewModel: BerandaUserViewModel = viewModel(),
     onLihatSemuaBarang: () -> Unit = {},
+    onSearchBarang: (String) -> Unit = {},
     onBarangClick: (Barang) -> Unit = {},
     onBerandaClick: () -> Unit = {},
     onKatalogClick: () -> Unit = {},
@@ -113,8 +121,7 @@ fun BerandaUserScreen(
 
             item {
                 SearchSection(
-                    query = uiState.searchQuery,
-                    onQueryChange = viewModel::onSearchChange
+                    onSearchSubmit = onSearchBarang
                 )
             }
 
@@ -287,12 +294,19 @@ private fun HeaderSection() {
 
 @Composable
 private fun SearchSection(
-    query: String = "",
-    onQueryChange: (String) -> Unit = {},
+    onSearchSubmit: (String) -> Unit = {},
 ) {
-    androidx.compose.foundation.text.BasicTextField(
+    var query by rememberSaveable { mutableStateOf("") }
+    val focusManager = LocalFocusManager.current
+
+    fun submitSearch() {
+        focusManager.clearFocus()
+        onSearchSubmit(query.trim())
+    }
+
+    BasicTextField(
         value = query,
-        onValueChange = onQueryChange,
+        onValueChange = { query = it },
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 20.dp)
@@ -304,13 +318,19 @@ private fun SearchSection(
             fontSize = 14.sp,
             color = TextPrimary
         ),
+        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
+        keyboardActions = KeyboardActions(
+            onSearch = { submitSearch() }
+        ),
         decorationBox = { innerTextField ->
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(
                     imageVector = Icons.Filled.Search,
                     contentDescription = null,
                     tint = TextSecondary,
-                    modifier = Modifier.size(20.dp)
+                    modifier = Modifier
+                        .size(20.dp)
+                        .clickable { submitSearch() }
                 )
                 Spacer(Modifier.width(10.dp))
                 Box {

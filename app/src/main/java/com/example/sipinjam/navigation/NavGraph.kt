@@ -41,7 +41,9 @@ object Routes {
     const val FORGOT_PASSWORD = "forgot_password"
 
     const val BERANDA_USER = "beranda_user"
-    const val KATALOG_USER = "katalog_user"
+
+    private const val KATALOG_USER_BASE = "katalog_user"
+    const val KATALOG_USER = "$KATALOG_USER_BASE?query={query}"
     const val PROFIL = "profil"
     const val GANTI_PASSWORD = "ganti_password"
     const val RIWAYAT_PEMINJAMAN = "riwayat_peminjaman"
@@ -67,6 +69,15 @@ object Routes {
 
     fun detailBarang(barangId: String): String {
         return "$DETAIL_BARANG_BASE/${Uri.encode(barangId)}"
+    }
+
+    fun katalogUser(query: String = ""): String {
+        val normalizedQuery = query.trim()
+        return if (normalizedQuery.isBlank()) {
+            KATALOG_USER_BASE
+        } else {
+            "$KATALOG_USER_BASE?query=${Uri.encode(normalizedQuery)}"
+        }
     }
 
     fun detailPengajuan(peminjamanId: String): String {
@@ -195,7 +206,10 @@ fun NavGraph(
             BerandaUserScreen(
                 viewModel = berandaViewModel,
                 onLihatSemuaBarang = {
-                    navController.navigateSingleTop(Routes.KATALOG_USER)
+                    navController.navigateSingleTop(Routes.katalogUser())
+                },
+                onSearchBarang = { query ->
+                    navController.navigateSingleTop(Routes.katalogUser(query))
                 },
                 onBarangClick = { barang ->
                     if (barang.id.isNotBlank()) {
@@ -204,7 +218,7 @@ fun NavGraph(
                 },
                 onBerandaClick = {},
                 onKatalogClick = {
-                    navController.navigateSingleTop(Routes.KATALOG_USER)
+                    navController.navigateSingleTop(Routes.katalogUser())
                 },
                 onRiwayatClick = {
                     navController.navigateSingleTop(Routes.RIWAYAT_PEMINJAMAN)
@@ -227,8 +241,19 @@ fun NavGraph(
             )
         }
 
-        composable(Routes.KATALOG_USER) {
+        composable(
+            route = Routes.KATALOG_USER,
+            arguments = listOf(
+                navArgument("query") {
+                    type = NavType.StringType
+                    defaultValue = ""
+                }
+            )
+        ) { backStackEntry ->
+            val initialQuery = backStackEntry.arguments?.getString("query").orEmpty()
+
             KatalogScreen(
+                initialSearchQuery = initialQuery,
                 onBarangClick = { barang ->
                     if (barang.id.isNotBlank()) {
                         navController.navigate(Routes.detailBarang(barang.id))
@@ -324,7 +349,7 @@ fun NavGraph(
                     navController.navigateSingleTop(Routes.BERANDA_USER)
                 },
                 onKatalogClick = {
-                    navController.navigateSingleTop(Routes.KATALOG_USER)
+                    navController.navigateSingleTop(Routes.katalogUser())
                 },
                 onRiwayatClick = {},
                 onProfilClick = {
@@ -554,7 +579,7 @@ fun NavGraph(
                     navController.navigateSingleTop(Routes.BERANDA_USER)
                 },
                 onKatalogClick = {
-                    navController.navigateSingleTop(Routes.KATALOG_USER)
+                    navController.navigateSingleTop(Routes.katalogUser())
                 },
                 onRiwayatClick = {
                     navController.navigateSingleTop(Routes.RIWAYAT_PEMINJAMAN)
