@@ -15,8 +15,10 @@ import androidx.navigation.compose.rememberNavController
 import com.example.sipinjam.data.preferences.AppPreferences
 import com.example.sipinjam.data.repository.AuthRepository
 import com.example.sipinjam.navigation.NavGraph
+import com.example.sipinjam.screens.auth.SplashScreen
 import com.example.sipinjam.ui.theme.SiPinjamLocale
 import com.example.sipinjam.ui.theme.SiPinjamTheme
+import kotlinx.coroutines.delay
 
 class MainActivity : ComponentActivity() {
 
@@ -49,15 +51,19 @@ class MainActivity : ComponentActivity() {
                         var isReady by rememberSaveable { mutableStateOf(false) }
 
                         LaunchedEffect(Unit) {
+                            val startTime = System.currentTimeMillis()
+
                             if (authRepository.isLoggedIn()) {
                                 val user = authRepository.getCurrentUser()
-
                                 isLoggedIn = user != null
                                 isAdmin = user?.role == "admin"
                             } else {
                                 isLoggedIn = false
                                 isAdmin = false
                             }
+
+                            val elapsed = System.currentTimeMillis() - startTime
+                            if (elapsed < 1500) delay(1500 - elapsed)
 
                             isReady = true
                         }
@@ -72,6 +78,8 @@ class MainActivity : ComponentActivity() {
                                     isAdmin = admin
                                 }
                             )
+                        } else {
+                            SplashScreen()
                         }
                     }
                 }
