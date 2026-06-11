@@ -1,8 +1,8 @@
 package com.example.sipinjam.data.repository
 
-import com.example.sipinjam.data.model.BorrowingStatus
-import com.example.sipinjam.data.model.Pengembalian
-import com.example.sipinjam.data.model.ReturnStatus
+import com.example.sipinjam.domain.model.BorrowingStatus
+import com.example.sipinjam.domain.model.Pengembalian
+import com.example.sipinjam.domain.model.ReturnStatus
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
 import com.google.firebase.firestore.Query
@@ -11,12 +11,13 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.await
 
-class PengembalianRepository {
+import com.example.sipinjam.domain.repository.PengembalianRepository
+class PengembalianRepositoryImpl : PengembalianRepository {
 
     private val db = FirebaseFirestore.getInstance()
     private val collection = db.collection("returns")
 
-    suspend fun tambahPengembalian(pengembalian: Pengembalian): Result<Unit> {
+    override suspend fun tambahPengembalian(pengembalian: Pengembalian): Result<Unit> {
         return try {
             val docRef = collection.document()
             val data = pengembalian.copy(id = docRef.id)
@@ -27,7 +28,7 @@ class PengembalianRepository {
         }
     }
 
-    suspend fun ajukanPengembalianDanUpdatePeminjaman(
+    override suspend fun ajukanPengembalianDanUpdatePeminjaman(
         pengembalian: Pengembalian
     ): Result<Unit> {
         return try {
@@ -58,7 +59,7 @@ class PengembalianRepository {
         }
     }
 
-    suspend fun getPengembalianById(id: String): Result<Pengembalian> {
+    override suspend fun getPengembalianById(id: String): Result<Pengembalian> {
         return try {
             val doc = collection.document(id).get().await()
 
@@ -72,7 +73,7 @@ class PengembalianRepository {
         }
     }
 
-    suspend fun getPengembalianByPeminjamanId(peminjamanId: String): Result<Pengembalian?> {
+    override suspend fun getPengembalianByPeminjamanId(peminjamanId: String): Result<Pengembalian?> {
         return try {
             val snapshot = collection
                 .whereEqualTo("peminjamanId", peminjamanId)
@@ -92,7 +93,7 @@ class PengembalianRepository {
         }
     }
 
-    suspend fun updateVerifikasi(
+    override suspend fun updateVerifikasi(
         id: String,
         status: String,
         catatanAdmin: String,
@@ -115,7 +116,7 @@ class PengembalianRepository {
         }
     }
 
-    suspend fun setujuiPengembalian(
+    override suspend fun setujuiPengembalian(
         pengembalianId: String,
         catatanAdmin: String,
         kondisiBarang: String
@@ -187,7 +188,7 @@ class PengembalianRepository {
         }
     }
 
-    suspend fun tolakPengembalian(
+    override suspend fun tolakPengembalian(
         pengembalianId: String,
         catatanAdmin: String
     ): Result<Unit> {
@@ -244,7 +245,7 @@ class PengembalianRepository {
         }
     }
 
-    fun listenSemuaPengembalian(): Flow<List<Pengembalian>> = callbackFlow {
+    override fun listenSemuaPengembalian(): Flow<List<Pengembalian>> = callbackFlow {
         val listener: ListenerRegistration = collection
             .orderBy("createdAt", Query.Direction.DESCENDING)
             .addSnapshotListener { snapshot, error ->
