@@ -1,7 +1,7 @@
 package com.example.sipinjam.data.repository
 
-import com.example.sipinjam.data.model.BorrowingStatus
-import com.example.sipinjam.data.model.Peminjaman
+import com.example.sipinjam.domain.model.BorrowingStatus
+import com.example.sipinjam.domain.model.Peminjaman
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
 import kotlinx.coroutines.channels.awaitClose
@@ -9,12 +9,13 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.await
 
-class PeminjamanRepository {
+import com.example.sipinjam.domain.repository.PeminjamanRepository
+class PeminjamanRepositoryImpl : PeminjamanRepository {
 
     private val db = FirebaseFirestore.getInstance()
     private val collection = db.collection("borrowings")
 
-    suspend fun tambahPeminjaman(peminjaman: Peminjaman): Result<Unit> {
+    override suspend fun tambahPeminjaman(peminjaman: Peminjaman): Result<Unit> {
         return try {
             val docRef = collection.document()
             val data = peminjaman.copy(id = docRef.id)
@@ -25,7 +26,7 @@ class PeminjamanRepository {
         }
     }
 
-    suspend fun getPeminjamanByUser(userId: String): Result<List<Peminjaman>> {
+    override suspend fun getPeminjamanByUser(userId: String): Result<List<Peminjaman>> {
         return try {
             val snapshot = collection
                 .whereEqualTo("userId", userId)
@@ -40,7 +41,7 @@ class PeminjamanRepository {
         }
     }
 
-    suspend fun semuaPeminjaman(): Result<List<Peminjaman>> {
+    override suspend fun semuaPeminjaman(): Result<List<Peminjaman>> {
         return try {
             val snapshot = collection
                 .get()
@@ -54,7 +55,7 @@ class PeminjamanRepository {
         }
     }
 
-    suspend fun updateStatus(id: String, statusBaru: String): Result<Unit> {
+    override suspend fun updateStatus(id: String, statusBaru: String): Result<Unit> {
         return try {
             collection.document(id)
                 .update("status", statusBaru)
@@ -65,7 +66,7 @@ class PeminjamanRepository {
         }
     }
 
-    fun listenPeminjamanByUser(userId: String): Flow<List<Peminjaman>> = callbackFlow {
+    override fun listenPeminjamanByUser(userId: String): Flow<List<Peminjaman>> = callbackFlow {
         val listener: ListenerRegistration = collection
             .whereEqualTo("userId", userId)
             .addSnapshotListener { snapshot, error ->
@@ -82,7 +83,7 @@ class PeminjamanRepository {
         awaitClose { listener.remove() }
     }
 
-    fun listenSemuaPeminjaman(): Flow<List<Peminjaman>> = callbackFlow {
+    override fun listenSemuaPeminjaman(): Flow<List<Peminjaman>> = callbackFlow {
         val listener: ListenerRegistration = collection
             .addSnapshotListener { snapshot, error ->
                 if (error != null) {
@@ -104,7 +105,7 @@ class PeminjamanRepository {
         awaitClose { listener.remove() }
     }
 
-    suspend fun getPeminjamanById(id: String): Result<Peminjaman> {
+    override suspend fun getPeminjamanById(id: String): Result<Peminjaman> {
         return try {
             val document = collection.document(id).get().await()
 
@@ -118,7 +119,7 @@ class PeminjamanRepository {
         }
     }
 
-    suspend fun setujuiDenganKurangiStok(peminjaman: Peminjaman): Result<Unit> {
+    override suspend fun setujuiDenganKurangiStok(peminjaman: Peminjaman): Result<Unit> {
         return try {
             val peminjamanRef = collection.document(peminjaman.id)
             val barangRef = db.collection("items").document(peminjaman.barangId)
