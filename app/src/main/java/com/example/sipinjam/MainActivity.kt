@@ -21,27 +21,18 @@ import com.example.sipinjam.ui.theme.SiPinjamTheme
 
 class MainActivity : ComponentActivity() {
 
-    private var keepSplashScreenVisible = true
+    private var isSplashReady = false
 
     private val authRepository: AuthRepository by lazy {
         (application as SiPinjamApplication).appContainer.authRepository
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-<<<<<<< HEAD
-        var isReady = false
-=======
-        installSplashScreen().setKeepOnScreenCondition {
-            keepSplashScreenVisible
-        }
-
-        super.onCreate(savedInstanceState)
->>>>>>> 909d0f4 (fix: use branded system splash screen)
-
         val splashScreen = installSplashScreen()
-        splashScreen.setKeepOnScreenCondition { !isReady }
+        splashScreen.setKeepOnScreenCondition { !isSplashReady }
 
         super.onCreate(savedInstanceState)
+
         AppPreferences.load(this)
         enableEdgeToEdge()
 
@@ -69,12 +60,8 @@ class MainActivity : ComponentActivity() {
                                 isAdmin = false
                             }
 
-<<<<<<< HEAD
                             isNavReady = true
-=======
->>>>>>> 909d0f4 (fix: use branded system splash screen)
-                            isReady = true
-                            keepSplashScreenVisible = false
+                            isSplashReady = true
                         }
 
                         if (isNavReady) {
