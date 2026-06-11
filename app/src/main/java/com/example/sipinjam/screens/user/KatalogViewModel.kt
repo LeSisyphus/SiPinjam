@@ -2,8 +2,9 @@ package com.example.sipinjam.screens.user
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.sipinjam.data.model.Barang
-import com.example.sipinjam.data.repository.BarangRepository
+import com.example.sipinjam.domain.model.Barang
+import com.example.sipinjam.domain.repository.BarangRepository
+import com.example.sipinjam.data.repository.BarangRepositoryImpl
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -23,7 +24,7 @@ data class KatalogUiState(
 
 class KatalogViewModel : ViewModel() {
 
-    private val barangRepository = BarangRepository()
+    private val barangRepository = BarangRepositoryImpl()
 
     private val _uiState = MutableStateFlow(KatalogUiState())
     val uiState: StateFlow<KatalogUiState> = _uiState.asStateFlow()
