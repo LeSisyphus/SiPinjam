@@ -1,17 +1,18 @@
 package com.example.sipinjam.data.repository
 
-import com.example.sipinjam.data.model.Barang
+import com.example.sipinjam.domain.model.Barang
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.await
 
-class BarangRepository {
+import com.example.sipinjam.domain.repository.BarangRepository
+class BarangRepositoryImpl : BarangRepository {
     private val firestore = FirebaseFirestore.getInstance()
     private val itemsCollection = firestore.collection("items")
 
-    fun getAllBarangRealTime(): Flow<List<Barang>> = callbackFlow {
+    override fun getAllBarangRealTime(): Flow<List<Barang>> = callbackFlow {
         val listener = itemsCollection.addSnapshotListener { snapshot, error ->
             if (error != null) {
                 close(error)
@@ -27,7 +28,7 @@ class BarangRepository {
         awaitClose { listener.remove() }
     }
 
-    suspend fun getBarangById(id: String): Barang? {
+    override suspend fun getBarangById(id: String): Barang? {
         return try {
             val document = itemsCollection.document(id).get().await()
             document.toObject(Barang::class.java)?.copy(id = document.id)
@@ -36,7 +37,7 @@ class BarangRepository {
         }
     }
 
-    suspend fun addBarang(barang: Barang): Boolean {
+    override suspend fun addBarang(barang: Barang): Boolean {
         return try {
             val newDocRef = itemsCollection.document()
             val barangWithId = barang.copy(id = newDocRef.id)
@@ -47,9 +48,9 @@ class BarangRepository {
         }
     }
 
-    suspend fun updateBarang(barang: Barang): Boolean {
+    override suspend fun updateBarang(barang: Barang): Boolean {
         if (barang.id.isBlank()) return false
-        
+
         return try {
             itemsCollection.document(barang.id).set(barang).await()
             true
@@ -58,7 +59,7 @@ class BarangRepository {
         }
     }
 
-    suspend fun deleteBarang(id: String): Boolean {
+    override suspend fun deleteBarang(id: String): Boolean {
         return try {
             itemsCollection.document(id).delete().await()
             true
