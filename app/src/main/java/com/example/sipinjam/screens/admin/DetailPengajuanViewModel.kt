@@ -1,14 +1,17 @@
 package com.example.sipinjam.screens.admin
 
-import com.example.sipinjam.data.model.BorrowingStatus
+import com.example.sipinjam.domain.model.BorrowingStatus
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.sipinjam.data.model.Barang
-import com.example.sipinjam.data.model.Peminjaman
-import com.example.sipinjam.data.model.User
-import com.example.sipinjam.data.repository.AuthRepository
-import com.example.sipinjam.data.repository.BarangRepository
-import com.example.sipinjam.data.repository.PeminjamanRepository
+import com.example.sipinjam.domain.model.Barang
+import com.example.sipinjam.domain.model.Peminjaman
+import com.example.sipinjam.domain.model.User
+import com.example.sipinjam.domain.repository.AuthRepository
+import com.example.sipinjam.data.repository.AuthRepositoryImpl
+import com.example.sipinjam.domain.repository.BarangRepository
+import com.example.sipinjam.data.repository.BarangRepositoryImpl
+import com.example.sipinjam.domain.repository.PeminjamanRepository
+import com.example.sipinjam.data.repository.PeminjamanRepositoryImpl
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -27,9 +30,9 @@ data class DetailPengajuanUiState(
 
 class DetailPengajuanViewModel : ViewModel() {
 
-    private val peminjamanRepository = PeminjamanRepository()
-    private val barangRepository = BarangRepository()
-    private val authRepository = AuthRepository()
+    private val peminjamanRepository = PeminjamanRepositoryImpl()
+    private val barangRepository = BarangRepositoryImpl()
+    private val authRepository = AuthRepositoryImpl()
 
     private val _uiState = MutableStateFlow(DetailPengajuanUiState())
     val uiState: StateFlow<DetailPengajuanUiState> = _uiState.asStateFlow()

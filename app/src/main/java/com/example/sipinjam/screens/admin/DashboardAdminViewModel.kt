@@ -1,6 +1,6 @@
 package com.example.sipinjam.screens.admin
 
-import com.example.sipinjam.data.model.BorrowingStatus
+import com.example.sipinjam.domain.model.BorrowingStatus
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.firestore.DocumentSnapshot

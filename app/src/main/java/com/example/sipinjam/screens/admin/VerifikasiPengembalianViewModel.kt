@@ -1,14 +1,15 @@
 package com.example.sipinjam.screens.admin
 
-import com.example.sipinjam.data.model.ReturnStatus
-import com.example.sipinjam.data.model.BorrowingStatus
+import com.example.sipinjam.domain.model.ReturnStatus
+import com.example.sipinjam.domain.model.BorrowingStatus
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.sipinjam.data.model.Barang
-import com.example.sipinjam.data.model.Peminjaman
-import com.example.sipinjam.data.model.Pengembalian
-import com.example.sipinjam.data.model.User
-import com.example.sipinjam.data.repository.PengembalianRepository
+import com.example.sipinjam.domain.model.Barang
+import com.example.sipinjam.domain.model.Peminjaman
+import com.example.sipinjam.domain.model.Pengembalian
+import com.example.sipinjam.domain.model.User
+import com.example.sipinjam.domain.repository.PengembalianRepository
+import com.example.sipinjam.data.repository.PengembalianRepositoryImpl
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -27,7 +28,7 @@ data class VerifikasiPengembalianDetailUiState(
 
 class VerifikasiPengembalianViewModel : ViewModel() {
 
-    private val repository = PengembalianRepository()
+    private val repository = PengembalianRepositoryImpl()
     private val db = FirebaseFirestore.getInstance()
 
     private val _pengembalian = MutableStateFlow<Pengembalian?>(null)
