@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+<<<<<<< HEAD
     <style name="Theme.SiPinjam2" parent="android:Theme.Material.Light.NoActionBar" />
 
     <style name="Theme.SiPinjam2.Splash" parent="Theme.SplashScreen">
@@ -8,3 +9,14 @@
         <item name="postSplashScreenTheme">@style/Theme.SiPinjam2</item>
     </style>
 </resources>
+=======
+    <style name="Theme.SiPinjam" parent="android:Theme.Material.Light.NoActionBar" />
+
+    <style name="Theme.SiPinjam.Starting" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">@color/splash_background</item>
+        <item name="windowSplashScreenAnimatedIcon">@mipmap/ic_launcher</item>
+        <item name="windowSplashScreenAnimationDuration">0</item>
+        <item name="postSplashScreenTheme">@style/Theme.SiPinjam</item>
+    </style>
+</resources>
+>>>>>>> 909d0f4 (fix: use branded system splash screen)
