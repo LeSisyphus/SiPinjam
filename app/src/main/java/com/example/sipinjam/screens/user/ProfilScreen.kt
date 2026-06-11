@@ -161,21 +161,6 @@ fun ProfilScreen(
                 )
 
                 Spacer(Modifier.height(8.dp))
-
-                Box(
-                    modifier = Modifier
-                        .clip(RoundedCornerShape(50))
-                        .background(InputBg)
-                        .padding(horizontal = 16.dp, vertical = 6.dp)
-                ) {
-                    Text(
-                        text = uiState.user.peran.uppercase(),
-                        color = TextSecondary,
-                        fontSize = 12.sp,
-                        fontWeight = FontWeight.SemiBold,
-                        letterSpacing = 0.5.sp
-                    )
-                }
             }
 
             Spacer(Modifier.height(28.dp))
