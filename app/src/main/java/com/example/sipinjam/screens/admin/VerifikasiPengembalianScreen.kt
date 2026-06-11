@@ -1,7 +1,5 @@
 package com.example.sipinjam.screens.admin
 
-import com.example.sipinjam.R
-import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -19,15 +17,11 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Image
-import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
@@ -47,6 +41,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -55,17 +50,17 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
+import com.example.sipinjam.R
 import com.example.sipinjam.ui.components.CloudinaryImage
 import com.example.sipinjam.ui.components.SiPinjamTopBar
 import com.example.sipinjam.ui.theme.BackgroundGray
-import com.example.sipinjam.ui.theme.StatusOrange
-import com.example.sipinjam.ui.theme.StatusOrangeBg
-import com.example.sipinjam.ui.theme.StatusBlue
-import com.example.sipinjam.ui.theme.StatusBlueBg
 import com.example.sipinjam.ui.theme.CardWhite
-import com.example.sipinjam.ui.theme.DarkImageBg
 import com.example.sipinjam.ui.theme.InputBg
 import com.example.sipinjam.ui.theme.SiPinjamBlue
+import com.example.sipinjam.ui.theme.StatusBlue
+import com.example.sipinjam.ui.theme.StatusBlueBg
+import com.example.sipinjam.ui.theme.StatusOrange
+import com.example.sipinjam.ui.theme.StatusOrangeBg
 import com.example.sipinjam.ui.theme.StatusRed
 import com.example.sipinjam.ui.theme.TextPrimary
 import com.example.sipinjam.ui.theme.TextSecondary

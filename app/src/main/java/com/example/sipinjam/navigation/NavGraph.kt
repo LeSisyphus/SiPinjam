@@ -19,7 +19,6 @@ import com.example.sipinjam.SiPinjamApplication
 import com.example.sipinjam.screens.admin.DashboardAdminScreen
 import com.example.sipinjam.screens.admin.DetailPengajuanScreen
 import com.example.sipinjam.screens.admin.KelolaBarangScreen
-import com.example.sipinjam.screens.admin.KelolaBarangViewModel
 import com.example.sipinjam.screens.admin.PersetujuanPeminjamanScreen
 import com.example.sipinjam.screens.admin.VerifikasiPengembalianScreen
 import com.example.sipinjam.screens.auth.ForgotPasswordScreen

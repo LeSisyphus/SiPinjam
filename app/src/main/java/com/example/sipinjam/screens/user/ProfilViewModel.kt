@@ -1,21 +1,18 @@
 package com.example.sipinjam.screens.user
 
+import android.app.Application
 import android.net.Uri
-import androidx.lifecycle.ViewModel
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.sipinjam.domain.model.User
 import com.example.sipinjam.data.preferences.AppPreferences
-import com.example.sipinjam.domain.repository.AuthRepository
 import com.example.sipinjam.data.repository.AuthRepositoryImpl
-import com.example.sipinjam.domain.repository.StorageRepository
 import com.example.sipinjam.data.repository.StorageRepositoryImpl
+import com.example.sipinjam.domain.model.User
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import android.app.Application
-import androidx.lifecycle.AndroidViewModel
 import java.util.Locale
 
 data class ProfilUiState(
