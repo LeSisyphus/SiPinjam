@@ -2,7 +2,7 @@ package com.example.sipinjam.screens.user
 
 import com.example.sipinjam.R
 import androidx.compose.ui.res.stringResource
-import com.example.sipinjam.data.model.BorrowingStatus
+import com.example.sipinjam.domain.model.BorrowingStatus
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box

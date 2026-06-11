@@ -2,7 +2,8 @@ package com.example.sipinjam.screens.user
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.sipinjam.data.repository.BarangRepository
+import com.example.sipinjam.domain.repository.BarangRepository
+import com.example.sipinjam.data.repository.BarangRepositoryImpl
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -17,7 +18,7 @@ data class DetailUiState(
 
 class DetailBarangViewModel : ViewModel() {
 
-    private val repository = BarangRepository()
+    private val repository = BarangRepositoryImpl()
 
     private val _uiState = MutableStateFlow(DetailUiState())
     val uiState: StateFlow<DetailUiState> = _uiState.asStateFlow()

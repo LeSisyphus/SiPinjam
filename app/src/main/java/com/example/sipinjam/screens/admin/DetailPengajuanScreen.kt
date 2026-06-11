@@ -2,7 +2,7 @@ package com.example.sipinjam.screens.admin
 
 import com.example.sipinjam.R
 import androidx.compose.ui.res.stringResource
-import com.example.sipinjam.data.model.BorrowingStatus
+import com.example.sipinjam.domain.model.BorrowingStatus
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -50,9 +50,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
-import com.example.sipinjam.data.model.Barang
-import com.example.sipinjam.data.model.Peminjaman
-import com.example.sipinjam.data.model.User
+import com.example.sipinjam.domain.model.Barang
+import com.example.sipinjam.domain.model.Peminjaman
+import com.example.sipinjam.domain.model.User
 import com.example.sipinjam.ui.components.SiPinjamTopBar
 import com.example.sipinjam.ui.theme.BackgroundGray
 import com.example.sipinjam.ui.theme.CardWhite

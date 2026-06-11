@@ -13,8 +13,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.sipinjam.R
-import com.example.sipinjam.data.model.BorrowingStatus
-import com.example.sipinjam.data.model.ReturnStatus
+import com.example.sipinjam.domain.model.BorrowingStatus
+import com.example.sipinjam.domain.model.ReturnStatus
 import com.example.sipinjam.ui.theme.InputBg
 import com.example.sipinjam.ui.theme.StatusBlue
 import com.example.sipinjam.ui.theme.StatusBlueBg

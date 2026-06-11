@@ -1,17 +1,21 @@
 package com.example.sipinjam.screens.admin
 
-import com.example.sipinjam.data.model.BorrowingStatus
-import com.example.sipinjam.data.model.ReturnStatus
+import com.example.sipinjam.domain.model.BorrowingStatus
+import com.example.sipinjam.domain.model.ReturnStatus
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.sipinjam.data.model.Barang
-import com.example.sipinjam.data.model.Peminjaman
-import com.example.sipinjam.data.model.Pengembalian
-import com.example.sipinjam.data.model.User
-import com.example.sipinjam.data.repository.AuthRepository
-import com.example.sipinjam.data.repository.BarangRepository
-import com.example.sipinjam.data.repository.PeminjamanRepository
-import com.example.sipinjam.data.repository.PengembalianRepository
+import com.example.sipinjam.domain.model.Barang
+import com.example.sipinjam.domain.model.Peminjaman
+import com.example.sipinjam.domain.model.Pengembalian
+import com.example.sipinjam.domain.model.User
+import com.example.sipinjam.domain.repository.AuthRepository
+import com.example.sipinjam.data.repository.AuthRepositoryImpl
+import com.example.sipinjam.domain.repository.BarangRepository
+import com.example.sipinjam.data.repository.BarangRepositoryImpl
+import com.example.sipinjam.domain.repository.PeminjamanRepository
+import com.example.sipinjam.data.repository.PeminjamanRepositoryImpl
+import com.example.sipinjam.domain.repository.PengembalianRepository
+import com.example.sipinjam.data.repository.PengembalianRepositoryImpl
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -42,10 +46,10 @@ data class AdminPengembalianUiItem(
 )
 
 class PersetujuanPeminjamanViewModel(
-    private val peminjamanRepository: PeminjamanRepository = PeminjamanRepository(),
-    private val pengembalianRepository: PengembalianRepository = PengembalianRepository(),
-    private val barangRepository: BarangRepository = BarangRepository(),
-    private val authRepository: AuthRepository = AuthRepository()
+    private val peminjamanRepository: PeminjamanRepository = PeminjamanRepositoryImpl(),
+    private val pengembalianRepository: PengembalianRepository = PengembalianRepositoryImpl(),
+    private val barangRepository: BarangRepository = BarangRepositoryImpl(),
+    private val authRepository: AuthRepository = AuthRepositoryImpl()
 ) : ViewModel() {
 
     private val _daftarPeminjaman = MutableStateFlow<List<AdminPeminjamanUiItem>>(emptyList())

@@ -9,11 +9,12 @@ import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlin.coroutines.resume
 
-class StorageRepository(private val context: Context) {
+import com.example.sipinjam.domain.repository.StorageRepository
+class StorageRepositoryImpl(private val context: Context) : StorageRepository {
 
     private val auth = FirebaseAuth.getInstance()
 
-    suspend fun uploadFotoProfil(uri: Uri): Result<String> {
+    override suspend fun uploadFotoProfil(uri: Uri): Result<String> {
         val uid = auth.currentUser?.uid
             ?: return Result.failure(Exception("User tidak ditemukan"))
 
@@ -45,7 +46,7 @@ class StorageRepository(private val context: Context) {
         }
     }
 
-    suspend fun uploadFotoPengembalian(uri: Uri, peminjamanId: String): Result<String> {
+    override suspend fun uploadFotoPengembalian(uri: Uri, peminjamanId: String): Result<String> {
         return suspendCancellableCoroutine { continuation ->
             MediaManager.get()
                 .upload(uri)

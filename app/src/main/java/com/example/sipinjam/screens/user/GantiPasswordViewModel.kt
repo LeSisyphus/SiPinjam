@@ -2,7 +2,8 @@ package com.example.sipinjam.screens.user
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.sipinjam.data.repository.AuthRepository
+import com.example.sipinjam.domain.repository.AuthRepository
+import com.example.sipinjam.data.repository.AuthRepositoryImpl
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -22,7 +23,7 @@ data class GantiPasswordUiState(
 )
 
 class GantiPasswordViewModel(
-    private val repository: AuthRepository = AuthRepository()
+    private val repository: AuthRepository = AuthRepositoryImpl()
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(GantiPasswordUiState())

@@ -1,16 +1,19 @@
 package com.example.sipinjam.screens.user
 
-import com.example.sipinjam.data.model.ReturnStatus
-import com.example.sipinjam.data.model.BorrowingStatus
+import com.example.sipinjam.domain.model.ReturnStatus
+import com.example.sipinjam.domain.model.BorrowingStatus
 import android.content.Context
 import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.sipinjam.data.model.Barang
-import com.example.sipinjam.data.model.Pengembalian
-import com.example.sipinjam.data.repository.BarangRepository
-import com.example.sipinjam.data.repository.PengembalianRepository
-import com.example.sipinjam.data.repository.StorageRepository
+import com.example.sipinjam.domain.model.Barang
+import com.example.sipinjam.domain.model.Pengembalian
+import com.example.sipinjam.domain.repository.BarangRepository
+import com.example.sipinjam.data.repository.BarangRepositoryImpl
+import com.example.sipinjam.domain.repository.PengembalianRepository
+import com.example.sipinjam.data.repository.PengembalianRepositoryImpl
+import com.example.sipinjam.domain.repository.StorageRepository
+import com.example.sipinjam.data.repository.StorageRepositoryImpl
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -21,8 +24,8 @@ import java.util.Locale
 
 class PengembalianViewModel : ViewModel() {
 
-    private val pengembalianRepository = PengembalianRepository()
-    private val barangRepository = BarangRepository()
+    private val pengembalianRepository = PengembalianRepositoryImpl()
+    private val barangRepository = BarangRepositoryImpl()
 
     private val _barang = MutableStateFlow<Barang?>(null)
     val barang: StateFlow<Barang?> = _barang.asStateFlow()
@@ -87,7 +90,7 @@ class PengembalianViewModel : ViewModel() {
             _isLoading.value = true
             _errorMessage.value = null
 
-            val storageRepository = StorageRepository(context)
+            val storageRepository = StorageRepositoryImpl(context)
             val uploadResult = storageRepository.uploadFotoPengembalian(fotoUri, peminjamanId)
 
             if (uploadResult.isFailure) {

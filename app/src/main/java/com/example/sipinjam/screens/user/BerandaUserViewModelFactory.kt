@@ -2,9 +2,12 @@ package com.example.sipinjam.screens.user
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.example.sipinjam.data.repository.AuthRepository
-import com.example.sipinjam.data.repository.BarangRepository
-import com.example.sipinjam.data.repository.PeminjamanRepository
+import com.example.sipinjam.domain.repository.AuthRepository
+import com.example.sipinjam.data.repository.AuthRepositoryImpl
+import com.example.sipinjam.domain.repository.BarangRepository
+import com.example.sipinjam.data.repository.BarangRepositoryImpl
+import com.example.sipinjam.domain.repository.PeminjamanRepository
+import com.example.sipinjam.data.repository.PeminjamanRepositoryImpl
 import com.example.sipinjam.domain.usecase.holiday.GetTodayHolidayUseCase
 import com.example.sipinjam.domain.usecase.holiday.ObserveMonthlyHolidaysUseCase
 import com.example.sipinjam.domain.usecase.holiday.RefreshMonthlyHolidaysUseCase

@@ -3,10 +3,12 @@ package com.example.sipinjam.screens.user
 import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.sipinjam.data.model.User
+import com.example.sipinjam.domain.model.User
 import com.example.sipinjam.data.preferences.AppPreferences
-import com.example.sipinjam.data.repository.AuthRepository
-import com.example.sipinjam.data.repository.StorageRepository
+import com.example.sipinjam.domain.repository.AuthRepository
+import com.example.sipinjam.data.repository.AuthRepositoryImpl
+import com.example.sipinjam.domain.repository.StorageRepository
+import com.example.sipinjam.data.repository.StorageRepositoryImpl
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -33,8 +35,8 @@ class ProfilViewModel(
     application: Application,
 ) : AndroidViewModel(application) {
 
-    private val authRepository = AuthRepository()
-    private val storageRepository = StorageRepository(application)
+    private val authRepository = AuthRepositoryImpl()
+    private val storageRepository = StorageRepositoryImpl(application)
 
     private val _uiState = MutableStateFlow(ProfilUiState())
     val uiState: StateFlow<ProfilUiState> = _uiState.asStateFlow()

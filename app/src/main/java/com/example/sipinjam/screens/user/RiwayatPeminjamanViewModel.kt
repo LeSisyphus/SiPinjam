@@ -2,10 +2,13 @@ package com.example.sipinjam.screens.user
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.sipinjam.data.model.Peminjaman
-import com.example.sipinjam.data.repository.AuthRepository
-import com.example.sipinjam.data.repository.BarangRepository
-import com.example.sipinjam.data.repository.PeminjamanRepository
+import com.example.sipinjam.domain.model.Peminjaman
+import com.example.sipinjam.domain.repository.AuthRepository
+import com.example.sipinjam.data.repository.AuthRepositoryImpl
+import com.example.sipinjam.domain.repository.BarangRepository
+import com.example.sipinjam.data.repository.BarangRepositoryImpl
+import com.example.sipinjam.domain.repository.PeminjamanRepository
+import com.example.sipinjam.data.repository.PeminjamanRepositoryImpl
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -26,9 +29,9 @@ data class RiwayatPeminjamanUiItem(
 
 class RiwayatPeminjamanViewModel : ViewModel() {
 
-    private val repository = PeminjamanRepository()
-    private val barangRepository = BarangRepository()
-    private val authRepository = AuthRepository()
+    private val repository = PeminjamanRepositoryImpl()
+    private val barangRepository = BarangRepositoryImpl()
+    private val authRepository = AuthRepositoryImpl()
 
     private val _daftarPeminjaman = MutableStateFlow<List<RiwayatPeminjamanUiItem>>(emptyList())
     val daftarPeminjaman: StateFlow<List<RiwayatPeminjamanUiItem>> = _daftarPeminjaman.asStateFlow()

@@ -42,7 +42,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
-import com.example.sipinjam.data.model.Barang
+import com.example.sipinjam.domain.model.Barang
 import com.example.sipinjam.domain.model.Holiday
 import com.example.sipinjam.domain.model.HolidayStatus
 import com.example.sipinjam.ui.components.SiPinjamTopBar

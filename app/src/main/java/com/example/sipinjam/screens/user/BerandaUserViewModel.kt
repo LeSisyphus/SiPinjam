@@ -2,9 +2,12 @@ package com.example.sipinjam.screens.user
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.sipinjam.data.repository.AuthRepository
-import com.example.sipinjam.data.repository.BarangRepository
-import com.example.sipinjam.data.repository.PeminjamanRepository
+import com.example.sipinjam.domain.repository.AuthRepository
+import com.example.sipinjam.data.repository.AuthRepositoryImpl
+import com.example.sipinjam.domain.repository.BarangRepository
+import com.example.sipinjam.data.repository.BarangRepositoryImpl
+import com.example.sipinjam.domain.repository.PeminjamanRepository
+import com.example.sipinjam.data.repository.PeminjamanRepositoryImpl
 import com.example.sipinjam.domain.model.Holiday
 import com.example.sipinjam.domain.model.HolidayStatus
 import com.example.sipinjam.domain.usecase.holiday.GetTodayHolidayUseCase
@@ -37,9 +40,9 @@ class BerandaUserViewModel(
     private val getTodayHolidayUseCase: GetTodayHolidayUseCase? = null,
     private val observeMonthlyHolidaysUseCase: ObserveMonthlyHolidaysUseCase? = null,
     private val refreshMonthlyHolidaysUseCase: RefreshMonthlyHolidaysUseCase? = null,
-    private val barangRepository: BarangRepository = BarangRepository(),
-    private val peminjamanRepository: PeminjamanRepository = PeminjamanRepository(),
-    private val authRepository: AuthRepository = AuthRepository(),
+    private val barangRepository: BarangRepository = BarangRepositoryImpl(),
+    private val peminjamanRepository: PeminjamanRepository = PeminjamanRepositoryImpl(),
+    private val authRepository: AuthRepository = AuthRepositoryImpl(),
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(BerandaUiState())
