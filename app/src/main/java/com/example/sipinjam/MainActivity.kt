@@ -14,7 +14,8 @@ import androidx.compose.runtime.setValue
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.navigation.compose.rememberNavController
 import com.example.sipinjam.data.preferences.AppPreferences
-import com.example.sipinjam.data.repository.AuthRepository
+import com.example.sipinjam.domain.repository.AuthRepository
+import com.example.sipinjam.data.repository.AuthRepositoryImpl
 import com.example.sipinjam.navigation.NavGraph
 import com.example.sipinjam.ui.theme.SiPinjamLocale
 import com.example.sipinjam.ui.theme.SiPinjamTheme
