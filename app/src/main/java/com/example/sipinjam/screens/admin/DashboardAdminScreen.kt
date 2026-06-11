@@ -9,9 +9,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Book
 import androidx.compose.material.icons.filled.CheckCircle
-import androidx.compose.material.icons.filled.Dashboard
 import androidx.compose.material.icons.filled.Inventory
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.RequestPage
@@ -33,6 +31,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import com.example.sipinjam.ui.components.AdminBottomNavBar
+import com.example.sipinjam.ui.components.SiPinjamTopBar
 import com.example.sipinjam.ui.theme.*
 
 data class PermintaanItem(
@@ -75,26 +74,7 @@ fun DashboardAdminScreen(
             contentPadding = PaddingValues(bottom = 16.dp)
         ) {
             item {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 20.dp, vertical = 20.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Icon(
-                        imageVector = Icons.Filled.Book,
-                        contentDescription = null,
-                        tint = SiPinjamBlue,
-                        modifier = Modifier.size(26.dp)
-                    )
-                    Spacer(Modifier.width(8.dp))
-                    Text(
-                        text = stringResource(R.string.app_name),
-                        color = SiPinjamBlue,
-                        fontSize = 20.sp,
-                        fontWeight = FontWeight.Bold
-                    )
-                }
+                SiPinjamTopBar()
             }
 
             item {
@@ -114,17 +94,8 @@ fun DashboardAdminScreen(
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
                         Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                            Text(
-                                text = stringResource(R.string.screen_dashboard_requests),
-                                color = TextSecondary,
-                                fontSize = 14.sp
-                            )
-                            Text(
-                                text = uiState.jumlahPermintaanMasuk.toString(),
-                                color = TextPrimary,
-                                fontSize = 36.sp,
-                                fontWeight = FontWeight.ExtraBold
-                            )
+                            Text(text = stringResource(R.string.screen_dashboard_requests), color = TextSecondary, fontSize = 14.sp)
+                            Text(text = uiState.jumlahPermintaanMasuk.toString(), color = TextPrimary, fontSize = 36.sp, fontWeight = FontWeight.ExtraBold)
                         }
                         Box(
                             modifier = Modifier
@@ -133,12 +104,7 @@ fun DashboardAdminScreen(
                                 .background(InputBg),
                             contentAlignment = Alignment.Center
                         ) {
-                            Icon(
-                                imageVector = Icons.Filled.RequestPage,
-                                contentDescription = null,
-                                tint = SiPinjamBlue,
-                                modifier = Modifier.size(26.dp)
-                            )
+                            Icon(imageVector = Icons.Filled.RequestPage, contentDescription = null, tint = SiPinjamBlue, modifier = Modifier.size(26.dp))
                         }
                     }
                 }
@@ -182,12 +148,7 @@ fun DashboardAdminScreen(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text(
-                        text = stringResource(R.string.screen_dashboard_recent_requests),
-                        color = TextPrimary,
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.Bold
-                    )
+                    Text(text = stringResource(R.string.screen_dashboard_recent_requests), color = TextPrimary, fontSize = 16.sp, fontWeight = FontWeight.Bold)
                     Text(
                         text = stringResource(R.string.btn_lihat_semua),
                         color = SiPinjamBlue,
@@ -229,10 +190,7 @@ private fun StatusCard(
         colors = CardDefaults.cardColors(containerColor = CardWhite),
         elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
     ) {
-        Column(
-            modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(10.dp)
-        ) {
+        Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
             Box(
                 modifier = Modifier
                     .size(36.dp)
@@ -240,36 +198,16 @@ private fun StatusCard(
                     .background(iconBgColor),
                 contentAlignment = Alignment.Center
             ) {
-                Icon(
-                    imageVector = icon,
-                    contentDescription = null,
-                    tint = iconColor,
-                    modifier = Modifier.size(20.dp)
-                )
+                Icon(imageVector = icon, contentDescription = null, tint = iconColor, modifier = Modifier.size(20.dp))
             }
-            Text(
-                text = label,
-                color = TextSecondary,
-                fontSize = 11.sp,
-                fontWeight = FontWeight.SemiBold,
-                letterSpacing = 0.5.sp
-            )
-            Text(
-                text = jumlah.toString(),
-                color = TextPrimary,
-                fontSize = 28.sp,
-                fontWeight = FontWeight.ExtraBold
-            )
+            Text(text = label, color = TextSecondary, fontSize = 11.sp, fontWeight = FontWeight.SemiBold, letterSpacing = 0.5.sp)
+            Text(text = jumlah.toString(), color = TextPrimary, fontSize = 28.sp, fontWeight = FontWeight.ExtraBold)
         }
     }
 }
 
 @Composable
-private fun PermintaanCard(
-    item: PermintaanItem,
-    onTinjau: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
+private fun PermintaanCard(item: PermintaanItem, onTinjau: () -> Unit, modifier: Modifier = Modifier) {
     Row(
         modifier = modifier
             .fillMaxWidth()
@@ -287,33 +225,16 @@ private fun PermintaanCard(
             contentAlignment = Alignment.Center
         ) {
             if (item.fotoUserUrl.isNotBlank()) {
-                AsyncImage(
-                    model = item.fotoUserUrl,
-                    contentDescription = "Foto profil peminjam",
-                    modifier = Modifier.fillMaxSize(),
-                    contentScale = ContentScale.Crop
-                )
+                AsyncImage(model = item.fotoUserUrl, contentDescription = "Foto profil peminjam", modifier = Modifier.fillMaxSize(), contentScale = ContentScale.Crop)
             } else {
-                Icon(
-                    imageVector = Icons.Filled.Person,
-                    contentDescription = null,
-                    tint = TextSecondary,
-                    modifier = Modifier.size(22.dp)
-                )
+                Icon(imageVector = Icons.Filled.Person, contentDescription = null, tint = TextSecondary, modifier = Modifier.size(22.dp))
             }
         }
-
         Column(modifier = Modifier.weight(1f)) {
-            Text(
-                text = item.nama,
-                color = TextPrimary,
-                fontSize = 14.sp,
-                fontWeight = FontWeight.SemiBold
-            )
+            Text(text = item.nama, color = TextPrimary, fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
             Text(text = item.namaBarang, color = TextSecondary, fontSize = 12.sp)
             Text(text = item.waktu, color = TextSecondary, fontSize = 11.sp)
         }
-
         Box(
             modifier = Modifier
                 .clip(RoundedCornerShape(8.dp))
@@ -321,12 +242,7 @@ private fun PermintaanCard(
                 .clickable { onTinjau() }
                 .padding(horizontal = 14.dp, vertical = 7.dp)
         ) {
-            Text(
-                text = stringResource(R.string.btn_tinjau),
-                color = Color.White,
-                fontSize = 12.sp,
-                fontWeight = FontWeight.SemiBold
-            )
+            Text(text = stringResource(R.string.btn_tinjau), color = Color.White, fontSize = 12.sp, fontWeight = FontWeight.SemiBold)
         }
     }
 }

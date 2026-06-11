@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -22,7 +21,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.AlertDialog
@@ -32,13 +30,11 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -63,6 +59,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
+import com.example.sipinjam.ui.components.SiPinjamTopBar
 import com.example.sipinjam.ui.theme.BackgroundGray
 import com.example.sipinjam.ui.theme.CardWhite
 import com.example.sipinjam.ui.theme.DarkImageBg
@@ -154,7 +151,6 @@ fun PengembalianScreen(
                 Button(
                     onClick = {
                         showDialog = false
-
                         fotoUri?.let { uri ->
                             viewModel.kirimPengembalian(
                                 context = context,
@@ -185,35 +181,14 @@ fun PengembalianScreen(
     Scaffold(
         containerColor = BackgroundGray,
         topBar = {
-            Surface(
-                color = CardWhite,
-                shadowElevation = 2.dp
-            ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 8.dp, vertical = 12.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    IconButton(onClick = onBackClick) {
-                        Icon(
-                            imageVector = Icons.Filled.ArrowBack,
-                            contentDescription = "Kembali",
-                            tint = TextPrimary
-                        )
-                    }
-
-                    Text(
-                        text = stringResource(R.string.screen_return_item),
-                        color = TextPrimary,
-                        fontSize = 17.sp,
-                        fontWeight = FontWeight.SemiBold
-                    )
-                }
-            }
+            SiPinjamTopBar(
+                title = stringResource(R.string.screen_return_item),
+                showBackButton = true,
+                onBackClick = onBackClick
+            )
         },
         bottomBar = {
-            Surface(
+            androidx.compose.material3.Surface(
                 modifier = Modifier.fillMaxWidth(),
                 color = CardWhite,
                 shadowElevation = 8.dp
@@ -307,7 +282,6 @@ fun PengembalianScreen(
                                     fontWeight = FontWeight.SemiBold,
                                     letterSpacing = 0.5.sp
                                 )
-
                                 Text(
                                     text = tanggalPinjam,
                                     color = TextPrimary,
@@ -324,7 +298,6 @@ fun PengembalianScreen(
                                     fontWeight = FontWeight.SemiBold,
                                     letterSpacing = 0.5.sp
                                 )
-
                                 Text(
                                     text = tanggalJatuhTempo,
                                     color = TextPrimary,
@@ -477,7 +450,6 @@ fun PengembalianScreen(
                     tint = StatusOrange,
                     modifier = Modifier.size(18.dp)
                 )
-
                 Text(
                     text = stringResource(R.string.msg_return_photo_reminder),
                     color = StatusOrange,
@@ -519,7 +491,6 @@ private fun BarangImage(
                     strokeWidth = 2.dp
                 )
             }
-
             imageUrl.isNotBlank() -> {
                 AsyncImage(
                     model = imageUrl,
@@ -528,7 +499,6 @@ private fun BarangImage(
                     contentScale = ContentScale.Crop
                 )
             }
-
             else -> {
                 Icon(
                     imageVector = Icons.Filled.Image,
