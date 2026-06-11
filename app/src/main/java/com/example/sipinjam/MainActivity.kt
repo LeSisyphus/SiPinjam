@@ -11,6 +11,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.navigation.compose.rememberNavController
 import com.example.sipinjam.data.preferences.AppPreferences
 import com.example.sipinjam.data.repository.AuthRepository
@@ -20,11 +21,16 @@ import com.example.sipinjam.ui.theme.SiPinjamTheme
 
 class MainActivity : ComponentActivity() {
 
+    private var isSplashReady = false
+
     private val authRepository: AuthRepository by lazy {
         (application as SiPinjamApplication).appContainer.authRepository
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        val splashScreen = installSplashScreen()
+        splashScreen.setKeepOnScreenCondition { !isSplashReady }
+
         super.onCreate(savedInstanceState)
 
         AppPreferences.load(this)
@@ -36,22 +42,17 @@ class MainActivity : ComponentActivity() {
             CompositionLocalProvider(
                 LocalActivityResultRegistryOwner provides activityResultRegistryOwner
             ) {
-                SiPinjamTheme(
-                    darkTheme = AppPreferences.isDarkMode
-                ) {
-                    SiPinjamLocale(
-                        languageCode = AppPreferences.languageCode
-                    ) {
+                SiPinjamTheme(darkTheme = AppPreferences.isDarkMode) {
+                    SiPinjamLocale(languageCode = AppPreferences.languageCode) {
                         val navController = rememberNavController()
 
                         var isLoggedIn by rememberSaveable { mutableStateOf(false) }
                         var isAdmin by rememberSaveable { mutableStateOf(false) }
-                        var isReady by rememberSaveable { mutableStateOf(false) }
+                        var isNavReady by rememberSaveable { mutableStateOf(false) }
 
                         LaunchedEffect(Unit) {
                             if (authRepository.isLoggedIn()) {
                                 val user = authRepository.getCurrentUser()
-
                                 isLoggedIn = user != null
                                 isAdmin = user?.role == "admin"
                             } else {
@@ -59,10 +60,11 @@ class MainActivity : ComponentActivity() {
                                 isAdmin = false
                             }
 
-                            isReady = true
+                            isNavReady = true
+                            isSplashReady = true
                         }
 
-                        if (isReady) {
+                        if (isNavReady) {
                             NavGraph(
                                 navController = navController,
                                 isLoggedIn = isLoggedIn,
