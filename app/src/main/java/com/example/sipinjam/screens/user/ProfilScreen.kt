@@ -32,9 +32,9 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import com.example.sipinjam.ui.components.AdminBottomNavBar
+import com.example.sipinjam.ui.components.SiPinjamTopBar
 import com.example.sipinjam.ui.components.UserBottomNavBar
 import com.example.sipinjam.ui.theme.*
-
 
 @Composable
 fun ProfilScreen(
@@ -57,7 +57,6 @@ fun ProfilScreen(
         uri?.let { viewModel.onFotoSelected(it) }
     }
 
-    // Snackbar sukses simpan profil
     if (uiState.successMessage != null) {
         LaunchedEffect(uiState.successMessage) {
             viewModel.onDismissSuccess()
@@ -73,7 +72,7 @@ fun ProfilScreen(
                     onDashboardClick  = onDashboardClick,
                     onBarangClick     = onBarangClick,
                     onPermintaanClick = onPermintaanClick,
-                    onProfilClick     = { }
+                    onProfilClick     = {}
                 )
             } else {
                 UserBottomNavBar(
@@ -92,36 +91,13 @@ fun ProfilScreen(
                 .padding(innerPadding)
                 .verticalScroll(rememberScrollState())
         ) {
+            SiPinjamTopBar()
 
-            // Header SiPinjam
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 20.dp, vertical = 20.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Icon(
-                    imageVector = Icons.Filled.Book,
-                    contentDescription = null,
-                    tint = SiPinjamBlue,
-                    modifier = Modifier.size(26.dp)
-                )
-                Spacer(Modifier.width(8.dp))
-                Text(
-                    text = stringResource(R.string.app_name),
-                    color = SiPinjamBlue,
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.Bold
-                )
-            }
-
-            // Avatar + info user
             Column(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Box(contentAlignment = Alignment.BottomEnd) {
-                    // Avatar
                     Box(
                         modifier = Modifier
                             .size(88.dp)
@@ -153,7 +129,6 @@ fun ProfilScreen(
                         }
                     }
 
-                    // Tombol kamera
                     Box(
                         modifier = Modifier
                             .size(28.dp)
@@ -205,7 +180,6 @@ fun ProfilScreen(
 
             Spacer(Modifier.height(28.dp))
 
-            // Informasi Personal
             SectionLabel(stringResource(R.string.label_informasi_personal))
 
             Spacer(Modifier.height(10.dp))
@@ -274,7 +248,6 @@ fun ProfilScreen(
 
             Spacer(Modifier.height(24.dp))
 
-            // Keamanan
             SectionLabel("Keamanan")
 
             Spacer(Modifier.height(10.dp))
@@ -327,7 +300,6 @@ fun ProfilScreen(
 
             Spacer(Modifier.height(24.dp))
 
-            // Preferensi
             SectionLabel(stringResource(R.string.label_preferensi))
 
             Spacer(Modifier.height(10.dp))
@@ -341,7 +313,6 @@ fun ProfilScreen(
                 elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
             ) {
                 Column {
-                    // Dark Mode
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -384,7 +355,6 @@ fun ProfilScreen(
 
                     HorizontalDivider(color = DividerColor)
 
-                    // Bahasa
                     Column(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -451,7 +421,6 @@ fun ProfilScreen(
 
             Spacer(Modifier.height(24.dp))
 
-            // Tombol Keluar
             OutlinedButton(
                 onClick = { viewModel.onLogout(onDone = onLogoutDone) },
                 modifier = Modifier

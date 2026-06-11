@@ -21,7 +21,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Image
@@ -32,8 +31,6 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
@@ -56,6 +53,7 @@ import coil.compose.AsyncImage
 import com.example.sipinjam.data.model.Barang
 import com.example.sipinjam.data.model.Peminjaman
 import com.example.sipinjam.data.model.User
+import com.example.sipinjam.ui.components.SiPinjamTopBar
 import com.example.sipinjam.ui.theme.BackgroundGray
 import com.example.sipinjam.ui.theme.CardWhite
 import com.example.sipinjam.ui.theme.DarkImageBg
@@ -94,8 +92,9 @@ fun DetailPengajuanScreen(
     Scaffold(
         containerColor = BackgroundGray,
         topBar = {
-            DetailPengajuanTopBar(
+            SiPinjamTopBar(
                 title = stringResource(R.string.screen_approval_detail),
+                showBackButton = true,
                 onBackClick = onBackClick
             )
         },
@@ -154,40 +153,6 @@ fun DetailPengajuanScreen(
 }
 
 @Composable
-private fun DetailPengajuanTopBar(
-    title: String,
-    onBackClick: () -> Unit
-) {
-    Surface(
-        color = CardWhite,
-        shadowElevation = 1.dp
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(64.dp)
-                .padding(horizontal = 10.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            IconButton(onClick = onBackClick) {
-                Icon(
-                    imageVector = Icons.Filled.ArrowBack,
-                    contentDescription = "Kembali",
-                    tint = SiPinjamBlue
-                )
-            }
-
-            Text(
-                text = title,
-                color = SiPinjamBlue,
-                fontSize = 17.sp,
-                fontWeight = FontWeight.Bold
-            )
-        }
-    }
-}
-
-@Composable
 private fun DetailPengajuanContent(
     peminjaman: Peminjaman,
     barang: Barang?,
@@ -200,26 +165,14 @@ private fun DetailPengajuanContent(
             .padding(horizontal = 22.dp, vertical = 26.dp),
         verticalArrangement = Arrangement.spacedBy(24.dp)
     ) {
-        Column(
-            verticalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
+        Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
             SectionTitle(title = "Informasi Barang")
-
-            InformasiBarangCard(
-                peminjaman = peminjaman,
-                barang = barang
-            )
+            InformasiBarangCard(peminjaman = peminjaman, barang = barang)
         }
 
-        Column(
-            verticalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
+        Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
             SectionTitle(title = "Detail Peminjaman")
-
-            DetailPeminjamanCard(
-                peminjaman = peminjaman,
-                peminjam = peminjam
-            )
+            DetailPeminjamanCard(peminjaman = peminjaman, peminjam = peminjam)
         }
 
         Spacer(modifier = Modifier.height(90.dp))
@@ -237,10 +190,7 @@ private fun SectionTitle(title: String) {
 }
 
 @Composable
-private fun InformasiBarangCard(
-    peminjaman: Peminjaman,
-    barang: Barang?
-) {
+private fun InformasiBarangCard(peminjaman: Peminjaman, barang: Barang?) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(12.dp),
@@ -251,9 +201,7 @@ private fun InformasiBarangCard(
             modifier = Modifier.padding(20.dp),
             verticalArrangement = Arrangement.spacedBy(20.dp)
         ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically
-            ) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
                 Box(
                     modifier = Modifier
                         .size(80.dp)
@@ -280,16 +228,11 @@ private fun InformasiBarangCard(
 
                 Spacer(modifier = Modifier.width(16.dp))
 
-                Column(
-                    modifier = Modifier.weight(1f)
-                ) {
+                Column(modifier = Modifier.weight(1f)) {
                     KategoriChip(
-                        kategori = barang?.kategori?.ifBlank { "-" }
-                            ?: "-"
+                        kategori = barang?.kategori?.ifBlank { "-" } ?: "-"
                     )
-
                     Spacer(modifier = Modifier.height(6.dp))
-
                     Text(
                         text = peminjaman.namaBarang.ifBlank { barang?.nama ?: "-" },
                         color = TextPrimary,
@@ -299,9 +242,7 @@ private fun InformasiBarangCard(
                         maxLines = 2,
                         overflow = TextOverflow.Ellipsis
                     )
-
                     Spacer(modifier = Modifier.height(6.dp))
-
                     Text(
                         text = "Qty dipinjam: 1 unit",
                         color = TextSecondary,
@@ -343,10 +284,7 @@ private fun KategoriChip(kategori: String) {
 }
 
 @Composable
-private fun DetailPeminjamanCard(
-    peminjaman: Peminjaman,
-    peminjam: User?
-) {
+private fun DetailPeminjamanCard(peminjaman: Peminjaman, peminjam: User?) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(12.dp),
@@ -359,36 +297,26 @@ private fun DetailPeminjamanCard(
         ) {
             DetailInfoRow(
                 label = "Peminjam",
-                value = peminjam?.nama?.ifBlank { peminjaman.namaUser }
-                    ?: peminjaman.namaUser.ifBlank { "-" },
+                value = peminjam?.nama?.ifBlank { peminjaman.namaUser } ?: peminjaman.namaUser.ifBlank { "-" },
                 valueColor = TextPrimary
             )
-
             DetailInfoRow(
                 label = stringResource(R.string.label_tanggal_pinjam),
                 value = peminjaman.tanggalPinjam.ifBlank { "-" },
                 valueColor = TextPrimary
             )
-
             DetailInfoRow(
                 label = stringResource(R.string.label_tanggal_kembali),
                 value = peminjaman.tanggalKembali.ifBlank { "-" },
                 valueColor = TextPrimary
             )
-
             DetailInfoRow(
                 label = "Durasi",
-                value = hitungDurasiHari(
-                    tanggalPinjam = peminjaman.tanggalPinjam,
-                    tanggalKembali = peminjaman.tanggalKembali
-                ),
+                value = hitungDurasiHari(peminjaman.tanggalPinjam, peminjaman.tanggalKembali),
                 valueColor = SiPinjamBlue
             )
 
-            HorizontalDivider(
-                color = DividerColor,
-                thickness = 1.dp
-            )
+            HorizontalDivider(color = DividerColor, thickness = 1.dp)
 
             Text(
                 text = stringResource(R.string.label_alasan_peminjaman),
@@ -396,7 +324,6 @@ private fun DetailPeminjamanCard(
                 fontSize = 15.sp,
                 fontWeight = FontWeight.Medium
             )
-
             Text(
                 text = peminjaman.keperluan.ifBlank { "-" },
                 color = TextSecondary,
@@ -408,11 +335,7 @@ private fun DetailPeminjamanCard(
 }
 
 @Composable
-private fun DetailInfoRow(
-    label: String,
-    value: String,
-    valueColor: Color
-) {
+private fun DetailInfoRow(label: String, value: String, valueColor: Color) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.Top
@@ -423,7 +346,6 @@ private fun DetailInfoRow(
             fontSize = 16.sp,
             modifier = Modifier.weight(1f)
         )
-
         Text(
             text = value,
             color = valueColor,
@@ -494,9 +416,7 @@ private fun DetailPengajuanBottomAction(
                         contentDescription = null,
                         modifier = Modifier.size(18.dp)
                     )
-
                     Spacer(modifier = Modifier.width(6.dp))
-
                     Text(
                         text = stringResource(R.string.btn_tolak),
                         fontSize = 15.sp,
@@ -529,9 +449,7 @@ private fun DetailPengajuanBottomAction(
                             tint = Color.White,
                             modifier = Modifier.size(18.dp)
                         )
-
                         Spacer(modifier = Modifier.width(6.dp))
-
                         Text(
                             text = stringResource(R.string.btn_setujui),
                             color = Color.White,
@@ -545,25 +463,15 @@ private fun DetailPengajuanBottomAction(
     }
 }
 
-private fun hitungDurasiHari(
-    tanggalPinjam: String,
-    tanggalKembali: String
-): String {
+private fun hitungDurasiHari(tanggalPinjam: String, tanggalKembali: String): String {
     return try {
         val formatter = SimpleDateFormat("d MMMM yyyy", Locale("id", "ID"))
         val mulai = formatter.parse(tanggalPinjam)
         val selesai = formatter.parse(tanggalKembali)
-
         if (mulai == null || selesai == null) return "-"
-
         val diffMillis = selesai.time - mulai.time
         val hari = TimeUnit.MILLISECONDS.toDays(diffMillis).toInt()
-
-        if (hari <= 0) {
-            "-"
-        } else {
-            "$hari Hari"
-        }
+        if (hari <= 0) "-" else "$hari Hari"
     } catch (e: Exception) {
         "-"
     }

@@ -8,7 +8,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Book
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.*
@@ -25,6 +24,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.sipinjam.ui.components.SiPinjamTopBar
 import com.example.sipinjam.ui.theme.*
 import androidx.compose.ui.layout.ContentScale
 import coil.compose.AsyncImage
@@ -65,37 +65,15 @@ fun DetailBarangScreen(
     Scaffold(
         containerColor = BackgroundGray,
         topBar = {
-            Surface(
-                color = CardWhite,
-                shadowElevation = 2.dp
-            ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 8.dp, vertical = 12.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    IconButton(onClick = onBackClick) {
-                        Icon(
-                            imageVector = Icons.Filled.ArrowBack,
-                            contentDescription = "Kembali",
-                            tint = TextPrimary
-                        )
-                    }
-                    Text(
-                        text = stringResource(R.string.screen_item_detail),
-                        color = TextPrimary,
-                        fontSize = 17.sp,
-                        fontWeight = FontWeight.SemiBold,
-                        modifier = Modifier.weight(1f)
-                    )
-                }
-            }
+            SiPinjamTopBar(
+                title = stringResource(R.string.screen_item_detail),
+                showBackButton = true,
+                onBackClick = onBackClick
+            )
         },
         bottomBar = {
             uiState.barang?.let { barang ->
                 val statusBarangRoute = if (barang.tersedia) "Tersedia" else "Tidak Tersedia"
-
                 Surface(
                     modifier = Modifier.fillMaxWidth(),
                     color = CardWhite,

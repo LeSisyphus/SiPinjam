@@ -10,11 +10,9 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -25,7 +23,6 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items as gridItems
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Book
 import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Tune
@@ -33,7 +30,6 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
-import androidx.compose.material3.NavigationBarDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -54,6 +50,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import com.example.sipinjam.data.model.Barang
+import com.example.sipinjam.ui.components.SiPinjamTopBar
 import com.example.sipinjam.ui.components.UserBottomNavBar
 import com.example.sipinjam.ui.theme.BackgroundGray
 import com.example.sipinjam.ui.theme.CardWhite
@@ -65,8 +62,6 @@ import com.example.sipinjam.ui.theme.TextPrimary
 import com.example.sipinjam.ui.theme.TextSecondary
 import com.example.sipinjam.ui.theme.ToggleBg
 import com.example.sipinjam.ui.theme.StatusRedBg
-import com.example.sipinjam.ui.theme.StatusBlue
-import com.example.sipinjam.ui.theme.StatusBlueBg
 
 @Composable
 fun KatalogScreen(
@@ -86,6 +81,9 @@ fun KatalogScreen(
 
     Scaffold(
         containerColor = BackgroundGray,
+        topBar = {
+            SiPinjamTopBar()
+        },
         bottomBar = {
             UserBottomNavBar(
                 selected = 1,
@@ -102,8 +100,6 @@ fun KatalogScreen(
                 .background(BackgroundGray)
                 .padding(innerPadding)
         ) {
-            KatalogHeader()
-
             Spacer(modifier = Modifier.height(24.dp))
 
             SearchAndFilterSection(
@@ -174,34 +170,6 @@ fun KatalogScreen(
                 }
             }
         }
-    }
-}
-
-@Composable
-private fun KatalogHeader() {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(72.dp)
-            .background(StatusBlueBg)
-            .padding(horizontal = 32.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Icon(
-            imageVector = Icons.Filled.Book,
-            contentDescription = null,
-            tint = SiPinjamBlue,
-            modifier = Modifier.size(23.dp)
-        )
-
-        Spacer(modifier = Modifier.width(18.dp))
-
-        Text(
-            text = stringResource(R.string.app_name),
-            color = SiPinjamBlue,
-            fontSize = 20.sp,
-            fontWeight = FontWeight.Bold
-        )
     }
 }
 
@@ -331,9 +299,7 @@ private fun KatalogBarangCard(
         colors = CardDefaults.cardColors(containerColor = CardWhite),
         elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
     ) {
-        Column(
-            modifier = Modifier.fillMaxSize()
-        ) {
+        Column(modifier = Modifier.fillMaxSize()) {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()

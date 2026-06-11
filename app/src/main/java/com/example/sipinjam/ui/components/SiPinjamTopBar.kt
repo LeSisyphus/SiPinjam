@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
@@ -19,9 +20,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.sipinjam.ui.theme.CardWhite
 import com.example.sipinjam.ui.theme.SiPinjamBlue
 import com.example.sipinjam.ui.theme.TextPrimary
+import androidx.compose.material3.MaterialTheme
 
 @Composable
 fun SiPinjamTopBar(
@@ -30,12 +31,13 @@ fun SiPinjamTopBar(
     onBackClick: () -> Unit = {},
 ) {
     Surface(
-        color = CardWhite,
-        shadowElevation = 2.dp
+        color = MaterialTheme.colorScheme.background,
+        shadowElevation = 0.dp
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
+                .statusBarsPadding()
                 .padding(
                     start = if (showBackButton) 8.dp else 20.dp,
                     end = 20.dp,

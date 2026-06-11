@@ -17,7 +17,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.Image
@@ -25,11 +24,9 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.ScrollableTabRow
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -51,21 +48,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
+import com.example.sipinjam.ui.components.SiPinjamTopBar
 import com.example.sipinjam.ui.components.StatusChip
 import com.example.sipinjam.ui.components.UserBottomNavBar
 import com.example.sipinjam.ui.theme.BackgroundGray
 import com.example.sipinjam.ui.theme.CardWhite
 import com.example.sipinjam.ui.theme.DarkImageBg
-import com.example.sipinjam.ui.theme.InputBg
 import com.example.sipinjam.ui.theme.SiPinjamBlue
-import com.example.sipinjam.ui.theme.StatusBlue
-import com.example.sipinjam.ui.theme.StatusBlueBg
-import com.example.sipinjam.ui.theme.StatusGreen
-import com.example.sipinjam.ui.theme.StatusGreenBg
-import com.example.sipinjam.ui.theme.StatusOrange
-import com.example.sipinjam.ui.theme.StatusOrangeBg
-import com.example.sipinjam.ui.theme.StatusRed
-import com.example.sipinjam.ui.theme.StatusRedLightBg
 import com.example.sipinjam.ui.theme.TextPrimary
 import com.example.sipinjam.ui.theme.TextSecondary
 
@@ -91,7 +80,15 @@ fun RiwayatPeminjamanScreen(
     val errorMessage by viewModel.errorMessage.collectAsState()
 
     var filterAktif by remember { mutableStateOf("Semua") }
-    val filterList = listOf("Semua", BorrowingStatus.DIPROSES, BorrowingStatus.DISETUJUI_LEGACY, BorrowingStatus.DIPINJAM, BorrowingStatus.MENUNGGU_VERIFIKASI, BorrowingStatus.DITOLAK, BorrowingStatus.SELESAI)
+    val filterList = listOf(
+        "Semua",
+        BorrowingStatus.DIPROSES,
+        BorrowingStatus.DISETUJUI_LEGACY,
+        BorrowingStatus.DIPINJAM,
+        BorrowingStatus.MENUNGGU_VERIFIKASI,
+        BorrowingStatus.DITOLAK,
+        BorrowingStatus.SELESAI
+    )
 
     val filtered = if (filterAktif == "Semua") {
         daftarPeminjaman
@@ -106,26 +103,9 @@ fun RiwayatPeminjamanScreen(
     Scaffold(
         containerColor = BackgroundGray,
         topBar = {
-            Surface(
-                color = CardWhite,
-                shadowElevation = 2.dp
-            ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(start = 15.dp, end = 15.dp, top = 30.dp, bottom = 10.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-
-
-                    Text(
-                        text = stringResource(R.string.screen_history),
-                        color = TextPrimary,
-                        fontSize = 17.sp,
-                        fontWeight = FontWeight.SemiBold
-                    )
-                }
-            }
+            SiPinjamTopBar(
+                title = stringResource(R.string.screen_history)
+            )
         },
         bottomBar = {
             UserBottomNavBar(
@@ -168,19 +148,12 @@ fun RiwayatPeminjamanScreen(
 
             when {
                 isLoading -> {
-                    Box(
-                        modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center
-                    ) {
+                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                         CircularProgressIndicator(color = SiPinjamBlue)
                     }
                 }
-
                 filtered.isEmpty() -> {
-                    Box(
-                        modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center
-                    ) {
+                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                         Text(
                             text = errorMessage ?: "Belum ada riwayat peminjaman",
                             color = TextSecondary,
@@ -188,7 +161,6 @@ fun RiwayatPeminjamanScreen(
                         )
                     }
                 }
-
                 else -> {
                     LazyColumn(
                         modifier = Modifier.fillMaxSize(),
@@ -198,9 +170,7 @@ fun RiwayatPeminjamanScreen(
                         items(filtered, key = { it.id }) { item ->
                             RiwayatCard(
                                 item = item,
-                                onClick = if (
-                                    BorrowingStatus.canRequestReturn(item.status)
-                                ) {
+                                onClick = if (BorrowingStatus.canRequestReturn(item.status)) {
                                     {
                                         onPengembalianClick(
                                             item.id,
@@ -211,9 +181,7 @@ fun RiwayatPeminjamanScreen(
                                             item.tanggalKembali
                                         )
                                     }
-                                } else {
-                                    null
-                                }
+                                } else null
                             )
                         }
                     }
@@ -280,7 +248,6 @@ fun RiwayatCard(
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
-
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(4.dp)
@@ -291,7 +258,6 @@ fun RiwayatCard(
                         tint = TextSecondary,
                         modifier = Modifier.size(12.dp)
                     )
-
                     Text(
                         text = "${item.tanggalPinjam} - ${item.tanggalKembali}",
                         color = TextSecondary,
@@ -300,7 +266,6 @@ fun RiwayatCard(
                         overflow = TextOverflow.Ellipsis
                     )
                 }
-
                 StatusChip(status = item.status)
             }
 

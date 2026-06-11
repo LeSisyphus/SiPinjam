@@ -45,6 +45,7 @@ import coil.compose.AsyncImage
 import com.example.sipinjam.data.model.Barang
 import com.example.sipinjam.domain.model.Holiday
 import com.example.sipinjam.domain.model.HolidayStatus
+import com.example.sipinjam.ui.components.SiPinjamTopBar
 import com.example.sipinjam.ui.components.UserBottomNavBar
 import com.example.sipinjam.ui.theme.BackgroundGray
 import com.example.sipinjam.ui.theme.CardWhite
@@ -116,18 +117,14 @@ fun BerandaUserScreen(
             contentPadding = PaddingValues(bottom = 16.dp)
         ) {
             item {
-                HeaderSection()
+                SiPinjamTopBar()
             }
 
             item {
-                SearchSection(
-                    onSearchSubmit = onSearchBarang
-                )
+                SearchSection(onSearchSubmit = onSearchBarang)
             }
 
-            item {
-                Spacer(Modifier.height(16.dp))
-            }
+            item { Spacer(Modifier.height(16.dp)) }
 
             item {
                 HolidayInfoCard(
@@ -140,9 +137,7 @@ fun BerandaUserScreen(
                 )
             }
 
-            item {
-                Spacer(Modifier.height(24.dp))
-            }
+            item { Spacer(Modifier.height(24.dp)) }
 
             item {
                 SectionHeader(
@@ -152,9 +147,7 @@ fun BerandaUserScreen(
                 )
             }
 
-            item {
-                Spacer(Modifier.height(12.dp))
-            }
+            item { Spacer(Modifier.height(12.dp)) }
 
             item {
                 when {
@@ -171,14 +164,12 @@ fun BerandaUserScreen(
                             )
                         }
                     }
-
                     uiState.barangTersedia.isEmpty() -> {
                         EmptyStateCard(
                             text = "Belum ada barang tersedia.",
                             modifier = Modifier.padding(horizontal = 20.dp)
                         )
                     }
-
                     else -> {
                         LazyRow(
                             contentPadding = PaddingValues(horizontal = 20.dp),
@@ -206,9 +197,7 @@ fun BerandaUserScreen(
                 }
             }
 
-            item {
-                Spacer(Modifier.height(28.dp))
-            }
+            item { Spacer(Modifier.height(28.dp)) }
 
             item {
                 Text(
@@ -220,9 +209,7 @@ fun BerandaUserScreen(
                 )
             }
 
-            item {
-                Spacer(Modifier.height(12.dp))
-            }
+            item { Spacer(Modifier.height(12.dp)) }
 
             if (uiState.itemDikembalikan.isEmpty()) {
                 item {
@@ -267,35 +254,7 @@ fun BerandaUserScreen(
 }
 
 @Composable
-private fun HeaderSection() {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 20.dp, vertical = 20.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Icon(
-            imageVector = Icons.Filled.Book,
-            contentDescription = null,
-            tint = SiPinjamBlue,
-            modifier = Modifier.size(26.dp)
-        )
-
-        Spacer(Modifier.width(8.dp))
-
-        Text(
-            text = "SiPinjam",
-            color = SiPinjamBlue,
-            fontSize = 20.sp,
-            fontWeight = FontWeight.Bold
-        )
-    }
-}
-
-@Composable
-private fun SearchSection(
-    onSearchSubmit: (String) -> Unit = {},
-) {
+private fun SearchSection(onSearchSubmit: (String) -> Unit = {}) {
     var query by rememberSaveable { mutableStateOf("") }
     val focusManager = LocalFocusManager.current
 
@@ -319,9 +278,7 @@ private fun SearchSection(
             color = TextPrimary
         ),
         keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
-        keyboardActions = KeyboardActions(
-            onSearch = { submitSearch() }
-        ),
+        keyboardActions = KeyboardActions(onSearch = { submitSearch() }),
         decorationBox = { innerTextField ->
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(
@@ -387,7 +344,6 @@ private fun HolidayInfoCard(
                         fontSize = 11.sp
                     )
                 }
-
                 Text(
                     text = "REFRESH",
                     color = SiPinjamBlue,
@@ -415,39 +371,23 @@ private fun HolidayInfoCard(
                         )
                     }
                 }
-
                 errorMessage != null && todayStatus == null && monthlyHolidays.isEmpty() -> {
-                    Text(
-                        text = errorMessage,
-                        color = Color(0xFFD32F2F),
-                        fontSize = 13.sp
-                    )
+                    Text(text = errorMessage, color = Color(0xFFD32F2F), fontSize = 13.sp)
                 }
-
                 else -> {
                     val todayText = if (todayStatus?.isHoliday == true) {
                         "Hari ini libur: ${todayStatus.displayName}"
                     } else {
                         "Hari ini bukan hari libur nasional/cuti bersama."
                     }
-
-                    Text(
-                        text = todayText,
-                        color = TextPrimary,
-                        fontSize = 13.sp,
-                        fontWeight = FontWeight.Medium
-                    )
-
+                    Text(text = todayText, color = TextPrimary, fontSize = 13.sp, fontWeight = FontWeight.Medium)
                     Spacer(Modifier.height(6.dp))
-
                     Text(
-                        text = nearestHoliday?.let { holiday ->
-                            "Libur terdekat bulan ini: ${holiday.date} • ${holiday.name}"
-                        } ?: "Belum ada data libur pada bulan ini.",
+                        text = nearestHoliday?.let { "Libur terdekat bulan ini: ${it.date} • ${it.name}" }
+                            ?: "Belum ada data libur pada bulan ini.",
                         color = TextSecondary,
                         fontSize = 12.sp
                     )
-
                     if (errorMessage != null) {
                         Spacer(Modifier.height(6.dp))
                         Text(
@@ -463,11 +403,7 @@ private fun HolidayInfoCard(
 }
 
 @Composable
-private fun SectionHeader(
-    title: String,
-    actionText: String,
-    onActionClick: () -> Unit,
-) {
+private fun SectionHeader(title: String, actionText: String, onActionClick: () -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -475,13 +411,7 @@ private fun SectionHeader(
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(
-            text = title,
-            color = TextPrimary,
-            fontSize = 16.sp,
-            fontWeight = FontWeight.Bold
-        )
-
+        Text(text = title, color = TextPrimary, fontSize = 16.sp, fontWeight = FontWeight.Bold)
         Text(
             text = actionText,
             color = SiPinjamBlue,
@@ -494,10 +424,7 @@ private fun SectionHeader(
 }
 
 @Composable
-private fun BarangCard(
-    barang: BarangTersedia,
-    onClick: () -> Unit,
-) {
+private fun BarangCard(barang: BarangTersedia, onClick: () -> Unit) {
     Card(
         modifier = Modifier
             .width(180.dp)
@@ -530,7 +457,6 @@ private fun BarangCard(
                     )
                 }
             }
-
             Column(modifier = Modifier.padding(12.dp)) {
                 Box(
                     modifier = Modifier
@@ -546,34 +472,16 @@ private fun BarangCard(
                         letterSpacing = 0.3.sp
                     )
                 }
-
                 Spacer(Modifier.height(6.dp))
-
-                Text(
-                    text = barang.nama,
-                    color = TextPrimary,
-                    fontSize = 13.sp,
-                    fontWeight = FontWeight.SemiBold,
-                    maxLines = 1
-                )
-
-                Text(
-                    text = barang.kategori,
-                    color = TextSecondary,
-                    fontSize = 11.sp,
-                    maxLines = 1
-                )
+                Text(text = barang.nama, color = TextPrimary, fontSize = 13.sp, fontWeight = FontWeight.SemiBold, maxLines = 1)
+                Text(text = barang.kategori, color = TextSecondary, fontSize = 11.sp, maxLines = 1)
             }
         }
     }
 }
 
 @Composable
-private fun KembalikanCard(
-    item: ItemDikembalikan,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
+private fun KembalikanCard(item: ItemDikembalikan, onClick: () -> Unit, modifier: Modifier = Modifier) {
     Row(
         modifier = modifier
             .fillMaxWidth()
@@ -597,34 +505,14 @@ private fun KembalikanCard(
                     contentScale = ContentScale.Crop
                 )
             } else {
-                Icon(
-                    imageVector = item.icon,
-                    contentDescription = null,
-                    tint = SiPinjamBlue,
-                    modifier = Modifier.size(22.dp)
-                )
+                Icon(imageVector = item.icon, contentDescription = null, tint = SiPinjamBlue, modifier = Modifier.size(22.dp))
             }
         }
-
         Spacer(Modifier.width(12.dp))
-
         Column(modifier = Modifier.weight(1f)) {
-            Text(
-                text = item.nama,
-                color = TextPrimary,
-                fontSize = 14.sp,
-                fontWeight = FontWeight.SemiBold,
-                maxLines = 1
-            )
-
-            Text(
-                text = "${item.lokasi} • Jatuh tempo: ${item.tanggalJatuhTempo}",
-                color = TextSecondary,
-                fontSize = 12.sp,
-                maxLines = 1
-            )
+            Text(text = item.nama, color = TextPrimary, fontSize = 14.sp, fontWeight = FontWeight.SemiBold, maxLines = 1)
+            Text(text = "${item.lokasi} • Jatuh tempo: ${item.tanggalJatuhTempo}", color = TextSecondary, fontSize = 12.sp, maxLines = 1)
         }
-
         Box(
             modifier = Modifier
                 .clip(RoundedCornerShape(8.dp))
@@ -632,21 +520,13 @@ private fun KembalikanCard(
                 .clickable { onClick() }
                 .padding(horizontal = 14.dp, vertical = 7.dp)
         ) {
-            Text(
-                text = "Kembalikan",
-                color = Color.White,
-                fontSize = 12.sp,
-                fontWeight = FontWeight.SemiBold
-            )
+            Text(text = "Kembalikan", color = Color.White, fontSize = 12.sp, fontWeight = FontWeight.SemiBold)
         }
     }
 }
 
 @Composable
-private fun EmptyStateCard(
-    text: String,
-    modifier: Modifier = Modifier,
-) {
+private fun EmptyStateCard(text: String, modifier: Modifier = Modifier) {
     Box(
         modifier = modifier
             .fillMaxWidth()
@@ -655,19 +535,12 @@ private fun EmptyStateCard(
             .padding(horizontal = 16.dp, vertical = 18.dp),
         contentAlignment = Alignment.Center
     ) {
-        Text(
-            text = text,
-            color = TextSecondary,
-            fontSize = 13.sp
-        )
+        Text(text = text, color = TextSecondary, fontSize = 13.sp)
     }
 }
 
 @Composable
-private fun ErrorCard(
-    message: String,
-    modifier: Modifier = Modifier,
-) {
+private fun ErrorCard(message: String, modifier: Modifier = Modifier) {
     Box(
         modifier = modifier
             .fillMaxWidth()
@@ -676,11 +549,7 @@ private fun ErrorCard(
             .padding(horizontal = 16.dp, vertical = 14.dp),
         contentAlignment = Alignment.CenterStart
     ) {
-        Text(
-            text = message,
-            color = Color(0xFFD32F2F),
-            fontSize = 13.sp
-        )
+        Text(text = message, color = Color(0xFFD32F2F), fontSize = 13.sp)
     }
 }
 

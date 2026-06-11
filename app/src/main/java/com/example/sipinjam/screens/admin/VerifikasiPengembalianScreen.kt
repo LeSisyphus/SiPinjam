@@ -1,7 +1,6 @@
 package com.example.sipinjam.screens.admin
 
 import com.example.sipinjam.R
-import com.example.sipinjam.ui.components.CloudinaryImage
 import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -21,7 +20,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Button
@@ -30,14 +28,12 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -59,6 +55,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
+import com.example.sipinjam.ui.components.CloudinaryImage
+import com.example.sipinjam.ui.components.SiPinjamTopBar
 import com.example.sipinjam.ui.theme.BackgroundGray
 import com.example.sipinjam.ui.theme.StatusOrange
 import com.example.sipinjam.ui.theme.StatusOrangeBg
@@ -126,35 +124,14 @@ fun VerifikasiPengembalianScreen(
     Scaffold(
         containerColor = BackgroundGray,
         topBar = {
-            Surface(
-                color = CardWhite,
-                shadowElevation = 2.dp
-            ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 8.dp, vertical = 12.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    IconButton(onClick = onBackClick) {
-                        Icon(
-                            imageVector = Icons.Filled.ArrowBack,
-                            contentDescription = "Kembali",
-                            tint = TextPrimary
-                        )
-                    }
-
-                    Text(
-                        text = stringResource(R.string.screen_verify_return),
-                        color = TextPrimary,
-                        fontSize = 17.sp,
-                        fontWeight = FontWeight.SemiBold
-                    )
-                }
-            }
+            SiPinjamTopBar(
+                title = stringResource(R.string.screen_verify_return),
+                showBackButton = true,
+                onBackClick = onBackClick
+            )
         },
         bottomBar = {
-            Surface(
+            androidx.compose.material3.Surface(
                 modifier = Modifier.fillMaxWidth(),
                 color = CardWhite,
                 shadowElevation = 8.dp
@@ -256,14 +233,10 @@ fun VerifikasiPengembalianScreen(
                 )
 
                 if (!pengembalian?.fotoKondisiUrl.isNullOrBlank()) {
-                    FotoKondisiCard(
-                        imageUrl = pengembalian?.fotoKondisiUrl.orEmpty()
-                    )
+                    FotoKondisiCard(imageUrl = pengembalian?.fotoKondisiUrl.orEmpty())
                 }
 
-                CatatanPeminjamCard(
-                    catatan = detailUiState.catatanPeminjam
-                )
+                CatatanPeminjamCard(catatan = detailUiState.catatanPeminjam)
 
                 KondisiBarangCard(
                     kondisiList = kondisiList,
@@ -331,7 +304,6 @@ private fun HeaderPengembalianCard(
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
-
                     RoleBadge(
                         role = rolePeminjam,
                         modifier = Modifier.padding(top = 5.dp)
@@ -358,7 +330,6 @@ private fun HeaderPengembalianCard(
                     imageUrl = fotoBarangUrl,
                     modifier = Modifier.size(46.dp)
                 )
-
                 Text(
                     text = namaBarang,
                     color = TextPrimary,
@@ -374,9 +345,7 @@ private fun HeaderPengembalianCard(
 }
 
 @Composable
-private fun FotoKondisiCard(
-    imageUrl: String
-) {
+private fun FotoKondisiCard(imageUrl: String) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(16.dp),
@@ -393,9 +362,7 @@ private fun FotoKondisiCard(
                     .clip(RoundedCornerShape(12.dp)),
                 contentScale = ContentScale.Crop
             )
-
             Spacer(Modifier.height(8.dp))
-
             Text(
                 text = "Foto Kondisi Pengembalian",
                 color = TextSecondary,
@@ -406,9 +373,7 @@ private fun FotoKondisiCard(
 }
 
 @Composable
-private fun CatatanPeminjamCard(
-    catatan: String
-) {
+private fun CatatanPeminjamCard(catatan: String) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(16.dp),
@@ -426,7 +391,6 @@ private fun CatatanPeminjamCard(
                 fontWeight = FontWeight.SemiBold,
                 letterSpacing = 0.5.sp
             )
-
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -436,11 +400,7 @@ private fun CatatanPeminjamCard(
             ) {
                 Text(
                     text = catatan.ifBlank { "Peminjam tidak menambahkan catatan pengembalian." },
-                    color = if (catatan.isBlank()) {
-                        TextSecondary.copy(alpha = 0.7f)
-                    } else {
-                        TextPrimary
-                    },
+                    color = if (catatan.isBlank()) TextSecondary.copy(alpha = 0.7f) else TextPrimary,
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Normal,
                     fontStyle = if (catatan.isBlank()) FontStyle.Italic else FontStyle.Normal,
@@ -474,11 +434,9 @@ private fun KondisiBarangCard(
                 fontWeight = FontWeight.SemiBold,
                 letterSpacing = 0.5.sp
             )
-
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 kondisiList.forEach { item ->
                     val isSelected = kondisi == item
-
                     Box(
                         modifier = Modifier
                             .clip(RoundedCornerShape(8.dp))
@@ -490,11 +448,7 @@ private fun KondisiBarangCard(
                             text = item,
                             color = if (isSelected) Color.White else TextSecondary,
                             fontSize = 13.sp,
-                            fontWeight = if (isSelected) {
-                                FontWeight.SemiBold
-                            } else {
-                                FontWeight.Normal
-                            }
+                            fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Normal
                         )
                     }
                 }
@@ -525,7 +479,6 @@ private fun CatatanVerifikasiCard(
                 fontWeight = FontWeight.SemiBold,
                 letterSpacing = 0.5.sp
             )
-
             OutlinedTextField(
                 value = value,
                 onValueChange = onValueChange,
@@ -557,10 +510,7 @@ private fun CatatanVerifikasiCard(
 }
 
 @Composable
-private fun UserImage(
-    imageUrl: String,
-    modifier: Modifier = Modifier
-) {
+private fun UserImage(imageUrl: String, modifier: Modifier = Modifier) {
     CloudinaryImage(
         imageUrl = imageUrl,
         contentDescription = "Foto Peminjam",
@@ -571,10 +521,7 @@ private fun UserImage(
 }
 
 @Composable
-private fun BarangImage(
-    imageUrl: String,
-    modifier: Modifier = Modifier
-) {
+private fun BarangImage(imageUrl: String, modifier: Modifier = Modifier) {
     CloudinaryImage(
         imageUrl = imageUrl,
         contentDescription = stringResource(R.string.label_foto_barang),
@@ -585,26 +532,18 @@ private fun BarangImage(
 }
 
 @Composable
-private fun RoleBadge(
-    role: String,
-    modifier: Modifier = Modifier
-) {
+private fun RoleBadge(role: String, modifier: Modifier = Modifier) {
     val normalizedRole = role.uppercase()
-
     val badgeColor = when (normalizedRole) {
         "DOSEN" -> RoleCyanBg
-        "STAF" -> RoleOrangeBg
-        "STAFF" -> RoleOrangeBg
+        "STAF", "STAFF" -> RoleOrangeBg
         else -> RoleBlueBg
     }
-
     val textColor = when (normalizedRole) {
         "DOSEN" -> RoleCyanText
-        "STAF" -> RoleOrangeText
-        "STAFF" -> RoleOrangeText
+        "STAF", "STAFF" -> RoleOrangeText
         else -> RoleBlueText
     }
-
     Box(
         modifier = modifier
             .clip(CircleShape)
