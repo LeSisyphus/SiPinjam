@@ -324,7 +324,7 @@ private fun HeaderPengembalianCard(
                     .background(SoftItemBg)
                     .padding(12.dp),
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(10.dp)
+                horizontalArrangement = Arrangement.spacedBy(9.dp)
             ) {
                 BarangImage(
                     imageUrl = fotoBarangUrl,

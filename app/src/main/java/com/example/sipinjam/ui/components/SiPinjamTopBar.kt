@@ -46,7 +46,7 @@ fun SiPinjamTopBar(
                 .padding(
                     start = 20.dp,
                     end = 20.dp,
-                    top = 0.dp,
+                    top = 15.dp,
                     bottom = 20.dp
                 ),
             verticalAlignment = Alignment.CenterVertically
