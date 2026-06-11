@@ -20,6 +20,7 @@ import com.example.sipinjam.domain.usecase.holiday.GetTodayHolidayUseCase
 import com.example.sipinjam.domain.usecase.holiday.ObserveMonthlyHolidaysUseCase
 import com.example.sipinjam.domain.usecase.holiday.RefreshMonthlyHolidaysUseCase
 import com.example.sipinjam.screens.user.BerandaUserViewModelFactory
+import com.example.sipinjam.screens.user.FavoritBarangViewModelFactory
 
 class AppContainer(
     private val context: Context,
@@ -95,6 +96,13 @@ class AppContainer(
             barangRepository = barangRepository,
             peminjamanRepository = peminjamanRepository,
             authRepository = authRepository,
+        )
+    }
+
+    val favoritBarangViewModelFactory: FavoritBarangViewModelFactory by lazy {
+        FavoritBarangViewModelFactory(
+            getFavoriteItemsUseCase = getFavoriteItemsUseCase,
+            toggleFavoriteItemUseCase = toggleFavoriteItemUseCase,
         )
     }
 }
