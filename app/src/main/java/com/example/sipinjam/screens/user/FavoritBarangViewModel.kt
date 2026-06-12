@@ -3,6 +3,7 @@ package com.example.sipinjam.screens.user
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.sipinjam.domain.model.FavoriteItem
+import com.example.sipinjam.domain.usecase.auth.GetCurrentUserUseCase
 import com.example.sipinjam.domain.usecase.favorite.GetFavoriteItemsUseCase
 import com.example.sipinjam.domain.usecase.favorite.ToggleFavoriteItemUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -19,6 +20,7 @@ data class FavoritBarangUiState(
 )
 
 class FavoritBarangViewModel(
+    private val getCurrentUserUseCase: GetCurrentUserUseCase,
     private val getFavoriteItemsUseCase: GetFavoriteItemsUseCase,
     private val toggleFavoriteItemUseCase: ToggleFavoriteItemUseCase,
 ) : ViewModel() {
@@ -26,14 +28,30 @@ class FavoritBarangViewModel(
     private val _uiState = MutableStateFlow(FavoritBarangUiState())
     val uiState: StateFlow<FavoritBarangUiState> = _uiState.asStateFlow()
 
+    private var currentUserId: String? = null
+
     init {
         muatFavorit()
     }
 
     private fun muatFavorit() {
-        _uiState.update { it.copy(isLoading = true) }
+        _uiState.update { it.copy(isLoading = true, errorMessage = null) }
         viewModelScope.launch {
-            getFavoriteItemsUseCase()
+            val userId = getCurrentUserUseCase()?.uid.orEmpty()
+            currentUserId = userId.ifBlank { null }
+
+            if (userId.isBlank()) {
+                _uiState.update {
+                    it.copy(
+                        daftarFavorit = emptyList(),
+                        isLoading = false,
+                        errorMessage = "User belum login"
+                    )
+                }
+                return@launch
+            }
+
+            getFavoriteItemsUseCase(userId)
                 .catch { e ->
                     _uiState.update {
                         it.copy(isLoading = false, errorMessage = e.localizedMessage ?: "Gagal memuat favorit")
@@ -48,8 +66,9 @@ class FavoritBarangViewModel(
     }
 
     fun hapusFavorit(item: FavoriteItem) {
+        val userId = currentUserId ?: return
         viewModelScope.launch {
-            toggleFavoriteItemUseCase(item)
+            toggleFavoriteItemUseCase(item.copy(userId = userId))
         }
     }
 }

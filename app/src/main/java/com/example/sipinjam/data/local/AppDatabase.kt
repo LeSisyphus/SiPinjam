@@ -14,7 +14,7 @@ import com.example.sipinjam.data.local.entity.HolidayEntity
         HolidayEntity::class,
         FavoriteItemEntity::class,
     ],
-    version = 1,
+    version = 2,
     exportSchema = false,
 )
 abstract class AppDatabase : RoomDatabase() {

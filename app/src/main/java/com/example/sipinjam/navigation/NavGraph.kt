@@ -298,6 +298,9 @@ fun NavGraph(
                             statusBarang = statusBarang
                         )
                     )
+                },
+                onLihatFavorit = {
+                    navController.navigateSingleTop(Routes.FAVORIT_BARANG)
                 }
             )
         }
@@ -568,10 +571,12 @@ fun NavGraph(
                 onGantiPasswordClick = {
                     navController.navigateSingleTop(Routes.GANTI_PASSWORD)
                 },
+                onFavoritClick = {
+                    navController.navigateSingleTop(Routes.FAVORIT_BARANG)
+                },
                 onLogoutDone = {
                     currentIsAdmin = false
                     onAuthStateChanged(false, false)
-
                     navController.navigate(Routes.LOGIN) {
                         popUpTo(0) { inclusive = true }
                         launchSingleTop = true

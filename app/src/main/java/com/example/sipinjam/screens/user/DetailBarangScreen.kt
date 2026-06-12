@@ -9,7 +9,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Book
-import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -17,6 +18,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -24,10 +27,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import coil.compose.AsyncImage
+import com.example.sipinjam.SiPinjamApplication
 import com.example.sipinjam.ui.components.SiPinjamTopBar
 import com.example.sipinjam.ui.theme.*
-import androidx.compose.ui.layout.ContentScale
-import coil.compose.AsyncImage
 
 data class DetailBarang(
     val id: String = "",
@@ -46,7 +49,17 @@ data class DetailBarang(
 @Composable
 fun DetailBarangScreen(
     barangId: String,
-    viewModel: DetailBarangViewModel = viewModel(),
+    viewModel: DetailBarangViewModel = run {
+        val context = LocalContext.current
+        val appContainer = (context.applicationContext as SiPinjamApplication).appContainer
+        viewModel(
+            factory = DetailBarangViewModelFactory(
+                getCurrentUserUseCase = appContainer.getCurrentUserUseCase,
+                observeIsFavoriteItemUseCase = appContainer.observeIsFavoriteItemUseCase,
+                toggleFavoriteItemUseCase = appContainer.toggleFavoriteItemUseCase,
+            )
+        )
+    },
     onBackClick: () -> Unit = {},
     onAjukanPeminjaman: (
         barangId: String,
@@ -54,6 +67,7 @@ fun DetailBarangScreen(
         kategoriBarang: String,
         statusBarang: String
     ) -> Unit = { _, _, _, _ -> },
+    onLihatFavorit: () -> Unit = {},
 ) {
     LaunchedEffect(barangId) {
         viewModel.loadBarangDetail(barangId)
@@ -79,33 +93,55 @@ fun DetailBarangScreen(
                     color = CardWhite,
                     shadowElevation = 8.dp
                 ) {
-                    Button(
-                        onClick = {
-                            onAjukanPeminjaman(
-                                barang.id,
-                                barang.nama,
-                                barang.kategori,
-                                statusBarangRoute
-                            )
-                        },
-                        enabled = barang.tersedia,
+                    Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(horizontal = 20.dp, vertical = 16.dp)
-                            .height(52.dp),
-                        shape = RoundedCornerShape(14.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = SiPinjamBlue)
+                            .padding(horizontal = 20.dp, vertical = 16.dp),
+                        horizontalArrangement = Arrangement.spacedBy(12.dp),
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Text(
-                            text = if (barang.tersedia) {
-                                stringResource(R.string.screen_borrow_item)
-                            } else {
-                                stringResource(R.string.status_tidak_tersedia)
+                        IconButton(
+                            onClick = { viewModel.toggleFavorit() },
+                            modifier = Modifier
+                                .size(52.dp)
+                                .clip(RoundedCornerShape(14.dp))
+                                .background(if (uiState.isFavorit) StatusRedBg else InputBg)
+                        ) {
+                            Icon(
+                                imageVector = if (uiState.isFavorit) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder,
+                                contentDescription = "Favorit",
+                                tint = if (uiState.isFavorit) StatusRed else TextSecondary,
+                                modifier = Modifier.size(22.dp)
+                            )
+                        }
+
+                        Button(
+                            onClick = {
+                                onAjukanPeminjaman(
+                                    barang.id,
+                                    barang.nama,
+                                    barang.kategori,
+                                    statusBarangRoute
+                                )
                             },
-                            fontSize = 16.sp,
-                            fontWeight = FontWeight.SemiBold,
-                            color = Color.White
-                        )
+                            enabled = barang.tersedia,
+                            modifier = Modifier
+                                .weight(1f)
+                                .height(52.dp),
+                            shape = RoundedCornerShape(14.dp),
+                            colors = ButtonDefaults.buttonColors(containerColor = SiPinjamBlue)
+                        ) {
+                            Text(
+                                text = if (barang.tersedia) {
+                                    stringResource(R.string.screen_borrow_item)
+                                } else {
+                                    stringResource(R.string.status_tidak_tersedia)
+                                },
+                                fontSize = 16.sp,
+                                fontWeight = FontWeight.SemiBold,
+                                color = Color.White
+                            )
+                        }
                     }
                 }
             }
