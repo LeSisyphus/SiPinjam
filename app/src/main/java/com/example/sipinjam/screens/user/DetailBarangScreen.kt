@@ -54,6 +54,7 @@ fun DetailBarangScreen(
         val appContainer = (context.applicationContext as SiPinjamApplication).appContainer
         viewModel(
             factory = DetailBarangViewModelFactory(
+                getCurrentUserUseCase = appContainer.getCurrentUserUseCase,
                 observeIsFavoriteItemUseCase = appContainer.observeIsFavoriteItemUseCase,
                 toggleFavoriteItemUseCase = appContainer.toggleFavoriteItemUseCase,
             )
