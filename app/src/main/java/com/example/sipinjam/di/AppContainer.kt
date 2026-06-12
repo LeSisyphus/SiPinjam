@@ -176,6 +176,7 @@ class AppContainer(
 
     val favoritBarangViewModelFactory: FavoritBarangViewModelFactory by lazy {
         FavoritBarangViewModelFactory(
+            getCurrentUserUseCase = getCurrentUserUseCase,
             getFavoriteItemsUseCase = getFavoriteItemsUseCase,
             toggleFavoriteItemUseCase = toggleFavoriteItemUseCase,
         )

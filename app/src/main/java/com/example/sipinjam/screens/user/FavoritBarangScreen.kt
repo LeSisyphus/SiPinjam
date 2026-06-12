@@ -63,6 +63,7 @@ fun FavoritBarangScreen(
     val appContainer = (context.applicationContext as SiPinjamApplication).appContainer
     val viewModel: FavoritBarangViewModel = viewModel(
         factory = FavoritBarangViewModelFactory(
+            getCurrentUserUseCase = appContainer.getCurrentUserUseCase,
             getFavoriteItemsUseCase = appContainer.getFavoriteItemsUseCase,
             toggleFavoriteItemUseCase = appContainer.toggleFavoriteItemUseCase,
         )
