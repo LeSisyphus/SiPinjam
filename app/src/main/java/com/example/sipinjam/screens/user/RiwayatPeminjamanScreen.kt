@@ -23,6 +23,7 @@ import androidx.compose.material.icons.filled.Image
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -58,6 +59,10 @@ import com.example.sipinjam.ui.theme.SiPinjamBlue
 import com.example.sipinjam.ui.theme.TextPrimary
 import com.example.sipinjam.ui.theme.TextSecondary
 
+import androidx.compose.ui.platform.LocalContext
+import com.example.sipinjam.utils.notification.NotificationHelper
+
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RiwayatPeminjamanScreen(
     onBackClick: () -> Unit = {},
@@ -98,6 +103,40 @@ fun RiwayatPeminjamanScreen(
 
     LaunchedEffect(Unit) {
         viewModel.muatRiwayat()
+    }
+
+    val context = LocalContext.current
+    val notificationHelper = remember { NotificationHelper(context) }
+
+    LaunchedEffect(daftarPeminjaman) {
+        if (daftarPeminjaman.isNotEmpty()) {
+            val itemTerkini = daftarPeminjaman.firstOrNull()
+            if (itemTerkini != null) {
+                val namaBarang = itemTerkini.namaBarang
+
+                when (itemTerkini.status) {
+                    BorrowingStatus.DISETUJUI_LEGACY -> {
+                        notificationHelper.showStatusNotification(
+                            title = "Peminjaman Disetujui! 🎉",
+                            message = "Permintaan pinjam $namaBarang telah disetujui admin. Silakan ambil barang."
+                        )
+                    }
+                    BorrowingStatus.DITOLAK -> {
+                        notificationHelper.showStatusNotification(
+                            title = "Peminjaman Ditolak ❌",
+                            message = "Maaf, permintaan pinjam $namaBarang ditolak oleh admin."
+                        )
+                    }
+                    BorrowingStatus.SELESAI -> {
+                        notificationHelper.showStatusNotification(
+                            title = "Pengembalian Sukses 🟢",
+                            message = "Terima kasih, barang $namaBarang telah sukses dikembalikan ke inventaris."
+                        )
+                    }
+                    else -> {}
+                }
+            }
+        }
     }
 
     Scaffold(
