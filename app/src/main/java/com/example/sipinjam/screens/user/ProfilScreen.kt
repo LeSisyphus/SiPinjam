@@ -40,6 +40,7 @@ import com.example.sipinjam.ui.theme.*
 fun ProfilScreen(
     viewModel: ProfilViewModel = viewModel(),
     onGantiPasswordClick: () -> Unit = {},
+    onFavoritClick: () -> Unit = {},
     onLogoutDone: () -> Unit = {},
     onBerandaClick: () -> Unit = {},
     onKatalogClick: () -> Unit = {},
@@ -233,7 +234,7 @@ fun ProfilScreen(
 
             Spacer(Modifier.height(24.dp))
 
-            SectionLabel("Keamanan")
+            SectionLabel("Keamanan & Aktivitas")
 
             Spacer(Modifier.height(10.dp))
 
@@ -245,41 +246,84 @@ fun ProfilScreen(
                 colors = CardDefaults.cardColors(containerColor = CardWhite),
                 elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
             ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable { onGantiPasswordClick() }
-                        .padding(horizontal = 16.dp, vertical = 16.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    Box(
+                Column {
+                    Row(
                         modifier = Modifier
-                            .size(36.dp)
-                            .clip(RoundedCornerShape(10.dp))
-                            .background(SiPinjamBlue.copy(alpha = 0.1f)),
-                        contentAlignment = Alignment.Center
+                            .fillMaxWidth()
+                            .clickable { onGantiPasswordClick() }
+                            .padding(horizontal = 16.dp, vertical = 16.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
+                        Box(
+                            modifier = Modifier
+                                .size(36.dp)
+                                .clip(RoundedCornerShape(10.dp))
+                                .background(SiPinjamBlue.copy(alpha = 0.1f)),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Icon(
+                                imageVector = Icons.Filled.Lock,
+                                contentDescription = null,
+                                tint = SiPinjamBlue,
+                                modifier = Modifier.size(18.dp)
+                            )
+                        }
+                        Text(
+                            text = stringResource(R.string.screen_profile_change_password),
+                            color = TextPrimary,
+                            fontSize = 14.sp,
+                            fontWeight = FontWeight.Medium,
+                            modifier = Modifier.weight(1f)
+                        )
                         Icon(
-                            imageVector = Icons.Filled.Lock,
+                            imageVector = Icons.Filled.ChevronRight,
                             contentDescription = null,
-                            tint = SiPinjamBlue,
-                            modifier = Modifier.size(18.dp)
+                            tint = TextSecondary,
+                            modifier = Modifier.size(20.dp)
                         )
                     }
-                    Text(
-                        text = stringResource(R.string.screen_profile_change_password),
-                        color = TextPrimary,
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.Medium,
-                        modifier = Modifier.weight(1f)
-                    )
-                    Icon(
-                        imageVector = Icons.Filled.ChevronRight,
-                        contentDescription = null,
-                        tint = TextSecondary,
-                        modifier = Modifier.size(20.dp)
-                    )
+
+                    if (!isAdmin) {
+                        HorizontalDivider(color = DividerColor)
+
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable { onFavoritClick() }
+                                .padding(horizontal = 16.dp, vertical = 16.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .size(36.dp)
+                                    .clip(RoundedCornerShape(10.dp))
+                                    .background(StatusRed.copy(alpha = 0.1f)),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Filled.Favorite,
+                                    contentDescription = null,
+                                    tint = StatusRed,
+                                    modifier = Modifier.size(18.dp)
+                                )
+                            }
+                            Text(
+                                text = "Favorit Saya",
+                                color = TextPrimary,
+                                fontSize = 14.sp,
+                                fontWeight = FontWeight.Medium,
+                                modifier = Modifier.weight(1f)
+                            )
+                            Icon(
+                                imageVector = Icons.Filled.ChevronRight,
+                                contentDescription = null,
+                                tint = TextSecondary,
+                                modifier = Modifier.size(20.dp)
+                            )
+                        }
+                    }
                 }
             }
 
