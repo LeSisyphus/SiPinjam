@@ -219,20 +219,7 @@ private fun SearchAndFilterSection(
             )
         )
 
-        Box(
-            modifier = Modifier
-                .size(56.dp)
-                .clip(RoundedCornerShape(16.dp))
-                .background(CardWhite),
-            contentAlignment = Alignment.Center
-        ) {
-            Icon(
-                imageVector = Icons.Filled.Tune,
-                contentDescription = "Filter",
-                tint = SiPinjamBlue,
-                modifier = Modifier.size(24.dp)
-            )
-        }
+
     }
 }
 
