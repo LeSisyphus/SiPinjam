@@ -30,6 +30,7 @@ Dibangun sebagai Proyek Akhir mata kuliah Pemrograman Mobile, Program Studi Tekn
 | Network Logging      | OkHttp Logging Interceptor             |
 | Penyimpanan Foto     | Cloudinary                             |
 | Image Loader         | Coil                                   |
+| Notifikasi           | Android Local Notification             |
 | State Management     | ViewModel, StateFlow, rememberSaveable |
 | Dependency Injection | Manual DI melalui AppContainer         |
 | Theme                | Custom Theme + Dark Mode               |
@@ -52,6 +53,7 @@ Dibangun sebagai Proyek Akhir mata kuliah Pemrograman Mobile, Program Studi Tekn
 * Mengunggah foto kondisi barang saat pengembalian.
 * Melihat informasi Hari Libur Indonesia dari API pihak ketiga.
 * Menyimpan barang favorit secara lokal menggunakan Room Database.
+* Menerima notifikasi lokal saat status peminjaman atau pengembalian berubah.
 * Menggunakan dark mode dan pilihan bahasa.
 
 ### Admin
@@ -95,7 +97,38 @@ Dibangun sebagai Proyek Akhir mata kuliah Pemrograman Mobile, Program Studi Tekn
 | Dark Mode                   | Menggunakan custom theme `SiPinjamTheme` dan `LocalAppColors`                          |
 | Localization                | Menggunakan string resource untuk Bahasa Indonesia dan Bahasa Inggris                  |
 | Favorite Barang             | Data favorit disimpan secara lokal menggunakan Room Database                           |
-| Local Notification          | Dalam proses integrasi untuk perubahan status peminjaman dan pengembalian              |
+| Local Notification          | Menampilkan notifikasi Android lokal saat status peminjaman atau pengembalian berubah  |
+
+---
+
+## Local Notification
+
+SiPinjam menggunakan **Android Local Notification**, bukan Firebase Cloud Messaging (FCM). Notifikasi lokal dipilih karena lebih sederhana, tidak membutuhkan backend tambahan, dan cukup untuk kebutuhan demo UAS.
+
+Alur notifikasi lokal:
+
+```text
+Firestore status berubah
+→ aplikasi menerima update melalui listener
+→ ViewModel/logic aplikasi mendeteksi perubahan status
+→ LocalNotificationHelper membuat notifikasi
+→ Android NotificationManager menampilkan notifikasi
+```
+
+Contoh notifikasi:
+
+```text
+Peminjaman Disetujui
+Pengajuan peminjaman Proyektor telah disetujui.
+```
+
+Catatan implementasi:
+
+* Notifikasi ditampilkan melalui sistem notifikasi Android, bukan hanya pop-up di dalam aplikasi.
+* Aplikasi menggunakan `NotificationManager` dan notification channel.
+* Pada Android 13 ke atas, aplikasi membutuhkan permission `POST_NOTIFICATIONS`.
+* Fitur ini tidak membutuhkan collection `notifications` di Firestore karena notifikasi tidak disimpan sebagai data remote.
+* Karena tidak memakai FCM, notifikasi dipicu oleh aplikasi saat menerima perubahan data dari Firestore listener.
 
 ---
 
@@ -186,6 +219,7 @@ com.example.sipinjam
 │   ├── components
 │   └── theme
 └── utils
+    └── notification
 ```
 
 ### UI Layer
@@ -256,7 +290,6 @@ Dengan pendekatan ini, ViewModel tidak membuat dependency secara langsung, sehin
 | `items`         | Data barang inventaris                                           |
 | `borrowings`    | Data transaksi peminjaman                                        |
 | `returns`       | Data pengembalian barang                                         |
-| `notifications` | Data notifikasi/informasi status jika fitur notifikasi digunakan |
 
 ---
 
@@ -366,7 +399,8 @@ Aktifkan layanan berikut:
 * Firebase Authentication
 * Firestore Database
 * Firebase Analytics jika digunakan
-* Firebase Cloud Messaging jika fitur push notification digunakan
+
+Catatan: fitur notifikasi pada project ini menggunakan Android Local Notification, sehingga tidak membutuhkan Firebase Cloud Messaging untuk kebutuhan demo UAS.
 
 Tambahkan aplikasi Android dengan package name:
 
