@@ -55,6 +55,7 @@ import com.example.sipinjam.domain.usecase.profile.UpdateProfileUseCase
 import com.example.sipinjam.domain.usecase.storage.UploadProfilePhotoUseCase
 import com.example.sipinjam.domain.usecase.storage.UploadReturnPhotoUseCase
 import com.example.sipinjam.screens.user.BerandaUserViewModelFactory
+import com.example.sipinjam.screens.user.FavoritBarangViewModelFactory
 
 class AppContainer(
     private val context: Context,
@@ -170,6 +171,13 @@ class AppContainer(
             barangRepository = barangRepository,
             peminjamanRepository = peminjamanRepository,
             authRepository = authRepository,
+        )
+    }
+
+    val favoritBarangViewModelFactory: FavoritBarangViewModelFactory by lazy {
+        FavoritBarangViewModelFactory(
+            getFavoriteItemsUseCase = getFavoriteItemsUseCase,
+            toggleFavoriteItemUseCase = toggleFavoriteItemUseCase,
         )
     }
 }

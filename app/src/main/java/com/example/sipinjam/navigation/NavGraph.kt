@@ -34,6 +34,7 @@ import com.example.sipinjam.screens.user.PeminjamanScreen
 import com.example.sipinjam.screens.user.PengembalianScreen
 import com.example.sipinjam.screens.user.ProfilScreen
 import com.example.sipinjam.screens.user.RiwayatPeminjamanScreen
+import com.example.sipinjam.screens.user.FavoritBarangScreen
 
 object Routes {
     const val LOGIN = "login"
@@ -46,6 +47,7 @@ object Routes {
     const val KATALOG_USER = "$KATALOG_USER_BASE?query={query}"
     const val PROFIL = "profil"
     const val GANTI_PASSWORD = "ganti_password"
+    const val FAVORIT_BARANG = "favorit_barang"
     const val RIWAYAT_PEMINJAMAN = "riwayat_peminjaman"
 
     private const val DETAIL_BARANG_BASE = "detail_barang"
@@ -600,6 +602,29 @@ fun NavGraph(
             GantiPasswordScreen(
                 onBackClick = {
                     navController.popBackStack()
+                }
+            )
+        }
+
+        composable(Routes.FAVORIT_BARANG) {
+            FavoritBarangScreen(
+                onBackClick = {
+                    navController.popBackStack()
+                },
+                onBarangClick = { barangId ->
+                    navController.navigate(Routes.detailBarang(barangId))
+                },
+                onBerandaClick = {
+                    navController.navigateSingleTop(Routes.BERANDA_USER)
+                },
+                onKatalogClick = {
+                    navController.navigateSingleTop(Routes.katalogUser())
+                },
+                onRiwayatClick = {
+                    navController.navigateSingleTop(Routes.RIWAYAT_PEMINJAMAN)
+                },
+                onProfilClick = {
+                    navController.navigateSingleTop(Routes.PROFIL)
                 }
             )
         }
