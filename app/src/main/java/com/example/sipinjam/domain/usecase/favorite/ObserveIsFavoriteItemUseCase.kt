@@ -6,7 +6,7 @@ import kotlinx.coroutines.flow.Flow
 class ObserveIsFavoriteItemUseCase(
     private val repository: FavoriteItemRepository,
 ) {
-    operator fun invoke(barangId: String): Flow<Boolean> {
-        return repository.observeIsFavorite(barangId)
+    operator fun invoke(userId: String, barangId: String): Flow<Boolean> {
+        return repository.observeIsFavorite(userId, barangId)
     }
 }
