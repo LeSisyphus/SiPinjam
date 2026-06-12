@@ -14,6 +14,7 @@ Dokumen ini berisi panduan kerja tim SiPinjam agar proses pengembangan aplikasi 
 * [Konvensi Pull Request](#konvensi-pull-request)
 * [File yang Tidak Boleh Diedit Bersamaan](#file-yang-tidak-boleh-diedit-bersamaan)
 * [Aturan Build dan Testing](#aturan-build-dan-testing)
+* [Aturan Notifikasi Lokal](#aturan-notifikasi-lokal)
 * [Aturan File Sensitif](#aturan-file-sensitif)
 * [Aturan Tambahan](#aturan-tambahan)
 
@@ -63,7 +64,7 @@ Untuk menghindari konflik, setiap anggota tetap memiliki area utama berdasarkan 
 | Anggota | Area Utama | Cakupan |
 | --- | --- | --- |
 | Maulana | Auth, Admin, Profile, Arsitektur | Login/register, autentikasi, dashboard admin, approval admin, profile, integrasi arsitektur, API, Room, repository, use case, dan review merge |
-| Nabilla | Katalog, Barang, Profile, Reusable Component, Notifikasi | Katalog barang, detail barang, pengelolaan komponen UI reusable, profile-related UI, dark mode, localization, dan notifikasi |
+| Nabilla | Katalog, Barang, Profile, Reusable Component, Notifikasi Lokal | Katalog barang, detail barang, pengelolaan komponen UI reusable, profile-related UI, dark mode, localization, dan local notification |
 | Rachel | Peminjaman, Pengembalian, UI User | Form peminjaman, riwayat peminjaman, pengembalian barang, tampilan beranda user, favorite barang, dan user flow |
 
 ### Area Folder Project Saat Ini
@@ -71,7 +72,7 @@ Untuk menghindari konflik, setiap anggota tetap memiliki area utama berdasarkan 
 | Anggota | Folder/File Utama |
 | --- | --- |
 | Maulana | `screens/auth/`, `screens/admin/`, `screens/user/ProfilScreen.kt`, `data/`, `domain/`, `di/`, `navigation/`, `MainActivity.kt`, `AndroidManifest.xml`, `app/build.gradle.kts`, `gradle/libs.versions.toml` |
-| Nabilla | `screens/user/KatalogScreen.kt`, `screens/user/DetailBarangScreen.kt`, `screens/user/ProfilScreen.kt`, `ui/components/`, `ui/theme/`, `app/src/main/res/values/`, `app/src/main/res/values-en/`, `app/src/main/res/values-in/`, `notification/`, `docs/` |
+| Nabilla | `screens/user/KatalogScreen.kt`, `screens/user/DetailBarangScreen.kt`, `screens/user/ProfilScreen.kt`, `ui/components/`, `ui/theme/`, `app/src/main/res/values/`, `app/src/main/res/values-en/`, `app/src/main/res/values-in/`, `utils/notification/`, `docs/` |
 | Rachel | `screens/user/BerandaUserScreen.kt`, `screens/user/PeminjamanScreen.kt`, `screens/user/PeminjamanViewModel.kt`, `screens/user/PengembalianScreen.kt`, `screens/user/PengembalianViewModel.kt`, `screens/user/RiwayatPeminjamanScreen.kt`, `screens/user/FavoriteBarangScreen.kt` |
 
 Jika terdapat file yang masuk ke area lebih dari satu anggota, wajib koordinasi terlebih dahulu di grup sebelum mengedit.
@@ -93,10 +94,14 @@ Beberapa file dapat bersinggungan dengan lebih dari satu anggota. Contohnya:
 | `screens/user/ProfilScreen.kt` | Maulana/Nabilla | Maulana, Nabilla | Koordinasi sebelum edit karena berkaitan dengan profile, dark mode, dan localization |
 | `screens/user/DetailBarangScreen.kt` | Nabilla | Rachel | Koordinasi jika menambah tombol favorit |
 | `screens/user/BerandaUserScreen.kt` | Rachel | Maulana | Maulana boleh menyiapkan data/API, Rachel memoles UI |
+| `screens/user/RiwayatPeminjamanScreen.kt` | Rachel | Nabilla | Koordinasi jika notifikasi lokal dipicu dari perubahan status riwayat |
+| `screens/user/PengembalianScreen.kt` | Rachel | Nabilla | Koordinasi jika notifikasi lokal dipicu dari perubahan status pengembalian |
 | `navigation/NavGraph.kt` | Maulana | Semua anggota | Hanya diedit setelah koordinasi karena semua route berada di sini |
-| `MainActivity.kt` | Maulana | Nabilla | Koordinasi karena berkaitan dengan auth, AppContainer, dark mode, dan localization |
+| `MainActivity.kt` | Maulana | Nabilla | Koordinasi karena berkaitan dengan auth, AppContainer, dark mode, localization, dan permission notifikasi |
+| `AndroidManifest.xml` | Maulana | Nabilla | Koordinasi jika menambah permission `POST_NOTIFICATIONS` atau konfigurasi lain |
 | `ui/theme/` | Nabilla | Semua anggota | Jangan ubah warna/theme global tanpa koordinasi |
 | `data/`, `domain/`, `di/` | Maulana | Rachel/Nabilla | Anggota lain hanya menggunakan use case/contract yang sudah disediakan |
+
 ---
 
 ## Konvensi Penamaan Branch
@@ -123,15 +128,15 @@ git switch -c docs/update-readme
 
 Prefix yang digunakan:
 
-| Prefix     | Fungsi                                     |
-| ---------- | ------------------------------------------ |
-| `feat`     | Fitur baru                                 |
-| `fix`      | Perbaikan bug                              |
-| `ui`       | Perubahan tampilan murni                   |
-| `chore`    | Konfigurasi, setup, dependency, Gradle     |
-| `docs`     | Dokumentasi                                |
+| Prefix | Fungsi |
+| --- | --- |
+| `feat` | Fitur baru |
+| `fix` | Perbaikan bug |
+| `ui` | Perubahan tampilan murni |
+| `chore` | Konfigurasi, setup, dependency, Gradle |
+| `docs` | Dokumentasi |
 | `refactor` | Merapikan kode tanpa mengubah fungsi utama |
-| `test`     | Testing manual atau automated testing      |
+| `test` | Testing manual atau automated testing |
 
 Hindari nama branch yang terlalu umum seperti:
 
@@ -168,6 +173,9 @@ git commit -m "feat: add holiday API cache strategy"
 git commit -m "feat: add favorite item domain foundation"
 git commit -m "feat: add manual dependency injection app container"
 git commit -m "feat: display holiday information on user home"
+git commit -m "feat: add local notification helper"
+git commit -m "feat: notify user on borrowing status changes"
+git commit -m "feat: notify user on return status changes"
 git commit -m "fix: restore dark mode and localization root setup"
 git commit -m "docs: update README for final project documentation"
 git commit -m "docs: add application screenshots"
@@ -207,18 +215,19 @@ Contoh:
 13. [fix] Perbaiki dark mode setelah integrasi AppContainer
 14. [docs] Update README dan dokumentasi UAS
 15. [test] Testing semua flow aplikasi
+16. [feat] Tambah notifikasi lokal perubahan status
 ```
 
 Prefix issue:
 
-| Prefix  | Fungsi                |
-| ------- | --------------------- |
-| `feat`  | Fitur baru            |
-| `fix`   | Bug atau perbaikan    |
-| `ui`    | Perubahan tampilan    |
+| Prefix | Fungsi |
+| --- | --- |
+| `feat` | Fitur baru |
+| `fix` | Bug atau perbaikan |
+| `ui` | Perubahan tampilan |
 | `chore` | Konfigurasi dan setup |
-| `docs`  | Dokumentasi           |
-| `test`  | Testing               |
+| `docs` | Dokumentasi |
+| `test` | Testing |
 
 ---
 
@@ -235,6 +244,7 @@ Contoh:
 ```text
 feat: add holiday API cache strategy
 feat: add favorite item screen
+feat: add local notification for status updates
 fix: restore dark mode and localization root setup
 docs: update README and screenshots
 ```
@@ -274,23 +284,25 @@ Build: SUCCESS
 
 File berikut rawan konflik dan hanya boleh diedit setelah koordinasi:
 
-| File                                                                | Aturan                                                                                   |
-| ------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- |
-| `app/src/main/java/com/example/sipinjam/MainActivity.kt`            | Koordinasi karena berhubungan dengan theme, localization, auth, dan AppContainer         |
-| `app/src/main/java/com/example/sipinjam/navigation/NavGraph.kt`     | Koordinasi karena semua route aplikasi berada di sini                                    |
-| `app/src/main/AndroidManifest.xml`                                  | Koordinasi jika menambah permission, application class, activity, service, atau deeplink |
-| `app/build.gradle.kts`                                              | Koordinasi jika menambah dependency                                                      |
-| `build.gradle.kts`                                                  | Koordinasi jika menambah plugin project-level                                            |
-| `gradle/libs.versions.toml`                                         | Koordinasi jika menambah atau mengubah versi library                                     |
-| `gradle.properties`                                                 | Koordinasi karena dapat memengaruhi build semua anggota                                  |
-| `app/src/main/java/com/example/sipinjam/di/AppContainer.kt`         | Koordinasi karena semua dependency utama disediakan di sini                              |
-| `app/src/main/java/com/example/sipinjam/data/local/AppDatabase.kt`  | Koordinasi karena perubahan entity/DAO dapat memengaruhi Room                            |
-| `app/src/main/java/com/example/sipinjam/ui/theme/Theme.kt`          | Koordinasi karena memengaruhi dark mode                                                  |
-| `app/src/main/java/com/example/sipinjam/ui/theme/Color.kt`          | Koordinasi karena memengaruhi warna global                                               |
-| `app/src/main/java/com/example/sipinjam/ui/theme/LocalAppColors.kt` | Koordinasi karena memengaruhi custom color scheme                                        |
-| `app/src/main/res/values/strings.xml`                               | Koordinasi agar key string tidak duplikat                                                |
-| `app/src/main/res/values-en/strings.xml`                            | Koordinasi untuk localization Bahasa Inggris                                             |
-| `README.md`                                                         | Koordinasi jika mengubah dokumentasi utama                                               |
+| File | Aturan |
+| --- | --- |
+| `app/src/main/java/com/example/sipinjam/MainActivity.kt` | Koordinasi karena berhubungan dengan theme, localization, auth, AppContainer, dan permission notifikasi |
+| `app/src/main/java/com/example/sipinjam/navigation/NavGraph.kt` | Koordinasi karena semua route aplikasi berada di sini |
+| `app/src/main/AndroidManifest.xml` | Koordinasi jika menambah permission, application class, activity, service, atau deeplink |
+| `app/build.gradle.kts` | Koordinasi jika menambah dependency |
+| `build.gradle.kts` | Koordinasi jika menambah plugin project-level |
+| `gradle/libs.versions.toml` | Koordinasi jika menambah atau mengubah versi library |
+| `gradle.properties` | Koordinasi karena dapat memengaruhi build semua anggota |
+| `app/src/main/java/com/example/sipinjam/di/AppContainer.kt` | Koordinasi karena semua dependency utama disediakan di sini |
+| `app/src/main/java/com/example/sipinjam/data/local/AppDatabase.kt` | Koordinasi karena perubahan entity/DAO dapat memengaruhi Room |
+| `app/src/main/java/com/example/sipinjam/ui/theme/Theme.kt` | Koordinasi karena memengaruhi dark mode |
+| `app/src/main/java/com/example/sipinjam/ui/theme/Color.kt` | Koordinasi karena memengaruhi warna global |
+| `app/src/main/java/com/example/sipinjam/ui/theme/LocalAppColors.kt` | Koordinasi karena memengaruhi custom color scheme |
+| `app/src/main/java/com/example/sipinjam/utils/notification/` | Koordinasi jika notifikasi dipanggil dari flow peminjaman/pengembalian |
+| `app/src/main/res/values/strings.xml` | Koordinasi agar key string tidak duplikat |
+| `app/src/main/res/values-en/strings.xml` | Koordinasi untuk localization Bahasa Inggris |
+| `README.md` | Koordinasi jika mengubah dokumentasi utama |
+| `CONTRIBUTING.md` | Koordinasi jika mengubah aturan kerja tim |
 
 Jika file-file tersebut perlu diubah, komunikasikan terlebih dahulu di grup dan jelaskan bagian yang akan diedit.
 
@@ -319,7 +331,58 @@ Minimal testing manual sebelum PR:
 8. Tidak merusak flow peminjaman/pengembalian.
 ```
 
+Testing tambahan untuk task notifikasi lokal:
+
+```text
+1. Login sebagai user.
+2. Pastikan permission notifikasi Android sudah diberikan.
+3. Buat pengajuan peminjaman.
+4. Login sebagai admin dan ubah status peminjaman.
+5. Pastikan notifikasi Android muncul di device/emulator user saat app aktif.
+6. Ulangi untuk flow pengembalian jika fitur sudah terhubung.
+```
+
 Untuk task besar, tambahkan bukti screenshot atau rekaman singkat jika memungkinkan.
+
+---
+
+## Aturan Notifikasi Lokal
+
+Project SiPinjam menggunakan **Android Local Notification** untuk perubahan status peminjaman dan pengembalian.
+
+Notifikasi lokal berarti notifikasi dibuat oleh aplikasi di device sendiri menggunakan Android notification system, bukan dikirim dari server melalui Firebase Cloud Messaging.
+
+Alur yang digunakan:
+
+```text
+Firestore status berubah
+→ aplikasi menerima update melalui listener/repository
+→ ViewModel/use case mendeteksi perubahan status
+→ LocalNotificationHelper dipanggil
+→ NotificationManager menampilkan notifikasi Android
+```
+
+Aturan implementasi:
+
+* Gunakan `NotificationManager` atau `NotificationCompat` untuk menampilkan notifikasi.
+* Buat notification channel untuk Android 8+.
+* Tambahkan permission `POST_NOTIFICATIONS` untuk Android 13+ jika diperlukan.
+* Simpan helper notifikasi di folder `utils/notification/`.
+* Jangan menambahkan Firebase Cloud Messaging jika task hanya membutuhkan local notification.
+* Tidak perlu FCM token.
+* Tidak perlu Cloud Functions.
+* Tidak perlu collection `notifications` di Firestore kecuali nanti benar-benar dibuat fitur riwayat notifikasi.
+
+Contoh struktur folder:
+
+```text
+utils
+└── notification
+    ├── LocalNotificationHelper.kt
+    └── NotificationConstants.kt
+```
+
+Jika notifikasi perlu dipanggil dari flow peminjaman atau pengembalian, koordinasikan dengan pemilik file terkait agar tidak terjadi conflict.
 
 ---
 
@@ -365,6 +428,7 @@ CLOUDINARY_API_SECRET=your_api_secret
 * Jangan menghapus fitur anggota lain saat melakukan merge.
 * Jika fitur dark mode atau localization rusak setelah merge, prioritaskan fix sebelum melanjutkan fitur baru.
 * Jika fitur API/Room/DI mengubah file root seperti `MainActivity.kt` atau `NavGraph.kt`, pastikan fitur lama tetap berfungsi.
+* Jika menambah notifikasi lokal, pastikan tidak membawa dependency FCM kecuali sudah disepakati tim.
 
 ---
 
@@ -393,6 +457,7 @@ com.example.sipinjam
 │   ├── components
 │   └── theme
 └── utils
+    └── notification
 ```
 
 Setiap perubahan sebaiknya mengikuti struktur tersebut agar project tetap rapi dan mudah dijelaskan saat presentasi.
