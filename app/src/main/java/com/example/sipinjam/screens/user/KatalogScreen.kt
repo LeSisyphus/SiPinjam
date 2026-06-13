@@ -67,10 +67,11 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import com.example.sipinjam.di.rememberSiPinjamViewModelFactory
 
 @Composable
 fun KatalogScreen(
-    viewModel: KatalogViewModel = viewModel(),
+    viewModel: KatalogViewModel = viewModel(factory = rememberSiPinjamViewModelFactory()),
     initialSearchQuery: String = "",
     onBarangClick: (Barang) -> Unit = {},
     onBerandaClick: () -> Unit = {},
