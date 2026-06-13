@@ -74,4 +74,32 @@ class StorageRepositoryImpl(private val context: Context) : StorageRepository {
                 .dispatch(context)
         }
     }
+
+    override suspend fun uploadFotoBarang(uri: Uri): Result<String> {
+        return suspendCancellableCoroutine { continuation ->
+            MediaManager.get()
+                .upload(uri)
+                .option("folder", "foto_barang")
+                .option("overwrite", true)
+                .callback(object : UploadCallback {
+                    override fun onStart(requestId: String) {}
+                    override fun onProgress(requestId: String, bytes: Long, totalBytes: Long) {}
+                    override fun onSuccess(requestId: String, resultData: Map<*, *>) {
+                        val url = resultData["secure_url"] as? String
+                        if (url != null) {
+                            continuation.resume(Result.success(url))
+                        } else {
+                            continuation.resume(Result.failure(Exception("URL tidak ditemukan")))
+                        }
+                    }
+                    override fun onError(requestId: String, error: ErrorInfo) {
+                        continuation.resume(Result.failure(Exception(error.description)))
+                    }
+                    override fun onReschedule(requestId: String, error: ErrorInfo) {
+                        continuation.resume(Result.failure(Exception(error.description)))
+                    }
+                })
+                .dispatch(context)
+        }
+    }
 }

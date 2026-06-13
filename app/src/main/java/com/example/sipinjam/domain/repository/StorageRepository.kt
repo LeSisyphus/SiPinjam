@@ -5,4 +5,5 @@ import android.net.Uri
 interface StorageRepository {
     suspend fun uploadFotoProfil(uri: Uri): Result<String>
     suspend fun uploadFotoPengembalian(uri: Uri, peminjamanId: String): Result<String>
+    suspend fun uploadFotoBarang(uri: Uri): Result<String>
 }
