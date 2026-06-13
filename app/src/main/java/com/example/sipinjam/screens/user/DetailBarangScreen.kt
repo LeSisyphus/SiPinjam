@@ -281,12 +281,12 @@ fun DetailBarangScreen(
                                     Spacer(Modifier.height(12.dp))
                                     Row(modifier = Modifier.fillMaxWidth()) {
                                         SpekItem(
-                                            label = "Kondisi",
+                                            label = stringResource(R.string.label_kondisi_barang),
                                             value = barang.kondisi,
                                             modifier = Modifier.weight(1f)
                                         )
                                         SpekItem(
-                                            label = "Jumlah Tersedia",
+                                            label = stringResource(R.string.label_jumlah_stok),
                                             value = "${barang.jumlahTersedia} Unit",
                                             modifier = Modifier.weight(1f)
                                         )
@@ -294,12 +294,12 @@ fun DetailBarangScreen(
                                     Spacer(Modifier.height(12.dp))
                                     Row(modifier = Modifier.fillMaxWidth()) {
                                         SpekItem(
-                                            label = "Lokasi",
+                                            label = stringResource(R.string.label_lokasi_penyimpanan),
                                             value = barang.lokasi,
                                             modifier = Modifier.weight(1f)
                                         )
                                         SpekItem(
-                                            label = "Maksimal Pinjam",
+                                            label = stringResource(R.string.label_maksimal_hari_pinjam),
                                             value = barang.maksimalPinjam,
                                             modifier = Modifier.weight(1f)
                                         )

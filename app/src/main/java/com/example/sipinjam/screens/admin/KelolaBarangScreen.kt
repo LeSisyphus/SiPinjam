@@ -214,7 +214,7 @@ fun KelolaBarangScreen(
                 Box(
                     modifier = Modifier.clip(RoundedCornerShape(20.dp)).background(sipinjamBlue.copy(alpha = 0.1f)).padding(horizontal = 12.dp, vertical = 4.dp)
                 ) {
-                    Text(text = "${daftarBarang.size} barang terdaftar", color = sipinjamBlue, fontSize = 12.sp, fontWeight = FontWeight.Medium)
+                    Text(text = stringResource(R.string.admin_registered_item_count, daftarBarang.size), color = sipinjamBlue, fontSize = 12.sp, fontWeight = FontWeight.Medium)
                 }
             }
 
@@ -233,7 +233,7 @@ fun KelolaBarangScreen(
                             .clickable { selectedKategori = kategori }
                             .padding(horizontal = 16.dp, vertical = 8.dp)
                     ) {
-                        Text(text = kategori, color = if (isSelected) Color.White else textSecondary, fontSize = 13.sp, fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Normal)
+                        Text(text = localizedAdminKategoriText(kategori), color = if (isSelected) Color.White else textSecondary, fontSize = 13.sp, fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Normal)
                     }
                 }
             }
@@ -431,7 +431,7 @@ fun KelolaBarangScreen(
                     modifier = Modifier.fillMaxWidth().heightIn(max = 400.dp).verticalScroll(rememberScrollState()),
                     verticalArrangement = Arrangement.spacedBy(14.dp)
                 ) {
-                    Text("ID Barang: ${barangToEdit.id}", color = textSecondary, fontSize = 12.sp, fontWeight = FontWeight.Medium)
+                    Text(stringResource(R.string.label_item_id, barangToEdit.id), color = textSecondary, fontSize = 12.sp, fontWeight = FontWeight.Medium)
                     Text(stringResource(R.string.label_foto_barang_change), fontSize = 13.sp, fontWeight = FontWeight.SemiBold, color = textSecondary)
                     Box(
                         modifier = Modifier
@@ -519,7 +519,7 @@ fun KelolaBarangScreen(
         AlertDialog(
             onDismissRequest = { if (!isLoading) onDeleteDismiss() },
             title = { Text(stringResource(R.string.btn_hapus_barang), fontWeight = FontWeight.Bold, fontSize = 18.sp, color = textPrimary) },
-            text = { Text("Apakah Anda yakin ingin menghapus \"${barangToDelete.nama}\" dari sistem?\nTindakan ini tidak dapat dibatalkan.", color = textSecondary) },
+            text = { Text(stringResource(R.string.dialog_delete_item_message, barangToDelete.nama), color = textSecondary) },
             confirmButton = {
                 Button(
                     colors = ButtonDefaults.buttonColors(containerColor = statusRed),
@@ -583,24 +583,33 @@ private fun BarangAdminCard(
             Text(text = barang.nama, color = textPrimary, fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
             Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                 Box(modifier = Modifier.clip(RoundedCornerShape(4.dp)).background(sipinjamBlue.copy(alpha = 0.1f)).padding(horizontal = 6.dp, vertical = 2.dp)) {
-                    Text(text = barang.kategori, color = sipinjamBlue, fontSize = 10.sp, fontWeight = FontWeight.SemiBold)
+                    Text(text = localizedAdminKategoriText(barang.kategori), color = sipinjamBlue, fontSize = 10.sp, fontWeight = FontWeight.SemiBold)
                 }
-                Text(text = "Stok: ${barang.stok} unit", color = textSecondary, fontSize = 12.sp)
+                Text(text = stringResource(R.string.label_stock_unit, barang.stok), color = textSecondary, fontSize = 12.sp)
             }
             Box(modifier = Modifier.clip(RoundedCornerShape(4.dp)).background(if (barang.tersedia) statusGreenBg else statusRedBg).padding(horizontal = 8.dp, vertical = 2.dp)) {
-                Text(text = if (barang.tersedia) "Tersedia" else "Habis", color = if (barang.tersedia) statusGreen else statusRed, fontSize = 11.sp, fontWeight = FontWeight.Medium)
+                Text(text = if (barang.tersedia) stringResource(R.string.status_tersedia) else stringResource(R.string.status_out_of_stock), color = if (barang.tersedia) statusGreen else statusRed, fontSize = 11.sp, fontWeight = FontWeight.Medium)
             }
         }
 
         Column(verticalArrangement = Arrangement.spacedBy(8.dp), horizontalAlignment = Alignment.CenterHorizontally) {
             Box(modifier = Modifier.size(34.dp).clip(RoundedCornerShape(8.dp)).background(sipinjamBlue.copy(alpha = 0.1f)).clickable { onEditClick() }, contentAlignment = Alignment.Center) {
-                Icon(imageVector = Icons.Filled.Edit, contentDescription = "Edit", tint = sipinjamBlue, modifier = Modifier.size(18.dp))
+                Icon(imageVector = Icons.Filled.Edit, contentDescription = stringResource(R.string.screen_manage_edit_item), tint = sipinjamBlue, modifier = Modifier.size(18.dp))
             }
             Box(modifier = Modifier.size(34.dp).clip(RoundedCornerShape(8.dp)).background(statusRedBg).clickable { onDeleteClick() }, contentAlignment = Alignment.Center) {
                 Icon(imageVector = Icons.Filled.Delete, contentDescription = stringResource(R.string.btn_hapus), tint = statusRed, modifier = Modifier.size(18.dp))
             }
         }
     }
+}
+
+@Composable
+private fun localizedAdminKategoriText(kategori: String): String = when {
+    kategori.equals("Semua", ignoreCase = true) -> stringResource(R.string.filter_all)
+    kategori.equals("Elektronik", ignoreCase = true) -> stringResource(R.string.category_electronics)
+    kategori.equals("Optik", ignoreCase = true) -> stringResource(R.string.category_optic)
+    kategori.equals("Kabel", ignoreCase = true) -> stringResource(R.string.category_cable)
+    else -> kategori
 }
 
 @Composable

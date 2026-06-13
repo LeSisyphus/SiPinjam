@@ -364,7 +364,7 @@ private fun FotoKondisiCard(imageUrl: String) {
             )
             Spacer(Modifier.height(8.dp))
             Text(
-                text = "Foto Kondisi Pengembalian",
+                text = stringResource(R.string.label_return_condition_photo),
                 color = TextSecondary,
                 fontSize = 12.sp
             )
@@ -399,7 +399,7 @@ private fun CatatanPeminjamCard(catatan: String) {
                     .padding(14.dp)
             ) {
                 Text(
-                    text = catatan.ifBlank { "Peminjam tidak menambahkan catatan pengembalian." },
+                    text = catatan.ifBlank { stringResource(R.string.empty_return_note) },
                     color = if (catatan.isBlank()) TextSecondary.copy(alpha = 0.7f) else TextPrimary,
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Normal,
@@ -513,7 +513,7 @@ private fun CatatanVerifikasiCard(
 private fun UserImage(imageUrl: String, modifier: Modifier = Modifier) {
     CloudinaryImage(
         imageUrl = imageUrl,
-        contentDescription = "Foto Peminjam",
+        contentDescription = stringResource(R.string.desc_profile_photo),
         modifier = modifier,
         shape = RoundedCornerShape(12.dp),
         placeholderSize = 24.dp,
