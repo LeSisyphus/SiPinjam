@@ -108,34 +108,47 @@ fun RiwayatPeminjamanScreen(
     val context = LocalContext.current
     val notificationHelper = remember { NotificationHelper(context) }
 
+    var lastKnownStatusMap by remember { mutableStateOf<Map<String, String>>(emptyMap()) }
+    var isInitialLoad by remember { mutableStateOf(true) }
+
     LaunchedEffect(daftarPeminjaman) {
         if (daftarPeminjaman.isNotEmpty()) {
             val itemTerkini = daftarPeminjaman.firstOrNull()
             if (itemTerkini != null) {
+                val idBarang = itemTerkini.id
+                val statusSekarang = itemTerkini.status
                 val namaBarang = itemTerkini.namaBarang
 
-                when (itemTerkini.status) {
-                    BorrowingStatus.DISETUJUI_LEGACY -> {
-                        notificationHelper.showStatusNotification(
-                            title = "Peminjaman Disetujui! 🎉",
-                            message = "Permintaan pinjam $namaBarang telah disetujui admin. Silakan ambil barang."
-                        )
+                val statusLama = lastKnownStatusMap[idBarang]
+
+                if (!isInitialLoad && statusLama != null && statusLama != statusSekarang) {
+                    when (statusSekarang) {
+                        BorrowingStatus.DISETUJUI_LEGACY -> {
+                            notificationHelper.showStatusNotification(
+                                title = "Peminjaman Disetujui! 🎉",
+                                message = "Permintaan pinjam $namaBarang telah disetujui admin. Silakan ambil barang."
+                            )
+                        }
+                        BorrowingStatus.DITOLAK -> {
+                            notificationHelper.showStatusNotification(
+                                title = "Peminjaman Ditolak ❌",
+                                message = "Maaf, permintaan pinjam $namaBarang ditolak oleh admin."
+                            )
+                        }
+                        BorrowingStatus.SELESAI -> {
+                            notificationHelper.showStatusNotification(
+                                title = "Pengembalian Sukses 🟢",
+                                message = "Terima kasih, barang $namaBarang telah sukses dikembalikan ke inventaris."
+                            )
+                        }
+                        else -> {}
                     }
-                    BorrowingStatus.DITOLAK -> {
-                        notificationHelper.showStatusNotification(
-                            title = "Peminjaman Ditolak ❌",
-                            message = "Maaf, permintaan pinjam $namaBarang ditolak oleh admin."
-                        )
-                    }
-                    BorrowingStatus.SELESAI -> {
-                        notificationHelper.showStatusNotification(
-                            title = "Pengembalian Sukses 🟢",
-                            message = "Terima kasih, barang $namaBarang telah sukses dikembalikan ke inventaris."
-                        )
-                    }
-                    else -> {}
                 }
             }
+
+            lastKnownStatusMap = daftarPeminjaman.associate { it.id to it.status }
+
+            isInitialLoad = false
         }
     }
 
