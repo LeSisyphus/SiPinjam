@@ -35,6 +35,7 @@ import com.example.sipinjam.screens.user.PengembalianScreen
 import com.example.sipinjam.screens.user.ProfilScreen
 import com.example.sipinjam.screens.user.RiwayatPeminjamanScreen
 import com.example.sipinjam.screens.user.FavoritBarangScreen
+import com.example.sipinjam.utils.notification.StatusNotificationObserver
 
 object Routes {
     const val LOGIN = "login"
@@ -142,6 +143,18 @@ fun NavGraph(
         isLoggedIn && !currentIsAdmin -> Routes.BERANDA_USER
         else -> startDestination
     }
+
+    val context = LocalContext.current
+    val appContainer = (context.applicationContext as SiPinjamApplication).appContainer
+
+    StatusNotificationObserver(
+        isLoggedIn = isLoggedIn,
+        isAdmin = currentIsAdmin,
+        getCurrentUserUseCase = appContainer.getCurrentUserUseCase,
+        observeRiwayatPeminjamanUseCase = appContainer.observeRiwayatPeminjamanUseCase,
+        observePermintaanPeminjamanUseCase = appContainer.observePermintaanPeminjamanUseCase,
+        observePengembalianUseCase = appContainer.observePengembalianUseCase,
+    )
 
     NavHost(
         navController = navController,

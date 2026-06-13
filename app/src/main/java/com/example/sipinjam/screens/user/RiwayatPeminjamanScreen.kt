@@ -59,9 +59,6 @@ import com.example.sipinjam.ui.theme.SiPinjamBlue
 import com.example.sipinjam.ui.theme.TextPrimary
 import com.example.sipinjam.ui.theme.TextSecondary
 
-import androidx.compose.ui.platform.LocalContext
-import com.example.sipinjam.utils.notification.NotificationHelper
-
 private const val BorrowingStatusFilterAll = "__ALL__"
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -105,53 +102,6 @@ fun RiwayatPeminjamanScreen(
 
     LaunchedEffect(Unit) {
         viewModel.muatRiwayat()
-    }
-
-    val context = LocalContext.current
-    val notificationHelper = remember { NotificationHelper(context) }
-
-    var lastKnownStatusMap by remember { mutableStateOf<Map<String, String>>(emptyMap()) }
-    var isInitialLoad by remember { mutableStateOf(true) }
-
-    LaunchedEffect(daftarPeminjaman) {
-        if (daftarPeminjaman.isNotEmpty()) {
-            val itemTerkini = daftarPeminjaman.firstOrNull()
-            if (itemTerkini != null) {
-                val idBarang = itemTerkini.id
-                val statusSekarang = itemTerkini.status
-                val namaBarang = itemTerkini.namaBarang
-
-                val statusLama = lastKnownStatusMap[idBarang]
-
-                if (!isInitialLoad && statusLama != null && statusLama != statusSekarang) {
-                    when (statusSekarang) {
-                        BorrowingStatus.DISETUJUI_LEGACY -> {
-                            notificationHelper.showStatusNotification(
-                                title = context.getString(R.string.notif_borrowing_approved_title),
-                                message = context.getString(R.string.notif_borrowing_approved_message, namaBarang)
-                            )
-                        }
-                        BorrowingStatus.DITOLAK -> {
-                            notificationHelper.showStatusNotification(
-                                title = context.getString(R.string.notif_borrowing_rejected_title),
-                                message = context.getString(R.string.notif_borrowing_rejected_message, namaBarang)
-                            )
-                        }
-                        BorrowingStatus.SELESAI -> {
-                            notificationHelper.showStatusNotification(
-                                title = context.getString(R.string.notif_return_success_title),
-                                message = context.getString(R.string.notif_return_success_message, namaBarang)
-                            )
-                        }
-                        else -> {}
-                    }
-                }
-            }
-
-            lastKnownStatusMap = daftarPeminjaman.associate { it.id to it.status }
-
-            isInitialLoad = false
-        }
     }
 
     Scaffold(
