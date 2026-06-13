@@ -1,9 +1,8 @@
 package com.example.sipinjam.screens.user
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.example.sipinjam.data.repository.BarangRepositoryImpl
+import com.example.sipinjam.domain.usecase.barang.GetBarangDetailUseCase
 import com.example.sipinjam.domain.model.FavoriteItem
 import com.example.sipinjam.domain.usecase.auth.GetCurrentUserUseCase
 import com.example.sipinjam.domain.usecase.favorite.ObserveIsFavoriteItemUseCase
@@ -23,11 +22,10 @@ data class DetailUiState(
 
 class DetailBarangViewModel(
     private val getCurrentUserUseCase: GetCurrentUserUseCase,
+    private val getBarangDetailUseCase: GetBarangDetailUseCase,
     private val observeIsFavoriteItemUseCase: ObserveIsFavoriteItemUseCase,
     private val toggleFavoriteItemUseCase: ToggleFavoriteItemUseCase,
 ) : ViewModel() {
-
-    private val repository = BarangRepositoryImpl()
 
     private val _uiState = MutableStateFlow(DetailUiState())
     val uiState: StateFlow<DetailUiState> = _uiState.asStateFlow()
@@ -41,7 +39,7 @@ class DetailBarangViewModel(
             val userId = getCurrentUserUseCase()?.uid.orEmpty()
             currentUserId = userId.ifBlank { null }
 
-            val barangDoc = repository.getBarangById(barangId)
+            val barangDoc = getBarangDetailUseCase(barangId)
             if (barangDoc != null) {
                 val detailMapped = DetailBarang(
                     id = barangDoc.id,
@@ -89,20 +87,5 @@ class DetailBarangViewModel(
                 )
             )
         }
-    }
-}
-
-class DetailBarangViewModelFactory(
-    private val getCurrentUserUseCase: GetCurrentUserUseCase,
-    private val observeIsFavoriteItemUseCase: ObserveIsFavoriteItemUseCase,
-    private val toggleFavoriteItemUseCase: ToggleFavoriteItemUseCase,
-) : ViewModelProvider.Factory {
-    override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        @Suppress("UNCHECKED_CAST")
-        return DetailBarangViewModel(
-            getCurrentUserUseCase = getCurrentUserUseCase,
-            observeIsFavoriteItemUseCase = observeIsFavoriteItemUseCase,
-            toggleFavoriteItemUseCase = toggleFavoriteItemUseCase,
-        ) as T
     }
 }

@@ -30,7 +30,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -39,7 +38,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
-import com.example.sipinjam.SiPinjamApplication
+import com.example.sipinjam.di.rememberSiPinjamViewModelFactory
 import com.example.sipinjam.domain.model.FavoriteItem
 import com.example.sipinjam.ui.components.SiPinjamTopBar
 import com.example.sipinjam.ui.components.UserBottomNavBar
@@ -61,14 +60,8 @@ fun FavoritBarangScreen(
     onRiwayatClick: () -> Unit = {},
     onProfilClick: () -> Unit = {},
 ) {
-    val context = LocalContext.current
-    val appContainer = (context.applicationContext as SiPinjamApplication).appContainer
     val viewModel: FavoritBarangViewModel = viewModel(
-        factory = FavoritBarangViewModelFactory(
-            getCurrentUserUseCase = appContainer.getCurrentUserUseCase,
-            getFavoriteItemsUseCase = appContainer.getFavoriteItemsUseCase,
-            toggleFavoriteItemUseCase = appContainer.toggleFavoriteItemUseCase,
-        )
+        factory = rememberSiPinjamViewModelFactory(),
     )
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
