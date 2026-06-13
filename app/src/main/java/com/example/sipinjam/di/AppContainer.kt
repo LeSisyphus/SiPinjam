@@ -29,6 +29,7 @@ import com.example.sipinjam.domain.repository.StorageRepository
 import com.example.sipinjam.data.repository.StorageRepositoryImpl
 import com.example.sipinjam.domain.usecase.auth.CheckAuthStateUseCase
 import com.example.sipinjam.domain.usecase.auth.GetCurrentUserUseCase
+import com.example.sipinjam.domain.usecase.auth.GetUserByIdUseCase
 import com.example.sipinjam.domain.usecase.auth.LoginUseCase
 import com.example.sipinjam.domain.usecase.auth.LogoutUseCase
 import com.example.sipinjam.domain.usecase.auth.RegisterUseCase
@@ -45,6 +46,7 @@ import com.example.sipinjam.domain.usecase.peminjaman.ObservePermintaanPeminjama
 import com.example.sipinjam.domain.usecase.peminjaman.ObserveRiwayatPeminjamanUseCase
 import com.example.sipinjam.domain.usecase.peminjaman.RejectPeminjamanUseCase
 import com.example.sipinjam.domain.usecase.pengembalian.AjukanPengembalianUseCase
+import com.example.sipinjam.domain.usecase.pengembalian.GetPengembalianByPeminjamanIdUseCase
 import com.example.sipinjam.domain.usecase.pengembalian.GetPengembalianDetailUseCase
 import com.example.sipinjam.domain.usecase.pengembalian.ObservePengembalianUseCase
 import com.example.sipinjam.domain.usecase.pengembalian.TolakPengembalianUseCase
@@ -52,10 +54,9 @@ import com.example.sipinjam.domain.usecase.pengembalian.VerifikasiPengembalianUs
 import com.example.sipinjam.domain.usecase.profile.ChangePasswordUseCase
 import com.example.sipinjam.domain.usecase.profile.UpdateProfilePhotoUrlUseCase
 import com.example.sipinjam.domain.usecase.profile.UpdateProfileUseCase
+import com.example.sipinjam.domain.usecase.storage.UploadItemPhotoUseCase
 import com.example.sipinjam.domain.usecase.storage.UploadProfilePhotoUseCase
 import com.example.sipinjam.domain.usecase.storage.UploadReturnPhotoUseCase
-import com.example.sipinjam.screens.user.BerandaUserViewModelFactory
-import com.example.sipinjam.screens.user.FavoritBarangViewModelFactory
 
 class AppContainer(
     private val context: Context,
@@ -88,6 +89,7 @@ class AppContainer(
     val registerUseCase: RegisterUseCase by lazy { RegisterUseCase(authRepository) }
     val logoutUseCase: LogoutUseCase by lazy { LogoutUseCase(authRepository) }
     val getCurrentUserUseCase: GetCurrentUserUseCase by lazy { GetCurrentUserUseCase(authRepository) }
+    val getUserByIdUseCase: GetUserByIdUseCase by lazy { GetUserByIdUseCase(authRepository) }
     val checkAuthStateUseCase: CheckAuthStateUseCase by lazy { CheckAuthStateUseCase(authRepository) }
 
     val observeBarangListUseCase: ObserveBarangListUseCase by lazy { ObserveBarangListUseCase(barangRepository) }
@@ -107,6 +109,7 @@ class AppContainer(
     val ajukanPengembalianUseCase: AjukanPengembalianUseCase by lazy { AjukanPengembalianUseCase(pengembalianRepository) }
     val observePengembalianUseCase: ObservePengembalianUseCase by lazy { ObservePengembalianUseCase(pengembalianRepository) }
     val getPengembalianDetailUseCase: GetPengembalianDetailUseCase by lazy { GetPengembalianDetailUseCase(pengembalianRepository) }
+    val getPengembalianByPeminjamanIdUseCase: GetPengembalianByPeminjamanIdUseCase by lazy { GetPengembalianByPeminjamanIdUseCase(pengembalianRepository) }
     val verifikasiPengembalianUseCase: VerifikasiPengembalianUseCase by lazy { VerifikasiPengembalianUseCase(pengembalianRepository) }
     val tolakPengembalianUseCase: TolakPengembalianUseCase by lazy { TolakPengembalianUseCase(pengembalianRepository) }
 
@@ -114,6 +117,7 @@ class AppContainer(
     val changePasswordUseCase: ChangePasswordUseCase by lazy { ChangePasswordUseCase(authRepository) }
     val updateProfilePhotoUrlUseCase: UpdateProfilePhotoUrlUseCase by lazy { UpdateProfilePhotoUrlUseCase(authRepository) }
     val uploadProfilePhotoUseCase: UploadProfilePhotoUseCase by lazy { UploadProfilePhotoUseCase(storageRepository) }
+    val uploadItemPhotoUseCase: UploadItemPhotoUseCase by lazy { UploadItemPhotoUseCase(storageRepository) }
     val uploadReturnPhotoUseCase: UploadReturnPhotoUseCase by lazy { UploadReturnPhotoUseCase(storageRepository) }
 
     private val holidayRemoteDataSource: HolidayRemoteDataSource by lazy {
@@ -163,22 +167,10 @@ class AppContainer(
         ToggleFavoriteItemUseCase(favoriteItemRepository)
     }
 
-    val berandaUserViewModelFactory: BerandaUserViewModelFactory by lazy {
-        BerandaUserViewModelFactory(
-            getTodayHolidayUseCase = getTodayHolidayUseCase,
-            observeMonthlyHolidaysUseCase = observeMonthlyHolidaysUseCase,
-            refreshMonthlyHolidaysUseCase = refreshMonthlyHolidaysUseCase,
-            barangRepository = barangRepository,
-            peminjamanRepository = peminjamanRepository,
-            authRepository = authRepository,
-        )
-    }
-
-    val favoritBarangViewModelFactory: FavoritBarangViewModelFactory by lazy {
-        FavoritBarangViewModelFactory(
-            getCurrentUserUseCase = getCurrentUserUseCase,
-            getFavoriteItemsUseCase = getFavoriteItemsUseCase,
-            toggleFavoriteItemUseCase = toggleFavoriteItemUseCase,
+    val viewModelFactory: SiPinjamViewModelFactory by lazy {
+        SiPinjamViewModelFactory(
+            appContainer = this,
+            application = context.applicationContext as android.app.Application,
         )
     }
 }
