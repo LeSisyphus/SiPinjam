@@ -36,11 +36,13 @@ fun StatusNotificationObserver(
     val notificationHelper = remember { NotificationHelper(context) }
 
     val userBorrowingStatusMap = remember { mutableStateMapOf<String, String>() }
+    val userReturnStatusMap = remember { mutableStateMapOf<String, String>() }
     val adminBorrowingStatusMap = remember { mutableStateMapOf<String, String>() }
     val adminReturnStatusMap = remember { mutableStateMapOf<String, String>() }
 
     LaunchedEffect(isLoggedIn, isAdmin) {
         userBorrowingStatusMap.clear()
+        userReturnStatusMap.clear()
         adminBorrowingStatusMap.clear()
         adminReturnStatusMap.clear()
 
@@ -59,17 +61,46 @@ fun StatusNotificationObserver(
                 returnStatusMap = adminReturnStatusMap,
             )
         } else {
-            observeUserBorrowingStatusNotifications(
+            observeUserNotifications(
                 userId = currentUserId,
                 observeRiwayatPeminjamanUseCase = observeRiwayatPeminjamanUseCase,
+                observePengembalianUseCase = observePengembalianUseCase,
                 notificationHelper = notificationHelper,
                 borrowingStatusMap = userBorrowingStatusMap,
+                returnStatusMap = userReturnStatusMap,
             )
         }
     }
 }
 
-private suspend fun observeUserBorrowingStatusNotifications(
+private suspend fun observeUserNotifications(
+    userId: String,
+    observeRiwayatPeminjamanUseCase: ObserveRiwayatPeminjamanUseCase,
+    observePengembalianUseCase: ObservePengembalianUseCase,
+    notificationHelper: NotificationHelper,
+    borrowingStatusMap: MutableMap<String, String>,
+    returnStatusMap: MutableMap<String, String>,
+) = coroutineScope {
+    launch {
+        observeUserBorrowingNotifications(
+            userId = userId,
+            observeRiwayatPeminjamanUseCase = observeRiwayatPeminjamanUseCase,
+            notificationHelper = notificationHelper,
+            borrowingStatusMap = borrowingStatusMap,
+        )
+    }
+
+    launch {
+        observeUserReturnNotifications(
+            userId = userId,
+            observePengembalianUseCase = observePengembalianUseCase,
+            notificationHelper = notificationHelper,
+            returnStatusMap = returnStatusMap,
+        )
+    }
+}
+
+private suspend fun observeUserBorrowingNotifications(
     userId: String,
     observeRiwayatPeminjamanUseCase: ObserveRiwayatPeminjamanUseCase,
     notificationHelper: NotificationHelper,
@@ -87,33 +118,80 @@ private suspend fun observeUserBorrowingStatusNotifications(
                 val namaBarang = peminjaman.namaBarang
 
                 if (!isInitialLoad && statusLama != null && statusLama != statusSekarang) {
-                    when (statusSekarang) {
-                        BorrowingStatus.DIPINJAM,
-                        BorrowingStatus.DISETUJUI_LEGACY -> {
+                    when {
+                        statusLama.equals(BorrowingStatus.DIPROSES, ignoreCase = true) &&
+                                (
+                                        statusSekarang.equals(BorrowingStatus.DIPINJAM, ignoreCase = true) ||
+                                                statusSekarang.equals(BorrowingStatus.DISETUJUI_LEGACY, ignoreCase = true)
+                                        ) -> {
                             notificationHelper.showStatusNotification(
                                 title = "Peminjaman Disetujui!",
                                 message = "Permintaan pinjam $namaBarang telah disetujui admin. Silakan ambil barang."
                             )
                         }
 
-                        BorrowingStatus.DITOLAK -> {
+                        statusLama.equals(BorrowingStatus.DIPROSES, ignoreCase = true) &&
+                                statusSekarang.equals(BorrowingStatus.DITOLAK, ignoreCase = true) -> {
                             notificationHelper.showStatusNotification(
                                 title = "Peminjaman Ditolak",
                                 message = "Maaf, permintaan pinjam $namaBarang ditolak oleh admin."
                             )
                         }
 
-                        BorrowingStatus.SELESAI -> {
-                            notificationHelper.showStatusNotification(
-                                title = "Pengembalian Sukses",
-                                message = "Terima kasih, barang $namaBarang telah sukses dikembalikan ke inventaris."
-                            )
-                        }
+                        else -> Unit
                     }
                 }
 
                 borrowingStatusMap[peminjamanId] = statusSekarang
             }
+
+            isInitialLoad = false
+        }
+}
+
+private suspend fun observeUserReturnNotifications(
+    userId: String,
+    observePengembalianUseCase: ObservePengembalianUseCase,
+    notificationHelper: NotificationHelper,
+    returnStatusMap: MutableMap<String, String>,
+) {
+    var isInitialLoad = true
+
+    observePengembalianUseCase()
+        .catch { /* Keep notification observer silent if data listener fails. */ }
+        .collect { daftarPengembalian ->
+            daftarPengembalian
+                .filter { it.userId == userId }
+                .forEach { pengembalian ->
+                    val pengembalianId = pengembalian.id
+                    val statusSekarang = pengembalian.status
+                    val statusLama = returnStatusMap[pengembalianId]
+                    val namaBarang = pengembalian.barangId.ifBlank { "barang" }
+
+                    if (!isInitialLoad && statusLama != null && statusLama != statusSekarang) {
+                        when {
+                            statusLama.equals(ReturnStatus.MENUNGGU_VERIFIKASI, ignoreCase = true) &&
+                                    statusSekarang.equals(ReturnStatus.TERVERIFIKASI, ignoreCase = true) -> {
+                                notificationHelper.showStatusNotification(
+                                    title = "Pengembalian Disetujui",
+                                    message = "Pengembalian $namaBarang telah diverifikasi oleh admin."
+                                )
+                            }
+
+                            statusLama.equals(ReturnStatus.MENUNGGU_VERIFIKASI, ignoreCase = true) &&
+                                    statusSekarang.equals(ReturnStatus.DITOLAK, ignoreCase = true) -> {
+                                notificationHelper.showStatusNotification(
+                                    title = "Pengembalian Ditolak",
+                                    message = "Pengembalian $namaBarang ditolak. Silakan cek catatan admin."
+                                )
+                            }
+
+                            else -> Unit
+                        }
+                    }
+
+                    returnStatusMap[pengembalianId] = statusSekarang
+                }
 
             isInitialLoad = false
         }
