@@ -109,7 +109,7 @@ fun ProfilScreen(
                         if (uiState.user.fotoUrl.isNotBlank()) {
                             AsyncImage(
                                 model = uiState.user.fotoUrl,
-                                contentDescription = "Foto Profil",
+                                contentDescription = stringResource(R.string.desc_profile_photo),
                                 modifier = Modifier.fillMaxSize(),
                                 contentScale = ContentScale.Crop
                             )
@@ -234,7 +234,7 @@ fun ProfilScreen(
 
             Spacer(Modifier.height(24.dp))
 
-            SectionLabel("Keamanan & Aktivitas")
+            SectionLabel(stringResource(R.string.label_security_activity))
 
             Spacer(Modifier.height(10.dp))
 
@@ -310,7 +310,7 @@ fun ProfilScreen(
                                 )
                             }
                             Text(
-                                text = "Favorit Saya",
+                                text = stringResource(R.string.screen_profile_favorites),
                                 color = TextPrimary,
                                 fontSize = 14.sp,
                                 fontWeight = FontWeight.Medium,

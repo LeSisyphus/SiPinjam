@@ -1,5 +1,6 @@
 package com.example.sipinjam.screens.user
 
+import com.example.sipinjam.R
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.text.BasicTextField
@@ -34,6 +35,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
@@ -141,8 +143,8 @@ fun BerandaUserScreen(
 
             item {
                 SectionHeader(
-                    title = "Barang Tersedia",
-                    actionText = "LIHAT SEMUA",
+                    title = stringResource(R.string.screen_home_available_items),
+                    actionText = stringResource(R.string.btn_lihat_semua).uppercase(),
                     onActionClick = onLihatSemuaBarang
                 )
             }
@@ -166,7 +168,7 @@ fun BerandaUserScreen(
                     }
                     uiState.barangTersedia.isEmpty() -> {
                         EmptyStateCard(
-                            text = "Belum ada barang tersedia.",
+                            text = stringResource(R.string.empty_available_items),
                             modifier = Modifier.padding(horizontal = 20.dp)
                         )
                     }
@@ -201,7 +203,7 @@ fun BerandaUserScreen(
 
             item {
                 Text(
-                    text = "Perlu Dikembalikan",
+                    text = stringResource(R.string.screen_home_return_needed),
                     color = TextPrimary,
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold,
@@ -214,7 +216,7 @@ fun BerandaUserScreen(
             if (uiState.itemDikembalikan.isEmpty()) {
                 item {
                     EmptyStateCard(
-                        text = "Tidak ada barang yang perlu dikembalikan.",
+                        text = stringResource(R.string.empty_return_needed),
                         modifier = Modifier.padding(horizontal = 20.dp)
                     )
                 }
@@ -293,7 +295,7 @@ private fun SearchSection(onSearchSubmit: (String) -> Unit = {}) {
                 Box {
                     if (query.isEmpty()) {
                         Text(
-                            text = "Cari barang yang ingin kamu pinjam",
+                            text = stringResource(R.string.screen_home_search_prompt),
                             color = TextSecondary.copy(alpha = 0.6f),
                             fontSize = 14.sp
                         )
@@ -333,19 +335,19 @@ private fun HolidayInfoCard(
             ) {
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
-                        text = "Info Hari Libur",
+                        text = stringResource(R.string.label_holiday_info),
                         color = TextPrimary,
                         fontSize = 15.sp,
                         fontWeight = FontWeight.Bold
                     )
                     Text(
-                        text = "Data dari API pihak ketiga + cache Room",
+                        text = stringResource(R.string.label_holiday_source),
                         color = TextSecondary,
                         fontSize = 11.sp
                     )
                 }
                 Text(
-                    text = "REFRESH",
+                    text = stringResource(R.string.btn_refresh),
                     color = SiPinjamBlue,
                     fontSize = 11.sp,
                     fontWeight = FontWeight.SemiBold,
@@ -365,7 +367,7 @@ private fun HolidayInfoCard(
                         )
                         Spacer(Modifier.width(10.dp))
                         Text(
-                            text = "Memuat info hari libur...",
+                            text = stringResource(R.string.loading_holiday_info),
                             color = TextSecondary,
                             fontSize = 13.sp
                         )
@@ -376,22 +378,22 @@ private fun HolidayInfoCard(
                 }
                 else -> {
                     val todayText = if (todayStatus?.isHoliday == true) {
-                        "Hari ini libur: ${todayStatus.displayName}"
+                        stringResource(R.string.holiday_today_yes, todayStatus.displayName)
                     } else {
-                        "Hari ini bukan hari libur nasional/cuti bersama."
+                        stringResource(R.string.holiday_today_no)
                     }
                     Text(text = todayText, color = TextPrimary, fontSize = 13.sp, fontWeight = FontWeight.Medium)
                     Spacer(Modifier.height(6.dp))
                     Text(
-                        text = nearestHoliday?.let { "Libur terdekat bulan ini: ${it.date} • ${it.name}" }
-                            ?: "Belum ada data libur pada bulan ini.",
+                        text = nearestHoliday?.let { stringResource(R.string.holiday_nearest_month, it.date, it.name) }
+                            ?: stringResource(R.string.holiday_empty_month),
                         color = TextSecondary,
                         fontSize = 12.sp
                     )
                     if (errorMessage != null) {
                         Spacer(Modifier.height(6.dp))
                         Text(
-                            text = "Menampilkan cache terakhir karena refresh gagal.",
+                            text = stringResource(R.string.holiday_cache_fallback),
                             color = Color(0xFFF57C00),
                             fontSize = 11.sp
                         )
@@ -465,7 +467,7 @@ private fun BarangCard(barang: BarangTersedia, onClick: () -> Unit) {
                         .padding(horizontal = 6.dp, vertical = 2.dp)
                 ) {
                     Text(
-                        text = "TERSEDIA",
+                        text = stringResource(R.string.status_tersedia_upper),
                         color = StatusGreen,
                         fontSize = 9.sp,
                         fontWeight = FontWeight.Bold,
@@ -520,7 +522,7 @@ private fun KembalikanCard(item: ItemDikembalikan, onClick: () -> Unit, modifier
                 .clickable { onClick() }
                 .padding(horizontal = 14.dp, vertical = 7.dp)
         ) {
-            Text(text = "Kembalikan", color = Color.White, fontSize = 12.sp, fontWeight = FontWeight.SemiBold)
+            Text(text = stringResource(R.string.btn_kembalikan), color = Color.White, fontSize = 12.sp, fontWeight = FontWeight.SemiBold)
         }
     }
 }

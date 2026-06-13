@@ -62,6 +62,8 @@ import com.example.sipinjam.ui.theme.TextSecondary
 import androidx.compose.ui.platform.LocalContext
 import com.example.sipinjam.utils.notification.NotificationHelper
 
+private const val BorrowingStatusFilterAll = "__ALL__"
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RiwayatPeminjamanScreen(
@@ -84,9 +86,9 @@ fun RiwayatPeminjamanScreen(
     val isLoading by viewModel.isLoading.collectAsState()
     val errorMessage by viewModel.errorMessage.collectAsState()
 
-    var filterAktif by remember { mutableStateOf("Semua") }
+    var filterAktif by remember { mutableStateOf(BorrowingStatusFilterAll) }
     val filterList = listOf(
-        "Semua",
+        BorrowingStatusFilterAll,
         BorrowingStatus.DIPROSES,
         BorrowingStatus.DISETUJUI_LEGACY,
         BorrowingStatus.DIPINJAM,
@@ -95,7 +97,7 @@ fun RiwayatPeminjamanScreen(
         BorrowingStatus.SELESAI
     )
 
-    val filtered = if (filterAktif == "Semua") {
+    val filtered = if (filterAktif == BorrowingStatusFilterAll) {
         daftarPeminjaman
     } else {
         daftarPeminjaman.filter { it.status.equals(filterAktif, ignoreCase = true) }
@@ -125,20 +127,20 @@ fun RiwayatPeminjamanScreen(
                     when (statusSekarang) {
                         BorrowingStatus.DISETUJUI_LEGACY -> {
                             notificationHelper.showStatusNotification(
-                                title = "Peminjaman Disetujui! 🎉",
-                                message = "Permintaan pinjam $namaBarang telah disetujui admin. Silakan ambil barang."
+                                title = context.getString(R.string.notif_borrowing_approved_title),
+                                message = context.getString(R.string.notif_borrowing_approved_message, namaBarang)
                             )
                         }
                         BorrowingStatus.DITOLAK -> {
                             notificationHelper.showStatusNotification(
-                                title = "Peminjaman Ditolak ❌",
-                                message = "Maaf, permintaan pinjam $namaBarang ditolak oleh admin."
+                                title = context.getString(R.string.notif_borrowing_rejected_title),
+                                message = context.getString(R.string.notif_borrowing_rejected_message, namaBarang)
                             )
                         }
                         BorrowingStatus.SELESAI -> {
                             notificationHelper.showStatusNotification(
-                                title = "Pengembalian Sukses 🟢",
-                                message = "Terima kasih, barang $namaBarang telah sukses dikembalikan ke inventaris."
+                                title = context.getString(R.string.notif_return_success_title),
+                                message = context.getString(R.string.notif_return_success_message, namaBarang)
                             )
                         }
                         else -> {}
@@ -187,7 +189,7 @@ fun RiwayatPeminjamanScreen(
                         onClick = { filterAktif = filter },
                         text = {
                             Text(
-                                text = filter,
+                                text = localizedHistoryFilter(filter),
                                 fontSize = 13.sp,
                                 fontWeight = if (filterAktif == filter) FontWeight.Bold else FontWeight.Normal
                             )
@@ -207,7 +209,7 @@ fun RiwayatPeminjamanScreen(
                 filtered.isEmpty() -> {
                     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                         Text(
-                            text = errorMessage ?: "Belum ada riwayat peminjaman",
+                            text = errorMessage ?: stringResource(R.string.empty_history),
                             color = TextSecondary,
                             fontSize = 14.sp
                         )
@@ -241,6 +243,18 @@ fun RiwayatPeminjamanScreen(
             }
         }
     }
+}
+
+@Composable
+private fun localizedHistoryFilter(filter: String): String = when {
+    filter == BorrowingStatusFilterAll -> stringResource(R.string.filter_all)
+    filter.equals(BorrowingStatus.DIPROSES, ignoreCase = true) -> stringResource(R.string.status_diproses)
+    filter.equals(BorrowingStatus.DISETUJUI_LEGACY, ignoreCase = true) -> stringResource(R.string.status_disetujui_legacy)
+    filter.equals(BorrowingStatus.DIPINJAM, ignoreCase = true) -> stringResource(R.string.status_dipinjam)
+    filter.equals(BorrowingStatus.MENUNGGU_VERIFIKASI, ignoreCase = true) -> stringResource(R.string.status_menunggu_verifikasi)
+    filter.equals(BorrowingStatus.DITOLAK, ignoreCase = true) -> stringResource(R.string.status_ditolak)
+    filter.equals(BorrowingStatus.SELESAI, ignoreCase = true) -> stringResource(R.string.status_selesai)
+    else -> filter
 }
 
 @Composable

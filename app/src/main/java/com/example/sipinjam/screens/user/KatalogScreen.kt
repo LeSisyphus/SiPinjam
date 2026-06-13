@@ -147,7 +147,7 @@ fun KatalogScreen(
 
                 uiState.filteredBarang.isEmpty() -> {
                     KatalogMessageCard(
-                        message = "Tidak ada barang yang sesuai.",
+                        message = stringResource(R.string.empty_catalog_items),
                         modifier = Modifier.padding(horizontal = 24.dp)
                     )
                 }
@@ -241,7 +241,7 @@ private fun SearchAndFilterSection(
             ) {
                 Icon(
                     imageVector = Icons.Filled.Tune,
-                    contentDescription = "Filter",
+                    contentDescription = stringResource(R.string.desc_filter),
                     tint = if (selectedAvailability != "Semua") Color.White else SiPinjamBlue,
                     modifier = Modifier.size(24.dp)
                 )
@@ -253,7 +253,7 @@ private fun SearchAndFilterSection(
             ) {
                 listOf("Semua", "Tersedia", "Dipinjam").forEach { option ->
                     DropdownMenuItem(
-                        text = { Text(option) },
+                        text = { Text(localizedAvailabilityFilter(option)) },
                         onClick = {
                             onAvailabilitySelected(option)
                             showFilterMenu = false
@@ -263,6 +263,23 @@ private fun SearchAndFilterSection(
             }
         }
     }
+}
+
+@Composable
+private fun localizedAvailabilityFilter(option: String): String = when {
+    option.equals("Semua", ignoreCase = true) -> stringResource(R.string.filter_all)
+    option.equals("Tersedia", ignoreCase = true) -> stringResource(R.string.filter_available)
+    option.equals("Dipinjam", ignoreCase = true) -> stringResource(R.string.filter_borrowed)
+    else -> option
+}
+
+@Composable
+private fun localizedKategoriText(kategori: String): String = when {
+    kategori.equals("Semua", ignoreCase = true) -> stringResource(R.string.filter_all)
+    kategori.equals("Elektronik", ignoreCase = true) -> stringResource(R.string.category_electronics)
+    kategori.equals("Optik", ignoreCase = true) -> stringResource(R.string.category_optic)
+    kategori.equals("Kabel", ignoreCase = true) -> stringResource(R.string.category_cable)
+    else -> kategori
 }
 
 @Composable
@@ -302,7 +319,7 @@ private fun KategoriChip(
         contentAlignment = Alignment.Center
     ) {
         Text(
-            text = text,
+            text = localizedKategoriText(text),
             color = if (selected) Color.White else TextSecondary,
             fontSize = 14.sp,
             fontWeight = if (selected) FontWeight.Bold else FontWeight.Medium
@@ -316,7 +333,7 @@ private fun KatalogBarangCard(
     onClick: () -> Unit,
 ) {
     val isAvailable = barang.stok > 0 && barang.tersedia
-    val statusText = if (isAvailable) "Tersedia" else "Dipinjam"
+    val statusText = if (isAvailable) stringResource(R.string.status_tersedia) else stringResource(R.string.filter_borrowed)
     val statusColor = if (isAvailable) StatusGreen else StatusRed
 
     Card(
@@ -406,7 +423,7 @@ private fun KatalogBarangCard(
                     Spacer(modifier = Modifier.weight(1f))
 
                     Text(
-                        text = "${barang.stok.coerceAtLeast(0)} STOK",
+                        text = stringResource(R.string.label_stock_count, barang.stok.coerceAtLeast(0)),
                         color = TextSecondary,
                         fontSize = 10.sp,
                         fontWeight = FontWeight.ExtraBold,
