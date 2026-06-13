@@ -36,7 +36,6 @@ object AppPreferences {
             "en" -> "en"
             else -> "id"
         }
-
         languageCode = normalized
         context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
             .edit()
