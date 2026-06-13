@@ -2,12 +2,11 @@ package com.example.sipinjam.screens.user
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.sipinjam.domain.repository.AuthRepository
-import com.example.sipinjam.data.repository.AuthRepositoryImpl
-import com.example.sipinjam.domain.repository.BarangRepository
-import com.example.sipinjam.data.repository.BarangRepositoryImpl
-import com.example.sipinjam.domain.repository.PeminjamanRepository
-import com.example.sipinjam.data.repository.PeminjamanRepositoryImpl
+import com.example.sipinjam.domain.model.BorrowingStatus
+import com.example.sipinjam.domain.usecase.auth.GetCurrentUserUseCase
+import com.example.sipinjam.domain.usecase.barang.GetBarangDetailUseCase
+import com.example.sipinjam.domain.usecase.barang.ObserveBarangListUseCase
+import com.example.sipinjam.domain.usecase.peminjaman.ObserveRiwayatPeminjamanUseCase
 import com.example.sipinjam.domain.model.Holiday
 import com.example.sipinjam.domain.model.HolidayStatus
 import com.example.sipinjam.domain.usecase.holiday.GetTodayHolidayUseCase
@@ -37,12 +36,13 @@ data class BerandaUiState(
 )
 
 class BerandaUserViewModel(
-    private val getTodayHolidayUseCase: GetTodayHolidayUseCase? = null,
-    private val observeMonthlyHolidaysUseCase: ObserveMonthlyHolidaysUseCase? = null,
-    private val refreshMonthlyHolidaysUseCase: RefreshMonthlyHolidaysUseCase? = null,
-    private val barangRepository: BarangRepository = BarangRepositoryImpl(),
-    private val peminjamanRepository: PeminjamanRepository = PeminjamanRepositoryImpl(),
-    private val authRepository: AuthRepository = AuthRepositoryImpl(),
+    private val getTodayHolidayUseCase: GetTodayHolidayUseCase,
+    private val observeMonthlyHolidaysUseCase: ObserveMonthlyHolidaysUseCase,
+    private val refreshMonthlyHolidaysUseCase: RefreshMonthlyHolidaysUseCase,
+    private val observeBarangListUseCase: ObserveBarangListUseCase,
+    private val getBarangDetailUseCase: GetBarangDetailUseCase,
+    private val observeRiwayatPeminjamanUseCase: ObserveRiwayatPeminjamanUseCase,
+    private val getCurrentUserUseCase: GetCurrentUserUseCase,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(BerandaUiState())
@@ -68,9 +68,6 @@ class BerandaUserViewModel(
     }
 
     fun refreshHolidayInfo() {
-        val refreshUseCase = refreshMonthlyHolidaysUseCase ?: return
-        val todayUseCase = getTodayHolidayUseCase ?: return
-
         viewModelScope.launch {
             val (year, month) = currentYearMonth()
             _uiState.update {
@@ -80,8 +77,8 @@ class BerandaUserViewModel(
                 )
             }
 
-            val refreshResult = refreshUseCase(year, month)
-            val todayResult = todayUseCase()
+            val refreshResult = refreshMonthlyHolidaysUseCase(year, month)
+            val todayResult = getTodayHolidayUseCase()
 
             _uiState.update { currentState ->
                 currentState.copy(
@@ -101,11 +98,9 @@ class BerandaUserViewModel(
     }
 
     private fun observeHolidayCache() {
-        val observeUseCase = observeMonthlyHolidaysUseCase ?: return
-
         viewModelScope.launch {
             val (year, month) = currentYearMonth()
-            observeUseCase(year, month)
+            observeMonthlyHolidaysUseCase(year, month)
                 .catch { exception ->
                     _uiState.update {
                         it.copy(
@@ -126,7 +121,7 @@ class BerandaUserViewModel(
         _uiState.update { it.copy(isLoading = true) }
 
         viewModelScope.launch {
-            barangRepository.getAllBarangRealTime()
+            observeBarangListUseCase()
                 .catch { exception ->
                     _uiState.update {
                         it.copy(
@@ -170,7 +165,7 @@ class BerandaUserViewModel(
 
     private fun fetchItemPerluDikembalikanRealTime() {
         viewModelScope.launch {
-            val currentUser = authRepository.getCurrentUser()
+            val currentUser = getCurrentUserUseCase()
 
             if (currentUser == null) {
                 _uiState.update {
@@ -179,7 +174,7 @@ class BerandaUserViewModel(
                 return@launch
             }
 
-            peminjamanRepository.listenPeminjamanByUser(currentUser.uid)
+            observeRiwayatPeminjamanUseCase(currentUser.uid)
                 .catch { exception ->
                     _uiState.update {
                         it.copy(
@@ -190,12 +185,11 @@ class BerandaUserViewModel(
                 .collect { daftarPeminjaman ->
                     val daftarPerluDikembalikan = daftarPeminjaman
                         .filter { peminjaman ->
-                            peminjaman.status.equals("Disetujui", ignoreCase = true) ||
-                                    peminjaman.status.equals("Dipinjam", ignoreCase = true)
+                            BorrowingStatus.canRequestReturn(peminjaman.status)
                         }
                         .map { peminjaman ->
                             async {
-                                val barang = barangRepository.getBarangById(peminjaman.barangId)
+                                val barang = getBarangDetailUseCase(peminjaman.barangId)
 
                                 ItemDikembalikan(
                                     peminjamanId = peminjaman.id,

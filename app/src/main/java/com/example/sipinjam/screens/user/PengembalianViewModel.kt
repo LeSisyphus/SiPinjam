@@ -1,19 +1,16 @@
 package com.example.sipinjam.screens.user
 
 import com.example.sipinjam.domain.model.ReturnStatus
-import com.example.sipinjam.domain.model.BorrowingStatus
 import android.content.Context
 import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.sipinjam.domain.model.Barang
 import com.example.sipinjam.domain.model.Pengembalian
-import com.example.sipinjam.domain.repository.BarangRepository
-import com.example.sipinjam.data.repository.BarangRepositoryImpl
-import com.example.sipinjam.domain.repository.PengembalianRepository
-import com.example.sipinjam.data.repository.PengembalianRepositoryImpl
-import com.example.sipinjam.domain.repository.StorageRepository
-import com.example.sipinjam.data.repository.StorageRepositoryImpl
+import com.example.sipinjam.domain.usecase.barang.GetBarangDetailUseCase
+import com.example.sipinjam.domain.usecase.pengembalian.AjukanPengembalianUseCase
+import com.example.sipinjam.domain.usecase.pengembalian.GetPengembalianByPeminjamanIdUseCase
+import com.example.sipinjam.domain.usecase.storage.UploadReturnPhotoUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -22,10 +19,12 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-class PengembalianViewModel : ViewModel() {
-
-    private val pengembalianRepository = PengembalianRepositoryImpl()
-    private val barangRepository = BarangRepositoryImpl()
+class PengembalianViewModel(
+    private val getBarangDetailUseCase: GetBarangDetailUseCase,
+    private val getPengembalianByPeminjamanIdUseCase: GetPengembalianByPeminjamanIdUseCase,
+    private val ajukanPengembalianUseCase: AjukanPengembalianUseCase,
+    private val uploadReturnPhotoUseCase: UploadReturnPhotoUseCase,
+) : ViewModel() {
 
     private val _barang = MutableStateFlow<Barang?>(null)
     val barang: StateFlow<Barang?> = _barang.asStateFlow()
@@ -54,7 +53,7 @@ class PengembalianViewModel : ViewModel() {
         viewModelScope.launch {
             _isBarangLoading.value = true
 
-            val data = barangRepository.getBarangById(barangId)
+            val data = getBarangDetailUseCase(barangId)
             _barang.value = data
 
             _isBarangLoading.value = false
@@ -63,7 +62,7 @@ class PengembalianViewModel : ViewModel() {
 
     fun muatCatatanAdmin(peminjamanId: String) {
         viewModelScope.launch {
-            val result = pengembalianRepository.getPengembalianByPeminjamanId(peminjamanId)
+            val result = getPengembalianByPeminjamanIdUseCase(peminjamanId)
 
             result.onSuccess { pengembalian ->
                 _catatanAdmin.value = if (
@@ -90,8 +89,7 @@ class PengembalianViewModel : ViewModel() {
             _isLoading.value = true
             _errorMessage.value = null
 
-            val storageRepository = StorageRepositoryImpl(context)
-            val uploadResult = storageRepository.uploadFotoPengembalian(fotoUri, peminjamanId)
+            val uploadResult = uploadReturnPhotoUseCase(fotoUri, peminjamanId)
 
             if (uploadResult.isFailure) {
                 _errorMessage.value = "Gagal upload foto: ${uploadResult.exceptionOrNull()?.message}"
@@ -117,9 +115,7 @@ class PengembalianViewModel : ViewModel() {
                 status = ReturnStatus.MENUNGGU_VERIFIKASI
             )
 
-            val result = pengembalianRepository.ajukanPengembalianDanUpdatePeminjaman(
-                pengembalian = pengembalian
-            )
+            val result = ajukanPengembalianUseCase(pengembalian)
 
             if (result.isFailure) {
                 _errorMessage.value = result.exceptionOrNull()?.message

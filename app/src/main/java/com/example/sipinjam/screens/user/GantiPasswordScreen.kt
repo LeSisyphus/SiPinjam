@@ -27,10 +27,11 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.sipinjam.screens.user.GantiPasswordViewModel
 import com.example.sipinjam.ui.theme.*
+import com.example.sipinjam.di.rememberSiPinjamViewModelFactory
 
 @Composable
 fun GantiPasswordScreen(
-    viewModel: GantiPasswordViewModel = viewModel(),
+    viewModel: GantiPasswordViewModel = viewModel(factory = rememberSiPinjamViewModelFactory()),
     onBackClick: () -> Unit = {},
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()

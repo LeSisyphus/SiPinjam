@@ -69,13 +69,14 @@ import com.example.sipinjam.ui.theme.StatusBlueBg
 import java.text.SimpleDateFormat
 import java.util.Locale
 import java.util.concurrent.TimeUnit
+import com.example.sipinjam.di.rememberSiPinjamViewModelFactory
 
 @Composable
 fun DetailPengajuanScreen(
     peminjamanId: String,
     onBackClick: () -> Unit = {},
     onActionDone: () -> Unit = {},
-    viewModel: DetailPengajuanViewModel = viewModel()
+    viewModel: DetailPengajuanViewModel = viewModel(factory = rememberSiPinjamViewModelFactory())
 ) {
     val uiState by viewModel.uiState.collectAsState()
 

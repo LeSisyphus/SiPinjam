@@ -2,8 +2,7 @@ package com.example.sipinjam.screens.auth
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.sipinjam.domain.repository.AuthRepository
-import com.example.sipinjam.data.repository.AuthRepositoryImpl
+import com.example.sipinjam.domain.usecase.auth.RegisterUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -21,7 +20,7 @@ data class RegisterUiState(
 )
 
 class RegisterViewModel(
-    private val repository: AuthRepository = AuthRepositoryImpl()
+    private val registerUseCase: RegisterUseCase,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(RegisterUiState())
@@ -66,11 +65,11 @@ class RegisterViewModel(
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, errorMessage = null) }
 
-            val result = repository.register(
-                email    = state.email,
+            val result = registerUseCase(
+                email = state.email,
                 password = state.password,
-                nama     = state.namaLengkap,
-                peran      = state.peran,
+                nama = state.namaLengkap,
+                peran = state.peran,
             )
 
             result.fold(

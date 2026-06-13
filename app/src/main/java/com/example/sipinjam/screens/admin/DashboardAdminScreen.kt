@@ -33,6 +33,7 @@ import coil.compose.AsyncImage
 import com.example.sipinjam.ui.components.AdminBottomNavBar
 import com.example.sipinjam.ui.components.SiPinjamTopBar
 import com.example.sipinjam.ui.theme.*
+import com.example.sipinjam.di.rememberSiPinjamViewModelFactory
 
 data class PermintaanItem(
     val id: String = "",
@@ -44,7 +45,7 @@ data class PermintaanItem(
 
 @Composable
 fun DashboardAdminScreen(
-    viewModel: DashboardAdminViewModel = viewModel(),
+    viewModel: DashboardAdminViewModel = viewModel(factory = rememberSiPinjamViewModelFactory()),
     onLihatSemua: () -> Unit = {},
     onTinjau: (PermintaanItem) -> Unit = {},
     onDashboardClick: () -> Unit = {},

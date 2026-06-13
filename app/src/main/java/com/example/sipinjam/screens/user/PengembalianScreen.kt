@@ -70,6 +70,7 @@ import com.example.sipinjam.ui.theme.StatusOrange
 import com.example.sipinjam.ui.theme.StatusRed
 import com.example.sipinjam.ui.theme.TextPrimary
 import com.example.sipinjam.ui.theme.TextSecondary
+import com.example.sipinjam.di.rememberSiPinjamViewModelFactory
 
 @Composable
 fun PengembalianScreen(
@@ -81,7 +82,7 @@ fun PengembalianScreen(
     tanggalJatuhTempo: String = "14 Mei",
     onBackClick: () -> Unit = {},
     onKirimPengembalian: () -> Unit = {},
-    viewModel: PengembalianViewModel = viewModel()
+    viewModel: PengembalianViewModel = viewModel(factory = rememberSiPinjamViewModelFactory())
 ) {
     val context = LocalContext.current
 

@@ -58,6 +58,7 @@ import com.example.sipinjam.ui.theme.StatusGreen
 import com.example.sipinjam.ui.theme.StatusGreenBg
 import com.example.sipinjam.ui.theme.TextPrimary
 import com.example.sipinjam.ui.theme.TextSecondary
+import com.example.sipinjam.di.rememberSiPinjamViewModelFactory
 
 data class BarangTersedia(
     val id: String,
@@ -80,7 +81,7 @@ data class ItemDikembalikan(
 
 @Composable
 fun BerandaUserScreen(
-    viewModel: BerandaUserViewModel = viewModel(),
+    viewModel: BerandaUserViewModel = viewModel(factory = rememberSiPinjamViewModelFactory()),
     onLihatSemuaBarang: () -> Unit = {},
     onSearchBarang: (String) -> Unit = {},
     onBarangClick: (Barang) -> Unit = {},

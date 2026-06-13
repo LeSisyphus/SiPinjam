@@ -32,10 +32,11 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.sipinjam.ui.theme.*
+import com.example.sipinjam.di.rememberSiPinjamViewModelFactory
 
 @Composable
 fun RegisterScreen(
-    viewModel: RegisterViewModel = viewModel(),
+    viewModel: RegisterViewModel = viewModel(factory = rememberSiPinjamViewModelFactory()),
     onRegisterSuccess: () -> Unit = {},
     onBackClick: () -> Unit = {},
 ) {

@@ -3,12 +3,9 @@ package com.example.sipinjam.screens.user
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.sipinjam.domain.model.Peminjaman
-import com.example.sipinjam.domain.repository.AuthRepository
-import com.example.sipinjam.data.repository.AuthRepositoryImpl
-import com.example.sipinjam.domain.repository.BarangRepository
-import com.example.sipinjam.data.repository.BarangRepositoryImpl
-import com.example.sipinjam.domain.repository.PeminjamanRepository
-import com.example.sipinjam.data.repository.PeminjamanRepositoryImpl
+import com.example.sipinjam.domain.usecase.auth.GetCurrentUserUseCase
+import com.example.sipinjam.domain.usecase.barang.GetBarangDetailUseCase
+import com.example.sipinjam.domain.usecase.peminjaman.ObserveRiwayatPeminjamanUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -27,11 +24,11 @@ data class RiwayatPeminjamanUiItem(
     val status: String
 )
 
-class RiwayatPeminjamanViewModel : ViewModel() {
-
-    private val repository = PeminjamanRepositoryImpl()
-    private val barangRepository = BarangRepositoryImpl()
-    private val authRepository = AuthRepositoryImpl()
+class RiwayatPeminjamanViewModel(
+    private val getCurrentUserUseCase: GetCurrentUserUseCase,
+    private val observeRiwayatPeminjamanUseCase: ObserveRiwayatPeminjamanUseCase,
+    private val getBarangDetailUseCase: GetBarangDetailUseCase,
+) : ViewModel() {
 
     private val _daftarPeminjaman = MutableStateFlow<List<RiwayatPeminjamanUiItem>>(emptyList())
     val daftarPeminjaman: StateFlow<List<RiwayatPeminjamanUiItem>> = _daftarPeminjaman.asStateFlow()
@@ -52,14 +49,14 @@ class RiwayatPeminjamanViewModel : ViewModel() {
             _isLoading.value = true
             _errorMessage.value = null
 
-            val currentUser = authRepository.getCurrentUser()
+            val currentUser = getCurrentUserUseCase()
             if (currentUser == null) {
                 _isLoading.value = false
                 _errorMessage.value = "User tidak ditemukan, silakan login ulang"
                 return@launch
             }
 
-            repository.listenPeminjamanByUser(currentUser.uid)
+            observeRiwayatPeminjamanUseCase(currentUser.uid)
                 .catch { error ->
                     _isLoading.value = false
                     _errorMessage.value = error.message ?: "Gagal memuat riwayat peminjaman"
@@ -68,7 +65,7 @@ class RiwayatPeminjamanViewModel : ViewModel() {
                     val uiItems = mutableListOf<RiwayatPeminjamanUiItem>()
 
                     for (peminjaman in list) {
-                        val barang = barangRepository.getBarangById(peminjaman.barangId)
+                        val barang = getBarangDetailUseCase(peminjaman.barangId)
 
                         uiItems.add(
                             RiwayatPeminjamanUiItem(

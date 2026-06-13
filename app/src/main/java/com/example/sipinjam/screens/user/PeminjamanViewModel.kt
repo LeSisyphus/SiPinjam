@@ -5,12 +5,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.sipinjam.domain.model.Barang
 import com.example.sipinjam.domain.model.Peminjaman
-import com.example.sipinjam.domain.repository.AuthRepository
-import com.example.sipinjam.data.repository.AuthRepositoryImpl
-import com.example.sipinjam.domain.repository.BarangRepository
-import com.example.sipinjam.data.repository.BarangRepositoryImpl
-import com.example.sipinjam.domain.repository.PeminjamanRepository
-import com.example.sipinjam.data.repository.PeminjamanRepositoryImpl
+import com.example.sipinjam.domain.usecase.auth.GetCurrentUserUseCase
+import com.example.sipinjam.domain.usecase.barang.GetBarangDetailUseCase
+import com.example.sipinjam.domain.usecase.peminjaman.AjukanPeminjamanUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -21,11 +18,11 @@ import java.util.Date
 import java.util.Locale
 import java.util.concurrent.TimeUnit
 
-class PeminjamanViewModel : ViewModel() {
-
-    private val repository = PeminjamanRepositoryImpl()
-    private val barangRepository = BarangRepositoryImpl()
-    private val authRepository = AuthRepositoryImpl()
+class PeminjamanViewModel(
+    private val getCurrentUserUseCase: GetCurrentUserUseCase,
+    private val getBarangDetailUseCase: GetBarangDetailUseCase,
+    private val ajukanPeminjamanUseCase: AjukanPeminjamanUseCase,
+) : ViewModel() {
 
     private val _barang = MutableStateFlow<Barang?>(null)
     val barang: StateFlow<Barang?> = _barang.asStateFlow()
@@ -52,7 +49,7 @@ class PeminjamanViewModel : ViewModel() {
             _isBarangLoading.value = true
             _errorMessage.value = null
 
-            val result = barangRepository.getBarangById(barangId)
+            val result = getBarangDetailUseCase(barangId)
 
             if (result == null) {
                 _errorMessage.value = "Data barang tidak ditemukan"
@@ -95,13 +92,13 @@ class PeminjamanViewModel : ViewModel() {
                 return@launch
             }
 
-            val currentUser = authRepository.getCurrentUser()
+            val currentUser = getCurrentUserUseCase()
             if (currentUser == null) {
                 gagal("User tidak ditemukan, silakan login ulang")
                 return@launch
             }
 
-            val barangTerbaru = barangRepository.getBarangById(barangId)
+            val barangTerbaru = getBarangDetailUseCase(barangId)
             if (barangTerbaru == null) {
                 gagal("Data barang tidak ditemukan")
                 return@launch
@@ -158,7 +155,7 @@ class PeminjamanViewModel : ViewModel() {
                 createdAt = System.currentTimeMillis()
             )
 
-            val result = repository.tambahPeminjaman(peminjaman)
+            val result = ajukanPeminjamanUseCase(peminjaman)
 
             _isLoading.value = false
 

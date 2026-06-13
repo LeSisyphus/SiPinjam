@@ -1,14 +1,14 @@
 package com.example.sipinjam.screens.user
 
 import android.net.Uri
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.sipinjam.domain.model.User
 import com.example.sipinjam.data.preferences.AppPreferences
-import com.example.sipinjam.domain.repository.AuthRepository
-import com.example.sipinjam.data.repository.AuthRepositoryImpl
-import com.example.sipinjam.domain.repository.StorageRepository
-import com.example.sipinjam.data.repository.StorageRepositoryImpl
+import com.example.sipinjam.domain.usecase.auth.GetCurrentUserUseCase
+import com.example.sipinjam.domain.usecase.auth.LogoutUseCase
+import com.example.sipinjam.domain.usecase.profile.UpdateProfilePhotoUrlUseCase
+import com.example.sipinjam.domain.usecase.profile.UpdateProfileUseCase
+import com.example.sipinjam.domain.usecase.storage.UploadProfilePhotoUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -33,10 +33,12 @@ data class ProfilUiState(
 
 class ProfilViewModel(
     application: Application,
+    private val getCurrentUserUseCase: GetCurrentUserUseCase,
+    private val updateProfileUseCase: UpdateProfileUseCase,
+    private val updateProfilePhotoUrlUseCase: UpdateProfilePhotoUrlUseCase,
+    private val uploadProfilePhotoUseCase: UploadProfilePhotoUseCase,
+    private val logoutUseCase: LogoutUseCase,
 ) : AndroidViewModel(application) {
-
-    private val authRepository = AuthRepositoryImpl()
-    private val storageRepository = StorageRepositoryImpl(application)
 
     private val _uiState = MutableStateFlow(ProfilUiState())
     val uiState: StateFlow<ProfilUiState> = _uiState.asStateFlow()
@@ -55,7 +57,7 @@ class ProfilViewModel(
     private fun loadUser() {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
-            val user = authRepository.getCurrentUser()
+            val user = getCurrentUserUseCase()
             if (user != null) {
                 _uiState.update {
                     it.copy(
@@ -98,7 +100,7 @@ class ProfilViewModel(
         }
         viewModelScope.launch {
             _uiState.update { it.copy(isSaving = true, errorMessage = null) }
-            val result = authRepository.updateProfile(state.namaInput, state.nomorTeleponInput)
+            val result = updateProfileUseCase(state.namaInput, state.nomorTeleponInput)
             result.fold(
                 onSuccess = {
                     _uiState.update {
@@ -124,10 +126,10 @@ class ProfilViewModel(
     fun onFotoSelected(uri: Uri) {
         viewModelScope.launch {
             _uiState.update { it.copy(isUploadingFoto = true) }
-            val result = storageRepository.uploadFotoProfil(uri)
+            val result = uploadProfilePhotoUseCase(uri)
             result.fold(
                 onSuccess = { url ->
-                    authRepository.updateFotoUrl(url)
+                    updateProfilePhotoUrlUseCase(url)
                     _uiState.update {
                         it.copy(
                             isUploadingFoto = false,
@@ -147,7 +149,7 @@ class ProfilViewModel(
     }
 
     fun onLogout(onDone: () -> Unit) {
-        authRepository.logout()
+        logoutUseCase()
         onDone()
     }
 }

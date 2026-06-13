@@ -212,10 +212,8 @@ fun NavGraph(
         }
 
         composable(Routes.BERANDA_USER) {
-            val context = LocalContext.current
-            val appContainer = (context.applicationContext as SiPinjamApplication).appContainer
             val berandaViewModel: BerandaUserViewModel = viewModel(
-                factory = appContainer.berandaUserViewModelFactory
+                factory = appContainer.viewModelFactory
             )
 
             BerandaUserScreen(
@@ -470,7 +468,7 @@ fun NavGraph(
 
         composable(Routes.KELOLA_BARANG) {
             val context = LocalContext.current
-            val adminViewModel: KelolaBarangViewModel = viewModel()
+            val adminViewModel: KelolaBarangViewModel = viewModel(factory = appContainer.viewModelFactory)
             val adminUiState by adminViewModel.uiState.collectAsState()
 
             KelolaBarangScreen(

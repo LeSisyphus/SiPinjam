@@ -75,6 +75,7 @@ import com.example.sipinjam.ui.theme.TextSecondary
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import com.example.sipinjam.di.rememberSiPinjamViewModelFactory
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -85,7 +86,7 @@ fun PeminjamanScreen(
     statusBarang: String = "Tersedia",
     onBackClick: () -> Unit = {},
     onKirimPermohonan: (tanggalPinjam: String, tanggalKembali: String, keperluan: String) -> Unit = { _, _, _ -> },
-    viewModel: PeminjamanViewModel = viewModel()
+    viewModel: PeminjamanViewModel = viewModel(factory = rememberSiPinjamViewModelFactory())
 ) {
     var tanggalPinjam by rememberSaveable { mutableStateOf("") }
     var tanggalKembali by rememberSaveable { mutableStateOf("") }
