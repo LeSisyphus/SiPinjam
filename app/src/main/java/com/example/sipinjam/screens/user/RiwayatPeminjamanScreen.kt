@@ -58,6 +58,7 @@ import com.example.sipinjam.ui.theme.DarkImageBg
 import com.example.sipinjam.ui.theme.SiPinjamBlue
 import com.example.sipinjam.ui.theme.TextPrimary
 import com.example.sipinjam.ui.theme.TextSecondary
+import com.example.sipinjam.di.rememberSiPinjamViewModelFactory
 
 private const val BorrowingStatusFilterAll = "__ALL__"
 
@@ -77,7 +78,7 @@ fun RiwayatPeminjamanScreen(
         tanggalPinjam: String,
         tanggalJatuhTempo: String
     ) -> Unit = { _, _, _, _, _, _ -> },
-    viewModel: RiwayatPeminjamanViewModel = viewModel()
+    viewModel: RiwayatPeminjamanViewModel = viewModel(factory = rememberSiPinjamViewModelFactory())
 ) {
     val daftarPeminjaman by viewModel.daftarPeminjaman.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
