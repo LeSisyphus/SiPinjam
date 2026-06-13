@@ -69,6 +69,7 @@ import com.example.sipinjam.ui.theme.SiPinjamBlue
 import com.example.sipinjam.ui.theme.StatusRed
 import com.example.sipinjam.ui.theme.TextPrimary
 import com.example.sipinjam.ui.theme.TextSecondary
+import com.example.sipinjam.di.rememberSiPinjamViewModelFactory
 
 private val SoftBlueBg: Color
     @Composable get() = StatusBlueBg
@@ -95,7 +96,7 @@ fun VerifikasiPengembalianScreen(
     pengembalianId: String = "",
     onBackClick: () -> Unit = {},
     onVerifikasiDone: () -> Unit = {},
-    viewModel: VerifikasiPengembalianViewModel = viewModel()
+    viewModel: VerifikasiPengembalianViewModel = viewModel(factory = rememberSiPinjamViewModelFactory())
 ) {
     val pengembalian by viewModel.pengembalian.collectAsState()
     val detailUiState by viewModel.detailUiState.collectAsState()

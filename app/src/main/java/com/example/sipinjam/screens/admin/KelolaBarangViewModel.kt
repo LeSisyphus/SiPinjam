@@ -4,21 +4,19 @@ import android.content.Context
 import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.cloudinary.android.MediaManager
-import com.cloudinary.android.callback.ErrorInfo
-import com.cloudinary.android.callback.UploadCallback
 import com.example.sipinjam.domain.model.Barang
-import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.SetOptions
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.tasks.await
-import kotlinx.coroutines.suspendCancellableCoroutine
-import kotlin.coroutines.resume
-import kotlin.coroutines.resumeWithException
+import kotlinx.coroutines.flow.catch
+import com.example.sipinjam.domain.usecase.barang.AddBarangUseCase
+import com.example.sipinjam.domain.usecase.barang.DeleteBarangUseCase
+import com.example.sipinjam.domain.usecase.barang.GetBarangDetailUseCase
+import com.example.sipinjam.domain.usecase.barang.ObserveBarangListUseCase
+import com.example.sipinjam.domain.usecase.barang.UpdateBarangUseCase
+import com.example.sipinjam.domain.usecase.storage.UploadItemPhotoUseCase
 
 data class KelolaBarangUiState(
     val daftarBarang: List<BarangAdmin> = emptyList(),
@@ -44,9 +42,14 @@ data class KelolaBarangUiState(
         }
 }
 
-class KelolaBarangViewModel : ViewModel() {
-
-    private val firestore = FirebaseFirestore.getInstance()
+class KelolaBarangViewModel(
+    private val observeBarangListUseCase: ObserveBarangListUseCase,
+    private val addBarangUseCase: AddBarangUseCase,
+    private val updateBarangUseCase: UpdateBarangUseCase,
+    private val deleteBarangUseCase: DeleteBarangUseCase,
+    private val getBarangDetailUseCase: GetBarangDetailUseCase,
+    private val uploadItemPhotoUseCase: UploadItemPhotoUseCase,
+) : ViewModel() {
 
     private val _uiState = MutableStateFlow(KelolaBarangUiState())
     val uiState: StateFlow<KelolaBarangUiState> = _uiState.asStateFlow()
@@ -58,53 +61,28 @@ class KelolaBarangViewModel : ViewModel() {
     fun muatSemuaBarang() {
         _uiState.update { it.copy(isLoading = true) }
         viewModelScope.launch {
-            try {
-                val snapshot = firestore.collection("items").get().await()
-                val listBarang = snapshot.documents.map { document ->
-                    BarangAdmin(
-                        id = document.id,
-                        nama = document.getString("nama") ?: "Tanpa Nama",
-                        kategori = document.getString("kategori") ?: "UMUM",
-                        stok = document.getLong("stok")?.toInt() ?: 0,
-                        tersedia = document.getBoolean("tersedia") ?: true,
-                        imageUrl = document.getString("fotoUrl") ?: ""
-                    )
+            observeBarangListUseCase()
+                .catch { error ->
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            errorMessage = error.localizedMessage ?: "Gagal memuat data barang"
+                        )
+                    }
                 }
-                _uiState.update { it.copy(daftarBarang = listBarang, isLoading = false) }
-            } catch (e: Exception) {
-                _uiState.update { it.copy(isLoading = false, errorMessage = e.localizedMessage) }
-            }
-        }
-    }
-
-    private suspend fun uploadKeCloudinary(context: Context, imageUri: Uri): String = suspendCancellableCoroutine { continuation ->
-        try {
-            try {
-                MediaManager.get()
-            } catch (e: IllegalStateException) {
-            }
-
-            MediaManager.get().upload(imageUri)
-                .callback(object : UploadCallback {
-                    override fun onStart(requestId: String) {}
-                    override fun onProgress(requestId: String, bytes: Long, totalBytes: Long) {}
-
-                    override fun onSuccess(requestId: String, resultData: Map<*, *>) {
-                        val secureUrl = resultData["secure_url"] as? String ?: ""
-                        if (continuation.isActive) continuation.resume(secureUrl)
+                .collect { daftarBarang ->
+                    val listBarang = daftarBarang.map { barang ->
+                        BarangAdmin(
+                            id = barang.id,
+                            nama = barang.nama.ifBlank { "Tanpa Nama" },
+                            kategori = barang.kategori.ifBlank { "UMUM" },
+                            stok = barang.stok,
+                            tersedia = barang.tersedia,
+                            imageUrl = barang.fotoUrl
+                        )
                     }
-
-                    override fun onError(requestId: String, error: ErrorInfo) {
-                        if (continuation.isActive) {
-                            continuation.resumeWithException(Exception("Cloudinary Error: ${error.description}"))
-                        }
-                    }
-
-                    override fun onReschedule(requestId: String, error: ErrorInfo) {}
-                })
-                .dispatch(context)
-        } catch (e: Exception) {
-            if (continuation.isActive) continuation.resumeWithException(e)
+                    _uiState.update { it.copy(daftarBarang = listBarang, isLoading = false) }
+                }
         }
     }
 
@@ -116,14 +94,11 @@ class KelolaBarangViewModel : ViewModel() {
         _uiState.update { it.copy(isLoading = true, isSuccess = false, errorMessage = null) }
         viewModelScope.launch {
             try {
-                var finalImageUrl = ""
-                if (imageUri != null) {
-                    finalImageUrl = uploadKeCloudinary(context, imageUri)
-                }
+                val finalImageUrl = imageUri?.let { uri ->
+                    uploadItemPhotoUseCase(uri).getOrThrow()
+                }.orEmpty()
 
-                val docRef = firestore.collection("items").document()
                 val barangBaru = Barang(
-                    id = docRef.id,
                     nama = nama,
                     kategori = kategori,
                     stok = stok,
@@ -134,10 +109,15 @@ class KelolaBarangViewModel : ViewModel() {
                     deskripsi = deskripsi,
                     fotoUrl = finalImageUrl
                 )
-                docRef.set(barangBaru).await()
 
-                muatSemuaBarang()
-                _uiState.update { it.copy(isLoading = false, isSuccess = true) }
+                val berhasil = addBarangUseCase(barangBaru)
+                _uiState.update {
+                    it.copy(
+                        isLoading = false,
+                        isSuccess = berhasil,
+                        errorMessage = if (berhasil) null else "Gagal menambahkan barang"
+                    )
+                }
             } catch (e: Exception) {
                 _uiState.update { it.copy(isLoading = false, errorMessage = e.localizedMessage) }
             }
@@ -167,29 +147,28 @@ class KelolaBarangViewModel : ViewModel() {
         _uiState.update { it.copy(isLoading = true, errorMessage = null) }
         viewModelScope.launch {
             try {
-                val updateData = mutableMapOf<String, Any>(
-                    "nama" to nama,
-                    "kategori" to kategori,
-                    "stok" to stok,
-                    "tersedia" to (stok > 0)
-                )
-
-                if (imageUri != null) {
-                    val newImageUrl = uploadKeCloudinary(context, imageUri)
-                    updateData["fotoUrl"] = newImageUrl
+                val existingBarang = getBarangDetailUseCase(id)
+                val newImageUrl = imageUri?.let { uri ->
+                    uploadItemPhotoUseCase(uri).getOrThrow()
                 }
 
-                firestore.collection("items").document(id)
-                    .set(updateData, SetOptions.merge())
-                    .await()
+                val updatedBarang = (existingBarang ?: Barang(id = id)).copy(
+                    id = id,
+                    nama = nama,
+                    kategori = kategori,
+                    stok = stok,
+                    tersedia = stok > 0,
+                    fotoUrl = newImageUrl ?: existingBarang?.fotoUrl.orEmpty()
+                )
 
-                muatSemuaBarang()
+                val berhasil = updateBarangUseCase(updatedBarang)
                 _uiState.update {
                     it.copy(
                         isLoading = false,
-                        showEditDialog = false,
-                        barangToEdit = null,
-                        isEditSuccess = true
+                        showEditDialog = !berhasil,
+                        barangToEdit = if (berhasil) null else it.barangToEdit,
+                        isEditSuccess = berhasil,
+                        errorMessage = if (berhasil) null else "Gagal mengedit barang"
                     )
                 }
             } catch (e: Exception) {
@@ -212,9 +191,16 @@ class KelolaBarangViewModel : ViewModel() {
 
         viewModelScope.launch {
             try {
-                firestore.collection("items").document(barang.id).delete().await()
-                muatSemuaBarang()
-                _uiState.update { it.copy(isLoading = false, showDeleteDialog = false, barangToDelete = null, isDeleteSuccess = true) }
+                val berhasil = deleteBarangUseCase(barang.id)
+                _uiState.update {
+                    it.copy(
+                        isLoading = false,
+                        showDeleteDialog = !berhasil,
+                        barangToDelete = if (berhasil) null else it.barangToDelete,
+                        isDeleteSuccess = berhasil,
+                        errorMessage = if (berhasil) null else "Gagal menghapus barang"
+                    )
+                }
             } catch (e: Exception) {
                 _uiState.update { it.copy(isLoading = false, errorMessage = e.localizedMessage) }
             }

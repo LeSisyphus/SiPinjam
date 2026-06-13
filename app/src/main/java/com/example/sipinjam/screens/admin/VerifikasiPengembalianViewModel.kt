@@ -1,21 +1,22 @@
 package com.example.sipinjam.screens.admin
 
 import com.example.sipinjam.domain.model.ReturnStatus
-import com.example.sipinjam.domain.model.BorrowingStatus
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.sipinjam.domain.model.Barang
 import com.example.sipinjam.domain.model.Peminjaman
 import com.example.sipinjam.domain.model.Pengembalian
 import com.example.sipinjam.domain.model.User
-import com.example.sipinjam.domain.repository.PengembalianRepository
-import com.example.sipinjam.data.repository.PengembalianRepositoryImpl
-import com.google.firebase.firestore.FirebaseFirestore
+import com.example.sipinjam.domain.usecase.auth.GetUserByIdUseCase
+import com.example.sipinjam.domain.usecase.barang.GetBarangDetailUseCase
+import com.example.sipinjam.domain.usecase.peminjaman.GetPeminjamanDetailUseCase
+import com.example.sipinjam.domain.usecase.pengembalian.GetPengembalianDetailUseCase
+import com.example.sipinjam.domain.usecase.pengembalian.TolakPengembalianUseCase
+import com.example.sipinjam.domain.usecase.pengembalian.VerifikasiPengembalianUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.tasks.await
 
 data class VerifikasiPengembalianDetailUiState(
     val namaPeminjam: String = "-",
@@ -26,10 +27,14 @@ data class VerifikasiPengembalianDetailUiState(
     val catatanPeminjam: String = ""
 )
 
-class VerifikasiPengembalianViewModel : ViewModel() {
-
-    private val repository = PengembalianRepositoryImpl()
-    private val db = FirebaseFirestore.getInstance()
+class VerifikasiPengembalianViewModel(
+    private val getPengembalianDetailUseCase: GetPengembalianDetailUseCase,
+    private val getPeminjamanDetailUseCase: GetPeminjamanDetailUseCase,
+    private val getBarangDetailUseCase: GetBarangDetailUseCase,
+    private val getUserByIdUseCase: GetUserByIdUseCase,
+    private val verifikasiPengembalianUseCase: VerifikasiPengembalianUseCase,
+    private val tolakPengembalianUseCase: TolakPengembalianUseCase,
+) : ViewModel() {
 
     private val _pengembalian = MutableStateFlow<Pengembalian?>(null)
     val pengembalian: StateFlow<Pengembalian?> = _pengembalian.asStateFlow()
@@ -55,7 +60,7 @@ class VerifikasiPengembalianViewModel : ViewModel() {
             _isLoading.value = true
             _errorMessage.value = null
 
-            val result = repository.getPengembalianById(pengembalianId)
+            val result = getPengembalianDetailUseCase(pengembalianId)
 
             result.onSuccess { data ->
                 _pengembalian.value = data
@@ -115,7 +120,7 @@ class VerifikasiPengembalianViewModel : ViewModel() {
             _isLoading.value = true
             _errorMessage.value = null
 
-            val result = repository.setujuiPengembalian(
+            val result = verifikasiPengembalianUseCase(
                 pengembalianId = pengembalianId,
                 catatanAdmin = catatan,
                 kondisiBarang = kondisi
@@ -145,7 +150,7 @@ class VerifikasiPengembalianViewModel : ViewModel() {
             _isLoading.value = true
             _errorMessage.value = null
 
-            val result = repository.tolakPengembalian(
+            val result = tolakPengembalianUseCase(
                 pengembalianId = pengembalianId,
                 catatanAdmin = catatan
             )
@@ -169,14 +174,8 @@ class VerifikasiPengembalianViewModel : ViewModel() {
 
     private suspend fun getUserById(userId: String): User? {
         if (userId.isBlank()) return null
-
         return try {
-            val document = db.collection("users")
-                .document(userId)
-                .get()
-                .await()
-
-            document.toObject(User::class.java)?.copy(uid = document.id)
+            getUserByIdUseCase(userId)
         } catch (e: Exception) {
             null
         }
@@ -184,14 +183,8 @@ class VerifikasiPengembalianViewModel : ViewModel() {
 
     private suspend fun getBarangById(barangId: String): Barang? {
         if (barangId.isBlank()) return null
-
         return try {
-            val document = db.collection("items")
-                .document(barangId)
-                .get()
-                .await()
-
-            document.toObject(Barang::class.java)?.copy(id = document.id)
+            getBarangDetailUseCase(barangId)
         } catch (e: Exception) {
             null
         }
@@ -199,17 +192,7 @@ class VerifikasiPengembalianViewModel : ViewModel() {
 
     private suspend fun getPeminjamanById(peminjamanId: String): Peminjaman? {
         if (peminjamanId.isBlank()) return null
-
-        return try {
-            val document = db.collection("borrowings")
-                .document(peminjamanId)
-                .get()
-                .await()
-
-            document.toObject(Peminjaman::class.java)?.copy(id = document.id)
-        } catch (e: Exception) {
-            null
-        }
+        return getPeminjamanDetailUseCase(peminjamanId).getOrNull()
     }
 
     private fun formatRole(user: User?): String {
