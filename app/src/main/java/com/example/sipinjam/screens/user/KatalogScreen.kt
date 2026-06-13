@@ -62,6 +62,11 @@ import com.example.sipinjam.ui.theme.TextPrimary
 import com.example.sipinjam.ui.theme.TextSecondary
 import com.example.sipinjam.ui.theme.ToggleBg
 import com.example.sipinjam.ui.theme.StatusRedBg
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 
 @Composable
 fun KatalogScreen(
@@ -104,7 +109,9 @@ fun KatalogScreen(
 
             SearchAndFilterSection(
                 searchQuery = uiState.searchQuery,
-                onSearchQueryChanged = viewModel::onSearchQueryChanged
+                onSearchQueryChanged = viewModel::onSearchQueryChanged,
+                selectedAvailability = uiState.selectedAvailability,
+                onAvailabilitySelected = viewModel::onAvailabilitySelected
             )
 
             Spacer(modifier = Modifier.height(22.dp))
@@ -177,7 +184,11 @@ fun KatalogScreen(
 private fun SearchAndFilterSection(
     searchQuery: String,
     onSearchQueryChanged: (String) -> Unit,
+    selectedAvailability: String,
+    onAvailabilitySelected: (String) -> Unit,
 ) {
+    var showFilterMenu by remember { mutableStateOf(false) }
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -219,7 +230,38 @@ private fun SearchAndFilterSection(
             )
         )
 
+        Box {
+            Box(
+                modifier = Modifier
+                    .size(56.dp)
+                    .clip(RoundedCornerShape(16.dp))
+                    .background(if (selectedAvailability != "Semua") SiPinjamBlue else CardWhite)
+                    .clickable { showFilterMenu = true },
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.Tune,
+                    contentDescription = "Filter",
+                    tint = if (selectedAvailability != "Semua") Color.White else SiPinjamBlue,
+                    modifier = Modifier.size(24.dp)
+                )
+            }
 
+            DropdownMenu(
+                expanded = showFilterMenu,
+                onDismissRequest = { showFilterMenu = false }
+            ) {
+                listOf("Semua", "Tersedia", "Dipinjam").forEach { option ->
+                    DropdownMenuItem(
+                        text = { Text(option) },
+                        onClick = {
+                            onAvailabilitySelected(option)
+                            showFilterMenu = false
+                        }
+                    )
+                }
+            }
+        }
     }
 }
 

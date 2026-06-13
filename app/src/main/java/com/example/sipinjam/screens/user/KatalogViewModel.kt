@@ -18,6 +18,7 @@ data class KatalogUiState(
     val kategoriOptions: List<String> = listOf("Semua", "Elektronik", "Optik", "Kabel"),
     val selectedKategori: String = "Semua",
     val searchQuery: String = "",
+    val selectedAvailability: String = "Semua",
     val isLoading: Boolean = true,
     val errorMessage: String? = null,
 )
@@ -50,7 +51,8 @@ class KatalogViewModel : ViewModel() {
                         val filtered = filterBarang(
                             daftarBarang = daftarBarang,
                             selectedKategori = currentState.selectedKategori,
-                            searchQuery = currentState.searchQuery
+                            searchQuery = currentState.searchQuery,
+                            selectedAvailability = currentState.selectedAvailability
                         )
 
                         currentState.copy(
@@ -64,7 +66,6 @@ class KatalogViewModel : ViewModel() {
                 }
         }
     }
-
 
     fun setInitialSearchQuery(query: String) {
         val normalizedQuery = query.trim()
@@ -80,7 +81,8 @@ class KatalogViewModel : ViewModel() {
                 filteredBarang = filterBarang(
                     daftarBarang = currentState.daftarBarang,
                     selectedKategori = currentState.selectedKategori,
-                    searchQuery = query
+                    searchQuery = query,
+                    selectedAvailability = currentState.selectedAvailability
                 )
             )
         }
@@ -93,7 +95,22 @@ class KatalogViewModel : ViewModel() {
                 filteredBarang = filterBarang(
                     daftarBarang = currentState.daftarBarang,
                     selectedKategori = kategori,
-                    searchQuery = currentState.searchQuery
+                    searchQuery = currentState.searchQuery,
+                    selectedAvailability = currentState.selectedAvailability
+                )
+            )
+        }
+    }
+
+    fun onAvailabilitySelected(availability: String) {
+        _uiState.update { currentState ->
+            currentState.copy(
+                selectedAvailability = availability,
+                filteredBarang = filterBarang(
+                    daftarBarang = currentState.daftarBarang,
+                    selectedKategori = currentState.selectedKategori,
+                    searchQuery = currentState.searchQuery,
+                    selectedAvailability = availability
                 )
             )
         }
@@ -102,7 +119,8 @@ class KatalogViewModel : ViewModel() {
     private fun filterBarang(
         daftarBarang: List<Barang>,
         selectedKategori: String,
-        searchQuery: String
+        searchQuery: String,
+        selectedAvailability: String
     ): List<Barang> {
         return daftarBarang
             .filter { barang ->
@@ -114,7 +132,14 @@ class KatalogViewModel : ViewModel() {
                         barang.kategori.contains(searchQuery, ignoreCase = true) ||
                         barang.lokasi.contains(searchQuery, ignoreCase = true)
 
-                cocokKategori && cocokSearch
+                val isAvailable = barang.stok > 0 && barang.tersedia
+                val cocokAvailability = when (selectedAvailability) {
+                    "Tersedia" -> isAvailable
+                    "Dipinjam" -> !isAvailable
+                    else -> true
+                }
+
+                cocokKategori && cocokSearch && cocokAvailability
             }
             .sortedBy { it.nama.lowercase() }
     }
