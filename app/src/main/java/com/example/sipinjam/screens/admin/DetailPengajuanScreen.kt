@@ -131,7 +131,7 @@ fun DetailPengajuanScreen(
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        text = uiState.errorMessage ?: stringResource(R.string.empty_request_not_found),
+                        text = uiState.errorMessage ?: "Data pengajuan tidak ditemukan",
                         color = TextSecondary,
                         fontSize = 14.sp
                     )
@@ -166,12 +166,12 @@ private fun DetailPengajuanContent(
         verticalArrangement = Arrangement.spacedBy(24.dp)
     ) {
         Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            SectionTitle(title = stringResource(R.string.label_item_information))
+            SectionTitle(title = "Informasi Barang")
             InformasiBarangCard(peminjaman = peminjaman, barang = barang)
         }
 
         Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            SectionTitle(title = stringResource(R.string.label_borrow_detail))
+            SectionTitle(title = "Detail Peminjaman")
             DetailPeminjamanCard(peminjaman = peminjaman, peminjam = peminjam)
         }
 
@@ -244,7 +244,7 @@ private fun InformasiBarangCard(peminjaman: Peminjaman, barang: Barang?) {
                     )
                     Spacer(modifier = Modifier.height(6.dp))
                     Text(
-                        text = stringResource(R.string.label_quantity_borrowed_unit, 1),
+                        text = "Qty dipinjam: 1 unit",
                         color = TextSecondary,
                         fontSize = 15.sp
                     )
@@ -252,13 +252,13 @@ private fun InformasiBarangCard(peminjaman: Peminjaman, barang: Barang?) {
             }
 
             DetailInfoRow(
-                label = stringResource(R.string.label_initial_condition),
+                label = "Kondisi Awal",
                 value = barang?.kondisi?.ifBlank { "-" } ?: "-",
                 valueColor = StatusGreen
             )
 
             DetailInfoRow(
-                label = stringResource(R.string.label_pickup_location),
+                label = "Lokasi Pengambilan",
                 value = barang?.lokasi?.ifBlank { "-" } ?: "-",
                 valueColor = TextPrimary
             )
@@ -296,7 +296,7 @@ private fun DetailPeminjamanCard(peminjaman: Peminjaman, peminjam: User?) {
             verticalArrangement = Arrangement.spacedBy(18.dp)
         ) {
             DetailInfoRow(
-                label = stringResource(R.string.label_borrower),
+                label = "Peminjam",
                 value = peminjam?.nama?.ifBlank { peminjaman.namaUser } ?: peminjaman.namaUser.ifBlank { "-" },
                 valueColor = TextPrimary
             )
@@ -311,7 +311,7 @@ private fun DetailPeminjamanCard(peminjaman: Peminjaman, peminjam: User?) {
                 valueColor = TextPrimary
             )
             DetailInfoRow(
-                label = stringResource(R.string.label_duration),
+                label = "Durasi",
                 value = hitungDurasiHari(peminjaman.tanggalPinjam, peminjaman.tanggalKembali),
                 valueColor = SiPinjamBlue
             )

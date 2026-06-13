@@ -128,7 +128,7 @@ fun DashboardAdminScreen(
                         modifier = Modifier.weight(1f)
                     )
                     StatusCard(
-                        label = stringResource(R.string.status_dipinjam).uppercase(),
+                        label = "DIPINJAM",
                         jumlah = uiState.jumlahDipinjam,
                         icon = Icons.Filled.Timer,
                         iconColor = StatusOrange,
@@ -225,7 +225,7 @@ private fun PermintaanCard(item: PermintaanItem, onTinjau: () -> Unit, modifier:
             contentAlignment = Alignment.Center
         ) {
             if (item.fotoUserUrl.isNotBlank()) {
-                AsyncImage(model = item.fotoUserUrl, contentDescription = stringResource(R.string.desc_profile_photo), modifier = Modifier.fillMaxSize(), contentScale = ContentScale.Crop)
+                AsyncImage(model = item.fotoUserUrl, contentDescription = "Foto profil peminjam", modifier = Modifier.fillMaxSize(), contentScale = ContentScale.Crop)
             } else {
                 Icon(imageVector = Icons.Filled.Person, contentDescription = null, tint = TextSecondary, modifier = Modifier.size(22.dp))
             }

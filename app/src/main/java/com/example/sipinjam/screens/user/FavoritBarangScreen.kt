@@ -1,6 +1,5 @@
 package com.example.sipinjam.screens.user
 
-import com.example.sipinjam.R
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -31,7 +30,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -77,7 +75,7 @@ fun FavoritBarangScreen(
         containerColor = BackgroundGray,
         topBar = {
             SiPinjamTopBar(
-                title = stringResource(R.string.screen_profile_favorites),
+                title = "Favorit Saya",
                 showBackButton = true,
                 onBackClick = onBackClick
             )
@@ -231,7 +229,7 @@ private fun FavoritCard(
         ) {
             Icon(
                 imageVector = Icons.Filled.Delete,
-                contentDescription = stringResource(R.string.desc_delete_favorite),
+                contentDescription = "Hapus Favorit",
                 tint = StatusRed,
                 modifier = Modifier.size(18.dp)
             )
