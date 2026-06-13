@@ -2,12 +2,9 @@ package com.example.sipinjam.screens.auth
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.sipinjam.data.preferences.AppPreferences
-import com.example.sipinjam.domain.repository.AuthRepository
-import com.example.sipinjam.data.repository.AuthRepositoryImpl
+import com.example.sipinjam.domain.usecase.auth.LoginUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -26,7 +23,7 @@ data class LoginUiState(
 
 class LoginViewModel(
     application: Application,
-    private val repository: AuthRepository = AuthRepositoryImpl()
+    private val loginUseCase: LoginUseCase,
 ) : AndroidViewModel(application) {
 
     private val _uiState = MutableStateFlow(LoginUiState())
@@ -66,7 +63,7 @@ class LoginViewModel(
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, errorMessage = null) }
 
-            val result = repository.login(state.email, state.password)
+            val result = loginUseCase(state.email, state.password)
 
             result.fold(
                 onSuccess = { user ->
@@ -94,17 +91,6 @@ class LoginViewModel(
             message.contains("blocked all requests") -> "Terlalu banyak percobaan. Coba lagi nanti."
             message.contains("network error")        -> "Tidak ada koneksi internet."
             else                                     -> "Login gagal. Periksa email dan password."
-        }
-    }
-
-    companion object {
-        fun factory(application: Application): ViewModelProvider.Factory {
-            return object : ViewModelProvider.Factory {
-                @Suppress("UNCHECKED_CAST")
-                override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                    return LoginViewModel(application) as T
-                }
-            }
         }
     }
 }

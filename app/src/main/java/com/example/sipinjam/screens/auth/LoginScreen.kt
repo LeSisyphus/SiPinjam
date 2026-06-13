@@ -1,7 +1,6 @@
 package com.example.sipinjam.screens.auth
 
 import com.example.sipinjam.R
-import android.app.Application
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -29,14 +28,11 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.sipinjam.ui.theme.*
+import com.example.sipinjam.di.rememberSiPinjamViewModelFactory
 
 @Composable
 fun LoginScreen(
-    viewModel: LoginViewModel = viewModel(
-        factory = LoginViewModel.factory(
-            LocalContext.current.applicationContext as Application
-        )
-    ),
+    viewModel: LoginViewModel = viewModel(factory = rememberSiPinjamViewModelFactory()),
     onLoginSuccess: (isAdmin: Boolean) -> Unit = {},
     onRegisterClick: () -> Unit = {},
     onForgotPasswordClick: () -> Unit = {},
