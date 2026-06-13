@@ -174,7 +174,7 @@ private suspend fun observeUserReturnNotifications(
                                     statusSekarang.equals(ReturnStatus.TERVERIFIKASI, ignoreCase = true) -> {
                                 notificationHelper.showStatusNotification(
                                     title = "Pengembalian Disetujui",
-                                    message = "Pengembalian $namaBarang telah diverifikasi oleh admin."
+                                    message = "Pengembalian barang Anda telah diverifikasi oleh admin."
                                 )
                             }
 
@@ -182,7 +182,7 @@ private suspend fun observeUserReturnNotifications(
                                     statusSekarang.equals(ReturnStatus.DITOLAK, ignoreCase = true) -> {
                                 notificationHelper.showStatusNotification(
                                     title = "Pengembalian Ditolak",
-                                    message = "Pengembalian $namaBarang ditolak. Silakan cek catatan admin."
+                                    message = "Pengembalian barang Anda ditolak. Silakan cek catatan admin."
                                 )
                             }
 
