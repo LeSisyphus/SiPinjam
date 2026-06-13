@@ -76,6 +76,12 @@
     <string name="label_catatan_pengembalian_peminjam">CATATAN PENGEMBALIAN PEMINJAM</string>
     <string name="label_catatan_verifikasi_admin">CATATAN VERIFIKASI ADMIN</string>
     <string name="label_security_protocol">SECURITY PROTOCOL</string>
+    <string name="desc_back">Kembali</string>
+    <string name="label_current_password">Password Saat Ini</string>
+    <string name="label_new_password">Password Baru</string>
+    <string name="label_confirm_new_password">Konfirmasi Password Baru</string>
+    <string name="hint_minimum_8_characters">Minimal 8 karakter</string>
+    <string name="hint_repeat_new_password">Ulangi password baru</string>
 
     <string name="hint_email_mahasiswa">nama@mhs.ulm.ac.id</string>
     <string name="hint_email_kampus">nama@kampus.ac.id</string>

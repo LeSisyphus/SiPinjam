@@ -111,7 +111,7 @@ fun GantiPasswordScreen(
                     IconButton(onClick = onBackClick) {
                         Icon(
                             imageVector = Icons.Filled.ArrowBack,
-                            contentDescription = "Kembali",
+                            contentDescription = stringResource(R.string.desc_back),
                             tint = SiPinjamBlue
                         )
                     }
@@ -178,7 +178,7 @@ fun GantiPasswordScreen(
 
             // Password Saat Ini
             PasswordField(
-                label = "Password Saat Ini",
+                label = stringResource(R.string.label_current_password),
                 value = uiState.passwordLama,
                 visible = uiState.passwordLamaVisible,
                 placeholder = "••••••••",
@@ -188,20 +188,20 @@ fun GantiPasswordScreen(
 
             // Password Baru
             PasswordField(
-                label = "Password Baru",
+                label = stringResource(R.string.label_new_password),
                 value = uiState.passwordBaru,
                 visible = uiState.passwordBaruVisible,
-                placeholder = "Minimal 8 karakter",
+                placeholder = stringResource(R.string.hint_minimum_8_characters),
                 onValueChange = { viewModel.onPasswordBaruChange(it) },
                 onToggleVisibility = { viewModel.onTogglePasswordBaru() }
             )
 
             // Konfirmasi Password Baru
             PasswordField(
-                label = "Konfirmasi Password Baru",
+                label = stringResource(R.string.label_confirm_new_password),
                 value = uiState.konfirmasiPassword,
                 visible = uiState.konfirmasiVisible,
-                placeholder = "Ulangi password baru",
+                placeholder = stringResource(R.string.hint_repeat_new_password),
                 onValueChange = { viewModel.onKonfirmasiChange(it) },
                 onToggleVisibility = { viewModel.onToggleKonfirmasi() }
             )
