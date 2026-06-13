@@ -8,14 +8,10 @@ import com.example.sipinjam.domain.model.Barang
 import com.example.sipinjam.domain.model.Peminjaman
 import com.example.sipinjam.domain.model.Pengembalian
 import com.example.sipinjam.domain.model.User
-import com.example.sipinjam.domain.repository.AuthRepository
-import com.example.sipinjam.data.repository.AuthRepositoryImpl
-import com.example.sipinjam.domain.repository.BarangRepository
-import com.example.sipinjam.data.repository.BarangRepositoryImpl
-import com.example.sipinjam.domain.repository.PeminjamanRepository
-import com.example.sipinjam.data.repository.PeminjamanRepositoryImpl
-import com.example.sipinjam.domain.repository.PengembalianRepository
-import com.example.sipinjam.data.repository.PengembalianRepositoryImpl
+import com.example.sipinjam.domain.usecase.auth.GetUserByIdUseCase
+import com.example.sipinjam.domain.usecase.barang.GetBarangDetailUseCase
+import com.example.sipinjam.domain.usecase.peminjaman.ObservePermintaanPeminjamanUseCase
+import com.example.sipinjam.domain.usecase.pengembalian.ObservePengembalianUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -46,10 +42,10 @@ data class AdminPengembalianUiItem(
 )
 
 class PersetujuanPeminjamanViewModel(
-    private val peminjamanRepository: PeminjamanRepository = PeminjamanRepositoryImpl(),
-    private val pengembalianRepository: PengembalianRepository = PengembalianRepositoryImpl(),
-    private val barangRepository: BarangRepository = BarangRepositoryImpl(),
-    private val authRepository: AuthRepository = AuthRepositoryImpl()
+    private val observePermintaanPeminjamanUseCase: ObservePermintaanPeminjamanUseCase,
+    private val observePengembalianUseCase: ObservePengembalianUseCase,
+    private val getBarangDetailUseCase: GetBarangDetailUseCase,
+    private val getUserByIdUseCase: GetUserByIdUseCase,
 ) : ViewModel() {
 
     private val _daftarPeminjaman = MutableStateFlow<List<AdminPeminjamanUiItem>>(emptyList())
@@ -74,7 +70,7 @@ class PersetujuanPeminjamanViewModel(
             _isLoading.value = true
             _errorMessage.value = null
 
-            peminjamanRepository.listenSemuaPeminjaman()
+            observePermintaanPeminjamanUseCase()
                 .catch { error ->
                     _errorMessage.value = error.message ?: "Gagal memuat data peminjaman"
                     _isLoading.value = false
@@ -97,7 +93,7 @@ class PersetujuanPeminjamanViewModel(
 
     private fun muatPengembalian() {
         viewModelScope.launch {
-            pengembalianRepository.listenSemuaPengembalian()
+            observePengembalianUseCase()
                 .catch { error ->
                     _errorMessage.value = error.message ?: "Gagal memuat data pengembalian"
                 }
@@ -158,7 +154,7 @@ class PersetujuanPeminjamanViewModel(
     private suspend fun getUserById(userId: String): User? {
         if (userId.isBlank()) return null
         return try {
-            authRepository.getUserById(userId)
+            getUserByIdUseCase(userId)
         } catch (e: Exception) {
             null
         }
@@ -167,7 +163,7 @@ class PersetujuanPeminjamanViewModel(
     private suspend fun getBarangById(barangId: String): Barang? {
         if (barangId.isBlank()) return null
         return try {
-            barangRepository.getBarangById(barangId)
+            getBarangDetailUseCase(barangId)
         } catch (e: Exception) {
             null
         }

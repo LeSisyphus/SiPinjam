@@ -1,17 +1,15 @@
 package com.example.sipinjam.screens.admin
 
-import com.example.sipinjam.domain.model.BorrowingStatus
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.sipinjam.domain.model.Barang
 import com.example.sipinjam.domain.model.Peminjaman
 import com.example.sipinjam.domain.model.User
-import com.example.sipinjam.domain.repository.AuthRepository
-import com.example.sipinjam.data.repository.AuthRepositoryImpl
-import com.example.sipinjam.domain.repository.BarangRepository
-import com.example.sipinjam.data.repository.BarangRepositoryImpl
-import com.example.sipinjam.domain.repository.PeminjamanRepository
-import com.example.sipinjam.data.repository.PeminjamanRepositoryImpl
+import com.example.sipinjam.domain.usecase.auth.GetUserByIdUseCase
+import com.example.sipinjam.domain.usecase.barang.GetBarangDetailUseCase
+import com.example.sipinjam.domain.usecase.peminjaman.ApprovePeminjamanUseCase
+import com.example.sipinjam.domain.usecase.peminjaman.GetPeminjamanDetailUseCase
+import com.example.sipinjam.domain.usecase.peminjaman.RejectPeminjamanUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -28,11 +26,13 @@ data class DetailPengajuanUiState(
     val actionDone: Boolean = false,
 )
 
-class DetailPengajuanViewModel : ViewModel() {
-
-    private val peminjamanRepository = PeminjamanRepositoryImpl()
-    private val barangRepository = BarangRepositoryImpl()
-    private val authRepository = AuthRepositoryImpl()
+class DetailPengajuanViewModel(
+    private val getPeminjamanDetailUseCase: GetPeminjamanDetailUseCase,
+    private val getBarangDetailUseCase: GetBarangDetailUseCase,
+    private val getUserByIdUseCase: GetUserByIdUseCase,
+    private val approvePeminjamanUseCase: ApprovePeminjamanUseCase,
+    private val rejectPeminjamanUseCase: RejectPeminjamanUseCase,
+) : ViewModel() {
 
     private val _uiState = MutableStateFlow(DetailPengajuanUiState())
     val uiState: StateFlow<DetailPengajuanUiState> = _uiState.asStateFlow()
@@ -57,7 +57,7 @@ class DetailPengajuanViewModel : ViewModel() {
                 )
             }
 
-            val peminjamanResult = peminjamanRepository.getPeminjamanById(peminjamanId)
+            val peminjamanResult = getPeminjamanDetailUseCase(peminjamanId)
 
             if (peminjamanResult.isFailure) {
                 _uiState.update {
@@ -82,8 +82,8 @@ class DetailPengajuanViewModel : ViewModel() {
                 return@launch
             }
 
-            val barang = barangRepository.getBarangById(peminjaman.barangId)
-            val peminjam = authRepository.getUserById(peminjaman.userId)
+            val barang = getBarangDetailUseCase(peminjaman.barangId)
+            val peminjam = getUserByIdUseCase(peminjaman.userId)
 
             _uiState.update {
                 it.copy(
@@ -108,7 +108,7 @@ class DetailPengajuanViewModel : ViewModel() {
                 )
             }
 
-            val result = peminjamanRepository.setujuiDenganKurangiStok(peminjaman)
+            val result = approvePeminjamanUseCase(peminjaman)
 
             if (result.isSuccess) {
                 _uiState.update {
@@ -140,10 +140,7 @@ class DetailPengajuanViewModel : ViewModel() {
                 )
             }
 
-            val result = peminjamanRepository.updateStatus(
-                id = peminjaman.id,
-                statusBaru = BorrowingStatus.DITOLAK
-            )
+            val result = rejectPeminjamanUseCase(peminjaman.id)
 
             if (result.isSuccess) {
                 _uiState.update {

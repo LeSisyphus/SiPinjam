@@ -66,6 +66,7 @@ import com.example.sipinjam.ui.theme.StatusOrange
 import com.example.sipinjam.ui.theme.StatusOrangeBg
 import com.example.sipinjam.ui.theme.TextPrimary
 import com.example.sipinjam.ui.theme.TextSecondary
+import com.example.sipinjam.di.rememberSiPinjamViewModelFactory
 
 private val RequestPageBg: Color
     @Composable get() = BackgroundGray
@@ -111,7 +112,7 @@ fun PersetujuanPeminjamanScreen(
     onProfilClick: () -> Unit = {},
     onDetailPengajuanClick: (peminjamanId: String) -> Unit = {},
     onVerifikasiClick: (pengembalianId: String) -> Unit = {},
-    viewModel: PersetujuanPeminjamanViewModel = viewModel()
+    viewModel: PersetujuanPeminjamanViewModel = viewModel(factory = rememberSiPinjamViewModelFactory())
 ) {
     val daftarPeminjaman by viewModel.daftarPeminjaman.collectAsState()
     val daftarPengembalian by viewModel.daftarPengembalian.collectAsState()
