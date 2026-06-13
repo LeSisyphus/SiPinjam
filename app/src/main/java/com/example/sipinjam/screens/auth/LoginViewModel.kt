@@ -1,6 +1,5 @@
 package com.example.sipinjam.screens.auth
 
-import android.app.Activity
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModel
@@ -34,7 +33,6 @@ class LoginViewModel(
     val uiState: StateFlow<LoginUiState> = _uiState.asStateFlow()
 
     init {
-        AppPreferences.load(application)
         _uiState.update {
             it.copy(selectedLang = AppPreferences.languageCode.uppercase(Locale.ROOT))
         }
@@ -52,11 +50,9 @@ class LoginViewModel(
         _uiState.update { it.copy(passwordVisible = !it.passwordVisible) }
     }
 
-    fun onLangChange(lang: String, onRecreate: () -> Unit) {
+    fun onLangChange(lang: String) {
         AppPreferences.setLanguage(getApplication(), lang.lowercase(Locale.ROOT))
-        AppPreferences.applyLanguage(getApplication())
         _uiState.update { it.copy(selectedLang = AppPreferences.languageCode.uppercase(Locale.ROOT)) }
-        onRecreate()
     }
 
     fun onLoginClick(onSuccess: (isAdmin: Boolean) -> Unit) {

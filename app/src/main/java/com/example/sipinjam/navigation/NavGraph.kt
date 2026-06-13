@@ -132,7 +132,6 @@ fun NavGraph(
     startDestination: String = Routes.LOGIN,
     isAdmin: Boolean = false,
     onAuthStateChanged: (isLoggedIn: Boolean, isAdmin: Boolean) -> Unit = { _, _ -> },
-    onRecreate: () -> Unit = {},
 ) {
     var currentIsAdmin by rememberSaveable { mutableStateOf(isAdmin) }
 
@@ -148,7 +147,6 @@ fun NavGraph(
     ) {
         composable(Routes.LOGIN) {
             LoginScreen(
-                onRecreate = onRecreate,
                 onLoginSuccess = { loggedInAsAdmin ->
                     currentIsAdmin = loggedInAsAdmin
                     onAuthStateChanged(true, loggedInAsAdmin)
@@ -454,7 +452,7 @@ fun NavGraph(
 
         composable(Routes.KELOLA_BARANG) {
             val context = LocalContext.current
-            val adminViewModel: com.example.sipinjam.screens.admin.KelolaBarangViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
+            val adminViewModel: KelolaBarangViewModel = viewModel()
             val adminUiState by adminViewModel.uiState.collectAsState()
 
             KelolaBarangScreen(
@@ -465,7 +463,7 @@ fun NavGraph(
                 barangToDelete = adminUiState.barangToDelete,
                 isLoading = adminUiState.isLoading,
                 isSuccess = adminUiState.isSuccess,
-                isEditSuccess = adminUiState.isEditSuccess, // 🔥 Aliran data baru untuk Pop-up Edit
+                isEditSuccess = adminUiState.isEditSuccess,
                 isDeleteSuccess = adminUiState.isDeleteSuccess,
                 onTambahConfirm = { nama, kategori, stok, kondisi, lokasi, maksPinjam, deskripsi, imageUri ->
                     adminViewModel.onTambahBarangCloudinary(context, nama, kategori, stok, kondisi, lokasi, maksPinjam, deskripsi, imageUri)
@@ -479,12 +477,13 @@ fun NavGraph(
                 onDeleteConfirm = { adminViewModel.onDeleteConfirm() },
                 onDeleteDismiss = { adminViewModel.onDeleteDismiss() },
                 onSuccessDismiss = { adminViewModel.resetSuccessState() },
-                onDashboardClick  = { navController.navigate(Routes.DASHBOARD_ADMIN) { popUpTo(Routes.DASHBOARD_ADMIN) { inclusive = true } } },
-                onBarangClick     = {},
+                onDashboardClick = { navController.navigate(Routes.DASHBOARD_ADMIN) { popUpTo(Routes.DASHBOARD_ADMIN) { inclusive = true } } },
+                onBarangClick = {},
                 onPermintaanClick = { navController.navigate(Routes.PERSETUJUAN_PEMINJAMAN) },
-                onProfilClick     = { navController.navigate(Routes.PROFIL) }
+                onProfilClick = { navController.navigate(Routes.PROFIL) }
             )
         }
+
         composable(Routes.PERSETUJUAN_PEMINJAMAN) {
             PersetujuanPeminjamanScreen(
                 onDashboardClick = {
@@ -498,14 +497,10 @@ fun NavGraph(
                     navController.navigateSingleTop(Routes.PROFIL)
                 },
                 onDetailPengajuanClick = { peminjamanId ->
-                    navController.navigate(
-                        Routes.detailPengajuan(peminjamanId)
-                    )
+                    navController.navigate(Routes.detailPengajuan(peminjamanId))
                 },
                 onVerifikasiClick = { pengembalianId ->
-                    navController.navigate(
-                        Routes.verifikasiPengembalian(pengembalianId)
-                    )
+                    navController.navigate(Routes.verifikasiPengembalian(pengembalianId))
                 }
             )
         }
@@ -527,9 +522,7 @@ fun NavGraph(
                 },
                 onActionDone = {
                     navController.navigate(Routes.PERSETUJUAN_PEMINJAMAN) {
-                        popUpTo(Routes.PERSETUJUAN_PEMINJAMAN) {
-                            inclusive = false
-                        }
+                        popUpTo(Routes.PERSETUJUAN_PEMINJAMAN) { inclusive = false }
                         launchSingleTop = true
                     }
                 }
@@ -553,9 +546,7 @@ fun NavGraph(
                 },
                 onVerifikasiDone = {
                     navController.navigate(Routes.PERSETUJUAN_PEMINJAMAN) {
-                        popUpTo(Routes.PERSETUJUAN_PEMINJAMAN) {
-                            inclusive = false
-                        }
+                        popUpTo(Routes.PERSETUJUAN_PEMINJAMAN) { inclusive = false }
                         launchSingleTop = true
                     }
                 }

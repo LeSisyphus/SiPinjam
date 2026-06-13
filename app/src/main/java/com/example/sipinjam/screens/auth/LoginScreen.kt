@@ -37,13 +37,11 @@ fun LoginScreen(
             LocalContext.current.applicationContext as Application
         )
     ),
-    onRecreate: () -> Unit = {},
     onLoginSuccess: (isAdmin: Boolean) -> Unit = {},
     onRegisterClick: () -> Unit = {},
     onForgotPasswordClick: () -> Unit = {},
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val context = LocalContext.current
 
     Box(
         modifier = Modifier
@@ -257,7 +255,7 @@ fun LoginScreen(
 
             LanguageToggle(
                 selected = uiState.selectedLang,
-                onSelect = { viewModel.onLangChange(it, onRecreate) }
+                onSelect = { viewModel.onLangChange(it) }
             )
 
             Spacer(Modifier.height(32.dp))

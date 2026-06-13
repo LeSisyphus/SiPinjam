@@ -15,7 +15,6 @@ import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.navigation.compose.rememberNavController
 import com.example.sipinjam.data.preferences.AppPreferences
 import com.example.sipinjam.domain.repository.AuthRepository
-import com.example.sipinjam.data.repository.AuthRepositoryImpl
 import com.example.sipinjam.navigation.NavGraph
 import com.example.sipinjam.ui.theme.SiPinjamLocale
 import com.example.sipinjam.ui.theme.SiPinjamTheme
@@ -35,7 +34,6 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         AppPreferences.load(this)
-        AppPreferences.applyLanguage(this)
         enableEdgeToEdge()
 
         val activityResultRegistryOwner = this
@@ -74,8 +72,7 @@ class MainActivity : ComponentActivity() {
                                 onAuthStateChanged = { loggedIn, admin ->
                                     isLoggedIn = loggedIn
                                     isAdmin = admin
-                                },
-                                onRecreate = { recreate() }
+                                }
                             )
                         }
                     }
