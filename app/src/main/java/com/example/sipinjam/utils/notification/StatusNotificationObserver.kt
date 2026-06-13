@@ -91,21 +91,21 @@ private suspend fun observeUserBorrowingStatusNotifications(
                         BorrowingStatus.DIPINJAM,
                         BorrowingStatus.DISETUJUI_LEGACY -> {
                             notificationHelper.showStatusNotification(
-                                title = "Peminjaman Disetujui! 🎉",
+                                title = "Peminjaman Disetujui!",
                                 message = "Permintaan pinjam $namaBarang telah disetujui admin. Silakan ambil barang."
                             )
                         }
 
                         BorrowingStatus.DITOLAK -> {
                             notificationHelper.showStatusNotification(
-                                title = "Peminjaman Ditolak ❌",
+                                title = "Peminjaman Ditolak",
                                 message = "Maaf, permintaan pinjam $namaBarang ditolak oleh admin."
                             )
                         }
 
                         BorrowingStatus.SELESAI -> {
                             notificationHelper.showStatusNotification(
-                                title = "Pengembalian Sukses 🟢",
+                                title = "Pengembalian Sukses",
                                 message = "Terima kasih, barang $namaBarang telah sukses dikembalikan ke inventaris."
                             )
                         }
