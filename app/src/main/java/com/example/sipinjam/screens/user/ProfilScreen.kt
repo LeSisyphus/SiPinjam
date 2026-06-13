@@ -35,10 +35,11 @@ import com.example.sipinjam.ui.components.AdminBottomNavBar
 import com.example.sipinjam.ui.components.SiPinjamTopBar
 import com.example.sipinjam.ui.components.UserBottomNavBar
 import com.example.sipinjam.ui.theme.*
+import com.example.sipinjam.di.rememberSiPinjamViewModelFactory
 
 @Composable
 fun ProfilScreen(
-    viewModel: ProfilViewModel = viewModel(),
+    viewModel: ProfilViewModel = viewModel(factory = rememberSiPinjamViewModelFactory()),
     onGantiPasswordClick: () -> Unit = {},
     onFavoritClick: () -> Unit = {},
     onLogoutDone: () -> Unit = {},
