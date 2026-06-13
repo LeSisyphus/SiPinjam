@@ -35,6 +35,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         AppPreferences.load(this)
+        AppPreferences.applyLanguage(this)
         enableEdgeToEdge()
 
         val activityResultRegistryOwner = this
@@ -73,7 +74,8 @@ class MainActivity : ComponentActivity() {
                                 onAuthStateChanged = { loggedIn, admin ->
                                     isLoggedIn = loggedIn
                                     isAdmin = admin
-                                }
+                                },
+                                onRecreate = { recreate() }
                             )
                         }
                     }

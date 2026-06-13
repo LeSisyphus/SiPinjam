@@ -132,6 +132,7 @@ fun NavGraph(
     startDestination: String = Routes.LOGIN,
     isAdmin: Boolean = false,
     onAuthStateChanged: (isLoggedIn: Boolean, isAdmin: Boolean) -> Unit = { _, _ -> },
+    onRecreate: () -> Unit = {},
 ) {
     var currentIsAdmin by rememberSaveable { mutableStateOf(isAdmin) }
 
@@ -147,6 +148,7 @@ fun NavGraph(
     ) {
         composable(Routes.LOGIN) {
             LoginScreen(
+                onRecreate = onRecreate,
                 onLoginSuccess = { loggedInAsAdmin ->
                     currentIsAdmin = loggedInAsAdmin
                     onAuthStateChanged(true, loggedInAsAdmin)

@@ -1,7 +1,10 @@
 package com.example.sipinjam.screens.auth
 
+import android.app.Activity
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.sipinjam.data.preferences.AppPreferences
 import com.example.sipinjam.domain.repository.AuthRepository
@@ -49,9 +52,11 @@ class LoginViewModel(
         _uiState.update { it.copy(passwordVisible = !it.passwordVisible) }
     }
 
-    fun onLangChange(lang: String) {
+    fun onLangChange(lang: String, onRecreate: () -> Unit) {
         AppPreferences.setLanguage(getApplication(), lang.lowercase(Locale.ROOT))
+        AppPreferences.applyLanguage(getApplication())
         _uiState.update { it.copy(selectedLang = AppPreferences.languageCode.uppercase(Locale.ROOT)) }
+        onRecreate()
     }
 
     fun onLoginClick(onSuccess: (isAdmin: Boolean) -> Unit) {
@@ -93,6 +98,17 @@ class LoginViewModel(
             message.contains("blocked all requests") -> "Terlalu banyak percobaan. Coba lagi nanti."
             message.contains("network error")        -> "Tidak ada koneksi internet."
             else                                     -> "Login gagal. Periksa email dan password."
+        }
+    }
+
+    companion object {
+        fun factory(application: Application): ViewModelProvider.Factory {
+            return object : ViewModelProvider.Factory {
+                @Suppress("UNCHECKED_CAST")
+                override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                    return LoginViewModel(application) as T
+                }
+            }
         }
     }
 }

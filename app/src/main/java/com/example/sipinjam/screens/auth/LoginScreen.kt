@@ -1,7 +1,7 @@
 package com.example.sipinjam.screens.auth
 
 import com.example.sipinjam.R
-import androidx.compose.ui.res.stringResource
+import android.app.Application
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -18,6 +18,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.*
 import androidx.compose.ui.text.style.TextAlign
@@ -30,12 +32,18 @@ import com.example.sipinjam.ui.theme.*
 
 @Composable
 fun LoginScreen(
-    viewModel: LoginViewModel = viewModel(),
+    viewModel: LoginViewModel = viewModel(
+        factory = LoginViewModel.factory(
+            LocalContext.current.applicationContext as Application
+        )
+    ),
+    onRecreate: () -> Unit = {},
     onLoginSuccess: (isAdmin: Boolean) -> Unit = {},
     onRegisterClick: () -> Unit = {},
     onForgotPasswordClick: () -> Unit = {},
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val context = LocalContext.current
 
     Box(
         modifier = Modifier
@@ -249,7 +257,7 @@ fun LoginScreen(
 
             LanguageToggle(
                 selected = uiState.selectedLang,
-                onSelect = { viewModel.onLangChange(it) }
+                onSelect = { viewModel.onLangChange(it, onRecreate) }
             )
 
             Spacer(Modifier.height(32.dp))
