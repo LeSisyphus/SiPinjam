@@ -4,7 +4,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.mutableStateMapOf
+import android.content.Context
 import androidx.compose.ui.platform.LocalContext
+import com.example.sipinjam.R
 import com.example.sipinjam.domain.model.BorrowingStatus
 import com.example.sipinjam.domain.model.ReturnStatus
 import com.example.sipinjam.domain.usecase.auth.GetCurrentUserUseCase
@@ -54,6 +56,7 @@ fun StatusNotificationObserver(
 
         if (isAdmin) {
             observeAdminNotifications(
+                context = context,
                 observePermintaanPeminjamanUseCase = observePermintaanPeminjamanUseCase,
                 observePengembalianUseCase = observePengembalianUseCase,
                 notificationHelper = notificationHelper,
@@ -62,6 +65,7 @@ fun StatusNotificationObserver(
             )
         } else {
             observeUserNotifications(
+                context = context,
                 userId = currentUserId,
                 observeRiwayatPeminjamanUseCase = observeRiwayatPeminjamanUseCase,
                 observePengembalianUseCase = observePengembalianUseCase,
@@ -74,6 +78,7 @@ fun StatusNotificationObserver(
 }
 
 private suspend fun observeUserNotifications(
+    context: Context,
     userId: String,
     observeRiwayatPeminjamanUseCase: ObserveRiwayatPeminjamanUseCase,
     observePengembalianUseCase: ObservePengembalianUseCase,
@@ -83,6 +88,7 @@ private suspend fun observeUserNotifications(
 ) = coroutineScope {
     launch {
         observeUserBorrowingNotifications(
+            context = context,
             userId = userId,
             observeRiwayatPeminjamanUseCase = observeRiwayatPeminjamanUseCase,
             notificationHelper = notificationHelper,
@@ -92,6 +98,7 @@ private suspend fun observeUserNotifications(
 
     launch {
         observeUserReturnNotifications(
+            context = context,
             userId = userId,
             observePengembalianUseCase = observePengembalianUseCase,
             notificationHelper = notificationHelper,
@@ -101,6 +108,7 @@ private suspend fun observeUserNotifications(
 }
 
 private suspend fun observeUserBorrowingNotifications(
+    context: Context,
     userId: String,
     observeRiwayatPeminjamanUseCase: ObserveRiwayatPeminjamanUseCase,
     notificationHelper: NotificationHelper,
@@ -125,16 +133,16 @@ private suspend fun observeUserBorrowingNotifications(
                                                 statusSekarang.equals(BorrowingStatus.DISETUJUI_LEGACY, ignoreCase = true)
                                         ) -> {
                             notificationHelper.showStatusNotification(
-                                title = "Peminjaman Disetujui!",
-                                message = "Permintaan pinjam $namaBarang telah disetujui admin. Silakan ambil barang."
+                                title = context.getString(R.string.notif_borrowing_approved_title),
+                                message = context.getString(R.string.notif_borrowing_approved_message, namaBarang)
                             )
                         }
 
                         statusLama.equals(BorrowingStatus.DIPROSES, ignoreCase = true) &&
                                 statusSekarang.equals(BorrowingStatus.DITOLAK, ignoreCase = true) -> {
                             notificationHelper.showStatusNotification(
-                                title = "Peminjaman Ditolak",
-                                message = "Maaf, permintaan pinjam $namaBarang ditolak oleh admin."
+                                title = context.getString(R.string.notif_borrowing_rejected_title),
+                                message = context.getString(R.string.notif_borrowing_rejected_message, namaBarang)
                             )
                         }
 
@@ -150,6 +158,7 @@ private suspend fun observeUserBorrowingNotifications(
 }
 
 private suspend fun observeUserReturnNotifications(
+    context: Context,
     userId: String,
     observePengembalianUseCase: ObservePengembalianUseCase,
     notificationHelper: NotificationHelper,
@@ -173,16 +182,16 @@ private suspend fun observeUserReturnNotifications(
                             statusLama.equals(ReturnStatus.MENUNGGU_VERIFIKASI, ignoreCase = true) &&
                                     statusSekarang.equals(ReturnStatus.TERVERIFIKASI, ignoreCase = true) -> {
                                 notificationHelper.showStatusNotification(
-                                    title = "Pengembalian Disetujui",
-                                    message = "Pengembalian barang Anda telah diverifikasi oleh admin."
+                                    title = context.getString(R.string.notif_return_approved_title),
+                                    message = context.getString(R.string.notif_return_approved_message)
                                 )
                             }
 
                             statusLama.equals(ReturnStatus.MENUNGGU_VERIFIKASI, ignoreCase = true) &&
                                     statusSekarang.equals(ReturnStatus.DITOLAK, ignoreCase = true) -> {
                                 notificationHelper.showStatusNotification(
-                                    title = "Pengembalian Ditolak",
-                                    message = "Pengembalian barang Anda ditolak. Silakan cek catatan admin."
+                                    title = context.getString(R.string.notif_return_rejected_title),
+                                    message = context.getString(R.string.notif_return_rejected_message)
                                 )
                             }
 
@@ -198,6 +207,7 @@ private suspend fun observeUserReturnNotifications(
 }
 
 private suspend fun observeAdminNotifications(
+    context: Context,
     observePermintaanPeminjamanUseCase: ObservePermintaanPeminjamanUseCase,
     observePengembalianUseCase: ObservePengembalianUseCase,
     notificationHelper: NotificationHelper,
@@ -218,8 +228,12 @@ private suspend fun observeAdminNotifications(
 
                     if (!isInitialBorrowingLoad && isNewPendingRequest) {
                         notificationHelper.showStatusNotification(
-                            title = "Pengajuan Peminjaman Baru",
-                            message = "${peminjaman.namaUser} mengajukan peminjaman ${peminjaman.namaBarang}."
+                            title = context.getString(R.string.notif_admin_new_borrow_title),
+                            message = context.getString(
+                                R.string.notif_admin_new_borrow_message,
+                                peminjaman.namaUser,
+                                peminjaman.namaBarang
+                            )
                         )
                     }
 
@@ -245,8 +259,8 @@ private suspend fun observeAdminNotifications(
 
                     if (!isInitialReturnLoad && isNewReturnRequest) {
                         notificationHelper.showStatusNotification(
-                            title = "Pengajuan Pengembalian Baru",
-                            message = "Ada pengembalian barang yang menunggu verifikasi admin."
+                            title = context.getString(R.string.notif_admin_new_return_title),
+                            message = context.getString(R.string.notif_admin_new_return_message)
                         )
                     }
 

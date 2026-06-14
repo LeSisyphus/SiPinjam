@@ -55,7 +55,7 @@ fun SiPinjamTopBar(
                 IconButton(onClick = onBackClick) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = "Kembali",
+                        contentDescription = stringResource(R.string.desc_back),
                         tint = TextPrimary
                     )
                 }

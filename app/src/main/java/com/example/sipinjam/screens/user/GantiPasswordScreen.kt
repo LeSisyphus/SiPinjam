@@ -1,6 +1,7 @@
 package com.example.sipinjam.screens.user
 
 import com.example.sipinjam.R
+import com.example.sipinjam.ui.components.localizedUiMessage
 import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -210,7 +211,7 @@ fun GantiPasswordScreen(
             // Error
             if (uiState.errorMessage != null) {
                 Text(
-                    text = uiState.errorMessage!!,
+                    text = localizedUiMessage(uiState.errorMessage),
                     color = StatusRed,
                     fontSize = 13.sp
                 )

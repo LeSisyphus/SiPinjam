@@ -1,6 +1,8 @@
 package com.example.sipinjam.screens.auth
 
 import com.example.sipinjam.R
+import com.example.sipinjam.ui.components.localizedRoleText
+import com.example.sipinjam.ui.components.localizedUiMessage
 import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -62,7 +64,7 @@ fun RegisterScreen(
                 IconButton(onClick = onBackClick) {
                     Icon(
                         imageVector = Icons.Filled.ArrowBack,
-                        contentDescription = "Kembali",
+                        contentDescription = stringResource(R.string.desc_back),
                         tint = SiPinjamBlue
                     )
                 }
@@ -149,7 +151,7 @@ fun RegisterScreen(
                                     contentAlignment = Alignment.Center
                                 ) {
                                     Text(
-                                        text = peran,
+                                        text = localizedRoleText(peran),
                                         color = if (isSelected) Color.White else TextSecondary,
                                         fontSize = 13.sp,
                                         fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Normal
@@ -293,7 +295,7 @@ fun RegisterScreen(
                     // Error message
                     if (uiState.errorMessage != null) {
                         Text(
-                            text = uiState.errorMessage!!,
+                            text = localizedUiMessage(uiState.errorMessage),
                             color = StatusRed,
                             fontSize = 13.sp
                         )

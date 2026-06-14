@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import com.example.sipinjam.utils.UiMessageKey
 
 data class FavoritBarangUiState(
     val daftarFavorit: List<FavoriteItem> = emptyList(),
@@ -45,7 +46,7 @@ class FavoritBarangViewModel(
                     it.copy(
                         daftarFavorit = emptyList(),
                         isLoading = false,
-                        errorMessage = "User belum login"
+                        errorMessage = UiMessageKey.USER_NOT_LOGGED_IN
                     )
                 }
                 return@launch
@@ -54,7 +55,7 @@ class FavoritBarangViewModel(
             getFavoriteItemsUseCase(userId)
                 .catch { e ->
                     _uiState.update {
-                        it.copy(isLoading = false, errorMessage = e.localizedMessage ?: "Gagal memuat favorit")
+                        it.copy(isLoading = false, errorMessage = UiMessageKey.LOAD_FAVORITES_FAILED)
                     }
                 }
                 .collect { list ->

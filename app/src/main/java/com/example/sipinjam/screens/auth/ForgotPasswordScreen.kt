@@ -54,7 +54,8 @@ fun ForgotPasswordScreen(
     val adminPhone = "+6288242667283"
     val adminWhatsAppUrl = "https://wa.me/6288242667283"
     val adminEmail = "2410817210003@mhs.ulm.ac.id"
-    val adminEmailUrl = "mailto:$adminEmail?subject=Permintaan Reset Password SiPinjam"
+    val adminEmailSubject = stringResource(R.string.email_subject_reset_password)
+    val adminEmailUrl = "mailto:$adminEmail?subject=$adminEmailSubject"
 
     Box(
         modifier = Modifier
@@ -138,18 +139,18 @@ fun ForgotPasswordScreen(
                     )
 
                     ContactInfoItem(
-                        label = "Nomor Admin",
+                        label = stringResource(R.string.label_admin_phone),
                         value = adminPhone,
-                        actionText = "Hubungi",
+                        actionText = stringResource(R.string.btn_contact),
                         onClick = {
                             uriHandler.openUri(adminWhatsAppUrl)
                         }
                     )
 
                     ContactInfoItem(
-                        label = "Email Admin",
+                        label = stringResource(R.string.label_admin_email),
                         value = adminEmail,
-                        actionText = "Kirim Email",
+                        actionText = stringResource(R.string.btn_send_email),
                         onClick = {
                             uriHandler.openUri(adminEmailUrl)
                         }

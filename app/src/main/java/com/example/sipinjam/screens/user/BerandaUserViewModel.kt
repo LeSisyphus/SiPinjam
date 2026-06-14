@@ -21,6 +21,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import com.example.sipinjam.utils.UiMessageKey
 
 data class BerandaUiState(
     val barangTersedia: List<BarangTersedia> = emptyList(),
@@ -85,11 +86,7 @@ class BerandaUserViewModel(
                     todayHolidayStatus = todayResult.getOrNull() ?: currentState.todayHolidayStatus,
                     isHolidayLoading = false,
                     holidayErrorMessage = when {
-                        refreshResult.isFailure && todayResult.isFailure -> {
-                            refreshResult.exceptionOrNull()?.localizedMessage
-                                ?: todayResult.exceptionOrNull()?.localizedMessage
-                                ?: "Gagal memuat info hari libur"
-                        }
+                        refreshResult.isFailure && todayResult.isFailure -> UiMessageKey.LOAD_HOLIDAY_INFO_FAILED
                         else -> null
                     }
                 )
@@ -104,8 +101,7 @@ class BerandaUserViewModel(
                 .catch { exception ->
                     _uiState.update {
                         it.copy(
-                            holidayErrorMessage = exception.localizedMessage
-                                ?: "Gagal memuat cache hari libur"
+                            holidayErrorMessage = UiMessageKey.LOAD_HOLIDAY_CACHE_FAILED
                         )
                     }
                 }
@@ -126,7 +122,7 @@ class BerandaUserViewModel(
                     _uiState.update {
                         it.copy(
                             isLoading = false,
-                            errorMessage = exception.localizedMessage ?: "Gagal memuat barang"
+                            errorMessage = UiMessageKey.LOAD_ITEM_FAILED
                         )
                     }
                 }
@@ -169,7 +165,7 @@ class BerandaUserViewModel(
 
             if (currentUser == null) {
                 _uiState.update {
-                    it.copy(errorMessage = "User tidak ditemukan, silakan login ulang")
+                    it.copy(errorMessage = UiMessageKey.USER_NOT_FOUND_LOGIN_AGAIN)
                 }
                 return@launch
             }
@@ -178,7 +174,7 @@ class BerandaUserViewModel(
                 .catch { exception ->
                     _uiState.update {
                         it.copy(
-                            errorMessage = exception.localizedMessage ?: "Gagal memuat data peminjaman"
+                            errorMessage = UiMessageKey.LOAD_BORROWINGS_FAILED
                         )
                     }
                 }
@@ -196,7 +192,7 @@ class BerandaUserViewModel(
                                     barangId = peminjaman.barangId,
                                     userId = peminjaman.userId,
                                     nama = barang?.nama?.takeIf { it.isNotBlank() }
-                                        ?: peminjaman.namaBarang.ifBlank { "Barang" },
+                                        ?: peminjaman.namaBarang.ifBlank { "-" },
                                     lokasi = barang?.lokasi?.takeIf { it.isNotBlank() } ?: "-",
                                     tanggalPinjam = peminjaman.tanggalPinjam,
                                     tanggalJatuhTempo = peminjaman.tanggalKembali,

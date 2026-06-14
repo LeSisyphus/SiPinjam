@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import com.example.sipinjam.utils.UiMessageKey
 
 data class RegisterUiState(
     val peran: String = "Mahasiswa",
@@ -50,15 +51,15 @@ class RegisterViewModel(
         val state = _uiState.value
 
         if (state.namaLengkap.isBlank()) {
-            _uiState.update { it.copy(errorMessage = "Nama lengkap tidak boleh kosong.") }
+            _uiState.update { it.copy(errorMessage = UiMessageKey.EMPTY_FULL_NAME) }
             return
         }
         if (state.email.isBlank()) {
-            _uiState.update { it.copy(errorMessage = "Email tidak boleh kosong.") }
+            _uiState.update { it.copy(errorMessage = UiMessageKey.EMPTY_EMAIL) }
             return
         }
         if (state.password.length < 6) {
-            _uiState.update { it.copy(errorMessage = "Password minimal 6 karakter.") }
+            _uiState.update { it.copy(errorMessage = UiMessageKey.PASSWORD_MIN_6) }
             return
         }
 
@@ -91,11 +92,11 @@ class RegisterViewModel(
 
     private fun parseFirebaseError(message: String?): String {
         return when {
-            message == null                           -> "Terjadi kesalahan, coba lagi."
-            message.contains("email address is already") -> "Email sudah terdaftar."
-            message.contains("badly formatted")       -> "Format email tidak valid."
-            message.contains("network error")         -> "Tidak ada koneksi internet."
-            else                                      -> "Registrasi gagal. Coba lagi."
+            message == null                           -> UiMessageKey.TRY_AGAIN
+            message.contains("email address is already") -> UiMessageKey.EMAIL_ALREADY_REGISTERED
+            message.contains("badly formatted")       -> UiMessageKey.INVALID_EMAIL_FORMAT
+            message.contains("network error")         -> UiMessageKey.NO_INTERNET
+            else                                      -> UiMessageKey.REGISTER_FAILED
         }
     }
 }

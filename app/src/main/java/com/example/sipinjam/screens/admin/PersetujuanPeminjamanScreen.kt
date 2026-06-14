@@ -55,6 +55,9 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.sipinjam.ui.components.AdminBottomNavBar
 import com.example.sipinjam.ui.components.CloudinaryImage
 import com.example.sipinjam.ui.components.SiPinjamTopBar
+import com.example.sipinjam.ui.components.localizedRoleText
+import com.example.sipinjam.ui.components.localizedStatusText
+import com.example.sipinjam.ui.components.localizedUiMessage
 import com.example.sipinjam.ui.theme.BackgroundGray
 import com.example.sipinjam.ui.theme.CardWhite
 import com.example.sipinjam.ui.theme.DividerColor
@@ -122,9 +125,11 @@ fun PersetujuanPeminjamanScreen(
     val snackbarHostState = remember { SnackbarHostState() }
     var tabAktif by remember { mutableIntStateOf(0) }
 
-    LaunchedEffect(errorMessage) {
-        if (!errorMessage.isNullOrBlank()) {
-            snackbarHostState.showSnackbar(errorMessage.orEmpty())
+    val localizedErrorMessage = localizedUiMessage(errorMessage)
+
+    LaunchedEffect(localizedErrorMessage) {
+        if (localizedErrorMessage.isNotBlank()) {
+            snackbarHostState.showSnackbar(localizedErrorMessage)
             viewModel.clearError()
         }
     }
@@ -166,7 +171,7 @@ fun PersetujuanPeminjamanScreen(
                             LoadingContent()
                         } else if (daftarPeminjaman.isEmpty()) {
                             EmptyState(
-                                text = "Belum ada permintaan peminjaman",
+                                text = stringResource(R.string.empty_permohonan),
                                 modifier = Modifier.weight(1f)
                             )
                         } else {
@@ -206,7 +211,7 @@ fun PersetujuanPeminjamanScreen(
                     1 -> {
                         if (daftarPengembalian.isEmpty()) {
                             EmptyState(
-                                text = "Belum ada pengembalian menunggu verifikasi",
+                                text = stringResource(R.string.empty_returns_waiting_verification),
                                 modifier = Modifier.weight(1f)
                             )
                         } else {
@@ -564,7 +569,7 @@ private fun ReturnItemBox(
                 )
 
                 Text(
-                    text = "Dikembalikan: $tanggal",
+                    text = stringResource(R.string.label_returned_date, tanggal),
                     color = TextSecondary,
                     fontSize = 12.sp,
                     maxLines = 1,
@@ -573,7 +578,7 @@ private fun ReturnItemBox(
             }
 
             StatusWaitingBadge(
-                text = status.uppercase(),
+                text = localizedStatusText(status).uppercase(),
                 modifier = Modifier.padding(top = 14.dp)
             )
         }
@@ -587,7 +592,7 @@ private fun AvatarImage(
 ) {
     CloudinaryImage(
         imageUrl = imageUrl,
-        contentDescription = "Foto peminjam",
+        contentDescription = stringResource(R.string.desc_borrower_photo),
         modifier = modifier,
         shape = RoundedCornerShape(14.dp),
         placeholderSize = 24.dp
@@ -601,7 +606,7 @@ private fun ItemImage(
 ) {
     CloudinaryImage(
         imageUrl = imageUrl,
-        contentDescription = "Foto barang",
+        contentDescription = stringResource(R.string.desc_item_photo),
         modifier = modifier,
         shape = RoundedCornerShape(8.dp),
         placeholderSize = 26.dp
@@ -634,7 +639,7 @@ private fun RoleBadge(
             .padding(horizontal = 8.dp, vertical = 3.dp)
     ) {
         Text(
-            text = normalizedRole,
+            text = localizedRoleText(role),
             color = textColor,
             fontSize = 10.sp,
             fontWeight = FontWeight.ExtraBold,

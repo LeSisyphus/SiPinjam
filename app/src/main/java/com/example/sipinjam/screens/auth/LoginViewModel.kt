@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.util.Locale
+import com.example.sipinjam.utils.UiMessageKey
 
 data class LoginUiState(
     val email: String = "",
@@ -56,7 +57,7 @@ class LoginViewModel(
         val state = _uiState.value
 
         if (state.email.isBlank() || state.password.isBlank()) {
-            _uiState.update { it.copy(errorMessage = "Email dan password tidak boleh kosong.") }
+            _uiState.update { it.copy(errorMessage = UiMessageKey.EMPTY_EMAIL_PASSWORD) }
             return
         }
 
@@ -84,13 +85,13 @@ class LoginViewModel(
 
     private fun parseFirebaseError(message: String?): String {
         return when {
-            message == null                           -> "Terjadi kesalahan, coba lagi."
-            message.contains("no user record")       -> "Email tidak terdaftar."
-            message.contains("password is invalid")  -> "Password salah."
-            message.contains("badly formatted")      -> "Format email tidak valid."
-            message.contains("blocked all requests") -> "Terlalu banyak percobaan. Coba lagi nanti."
-            message.contains("network error")        -> "Tidak ada koneksi internet."
-            else                                     -> "Login gagal. Periksa email dan password."
+            message == null                           -> UiMessageKey.TRY_AGAIN
+            message.contains("no user record")       -> UiMessageKey.EMAIL_NOT_REGISTERED
+            message.contains("password is invalid")  -> UiMessageKey.WRONG_PASSWORD
+            message.contains("badly formatted")      -> UiMessageKey.INVALID_EMAIL_FORMAT
+            message.contains("blocked all requests") -> UiMessageKey.TOO_MANY_ATTEMPTS
+            message.contains("network error")        -> UiMessageKey.NO_INTERNET
+            else                                     -> UiMessageKey.LOGIN_FAILED
         }
     }
 }

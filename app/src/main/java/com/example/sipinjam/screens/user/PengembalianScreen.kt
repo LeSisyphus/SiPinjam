@@ -60,6 +60,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import com.example.sipinjam.ui.components.SiPinjamTopBar
+import com.example.sipinjam.ui.components.localizedUiMessage
 import com.example.sipinjam.ui.theme.BackgroundGray
 import com.example.sipinjam.ui.theme.CardWhite
 import com.example.sipinjam.ui.theme.DarkImageBg
@@ -96,6 +97,8 @@ fun PengembalianScreen(
     val sukses by viewModel.sukses.collectAsState()
     val errorMessage by viewModel.errorMessage.collectAsState()
     val catatanAdmin by viewModel.catatanAdmin.collectAsState()
+
+    val catatanAdminText = catatanAdmin
 
     val namaBarangTampil = barang?.nama
         ?.takeIf { it.isNotBlank() }
@@ -199,7 +202,7 @@ fun PengembalianScreen(
                 ) {
                     if (!errorMessage.isNullOrBlank()) {
                         Text(
-                            text = errorMessage.orEmpty(),
+                            text = localizedUiMessage(errorMessage),
                             color = StatusRed,
                             fontSize = 12.sp,
                             textAlign = TextAlign.Center,
@@ -369,7 +372,7 @@ fun PengembalianScreen(
                     } else {
                         AsyncImage(
                             model = fotoUri,
-                            contentDescription = "Foto kondisi barang",
+                            contentDescription = stringResource(R.string.desc_return_condition_photo),
                             modifier = Modifier
                                 .fillMaxSize()
                                 .clip(RoundedCornerShape(14.dp)),
@@ -459,13 +462,18 @@ fun PengembalianScreen(
                 )
             }
 
-            if (!catatanAdmin.isNullOrBlank()) {
+
+
+            if (!catatanAdminText.isNullOrBlank()) {
                 Text(
-                    text = "Catatan Admin: $catatanAdmin",
+                    text = stringResource(
+                        R.string.label_admin_note_value,
+                        catatanAdminText
+                    ),
                     color = StatusRed,
                     fontSize = 13.sp,
                     fontWeight = FontWeight.Medium,
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.padding(bottom = 8.dp)
                 )
             }
         }
@@ -495,7 +503,7 @@ private fun BarangImage(
             imageUrl.isNotBlank() -> {
                 AsyncImage(
                     model = imageUrl,
-                    contentDescription = "Foto barang",
+                    contentDescription = stringResource(R.string.desc_item_photo),
                     modifier = Modifier.fillMaxSize(),
                     contentScale = ContentScale.Crop
                 )

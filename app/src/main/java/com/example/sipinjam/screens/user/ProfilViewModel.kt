@@ -17,6 +17,7 @@ import kotlinx.coroutines.launch
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import java.util.Locale
+import com.example.sipinjam.utils.UiMessageKey
 
 data class ProfilUiState(
     val user: User = User(),
@@ -95,7 +96,7 @@ class ProfilViewModel(
     fun onSimpanProfil() {
         val state = _uiState.value
         if (state.namaInput.isBlank()) {
-            _uiState.update { it.copy(errorMessage = "Nama tidak boleh kosong.") }
+            _uiState.update { it.copy(errorMessage = UiMessageKey.EMPTY_NAME) }
             return
         }
         viewModelScope.launch {
@@ -106,7 +107,7 @@ class ProfilViewModel(
                     _uiState.update {
                         it.copy(
                             isSaving = false,
-                            successMessage = "Profil berhasil disimpan.",
+                            successMessage = UiMessageKey.SUCCESS_PROFILE_SAVED,
                             user = it.user.copy(
                                 nama = it.namaInput,
                                 nomorTelepon = it.nomorTeleponInput
@@ -116,7 +117,7 @@ class ProfilViewModel(
                 },
                 onFailure = { e ->
                     _uiState.update {
-                        it.copy(isSaving = false, errorMessage = e.message ?: "Gagal menyimpan.")
+                        it.copy(isSaving = false, errorMessage = UiMessageKey.SAVE_PROFILE_FAILED)
                     }
                 }
             )

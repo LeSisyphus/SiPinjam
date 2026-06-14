@@ -57,6 +57,9 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import com.example.sipinjam.ui.components.CloudinaryImage
 import com.example.sipinjam.ui.components.SiPinjamTopBar
+import com.example.sipinjam.ui.components.localizedItemConditionText
+import com.example.sipinjam.ui.components.localizedRoleText
+import com.example.sipinjam.ui.components.localizedUiMessage
 import com.example.sipinjam.ui.theme.BackgroundGray
 import com.example.sipinjam.ui.theme.StatusOrange
 import com.example.sipinjam.ui.theme.StatusOrangeBg
@@ -105,6 +108,18 @@ fun VerifikasiPengembalianScreen(
     val errorMessage by viewModel.errorMessage.collectAsState()
     val catatanTolak by viewModel.catatanTolak.collectAsState()
 
+    val catatanTolakText = catatanTolak
+
+    if (!catatanTolakText.isNullOrBlank()) {
+        Text(
+            text = stringResource(R.string.label_admin_note) + ": " + catatanTolakText,
+            color = StatusRed,
+            fontSize = 13.sp,
+            fontWeight = FontWeight.Medium,
+            modifier = Modifier.padding(bottom = 8.dp)
+        )
+    }
+
     var kondisi by remember { mutableStateOf("Baik") }
     var catatanVerifikasi by remember { mutableStateOf("") }
     val kondisiList = listOf("Baik", "Rusak Ringan", "Rusak Berat")
@@ -143,7 +158,7 @@ fun VerifikasiPengembalianScreen(
                 ) {
                     if (!errorMessage.isNullOrBlank()) {
                         Text(
-                            text = errorMessage.orEmpty(),
+                            text = localizedUiMessage(errorMessage),
                             color = StatusRed,
                             fontSize = 12.sp
                         )
@@ -250,9 +265,9 @@ fun VerifikasiPengembalianScreen(
                     onValueChange = { catatanVerifikasi = it }
                 )
 
-                if (!catatanTolak.isNullOrBlank()) {
+                if (!catatanTolakText.isNullOrBlank()) {
                     Text(
-                        text = "Catatan Admin: $catatanTolak",
+                        text = stringResource(R.string.label_admin_note) + ": " + catatanTolakText,
                         color = StatusRed,
                         fontSize = 13.sp,
                         fontWeight = FontWeight.Medium,
@@ -446,7 +461,7 @@ private fun KondisiBarangCard(
                             .padding(horizontal = 16.dp, vertical = 8.dp)
                     ) {
                         Text(
-                            text = item,
+                            text = localizedItemConditionText(item),
                             color = if (isSelected) Color.White else TextSecondary,
                             fontSize = 13.sp,
                             fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Normal
@@ -552,7 +567,7 @@ private fun RoleBadge(role: String, modifier: Modifier = Modifier) {
             .padding(horizontal = 8.dp, vertical = 3.dp)
     ) {
         Text(
-            text = normalizedRole,
+            text = localizedRoleText(role),
             color = textColor,
             fontSize = 10.sp,
             fontWeight = FontWeight.ExtraBold,
