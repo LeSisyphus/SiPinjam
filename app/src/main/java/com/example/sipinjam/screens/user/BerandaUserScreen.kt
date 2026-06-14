@@ -26,6 +26,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -319,10 +320,36 @@ private fun HolidayInfoCard(
     onRefreshClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val referenceDate = todayStatus?.date.orEmpty()
-    val nearestHoliday = monthlyHolidays.firstOrNull { holiday ->
-        referenceDate.isBlank() || holiday.date >= referenceDate
-    } ?: monthlyHolidays.firstOrNull()
+    val dateFormat = remember {
+        java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.US)
+    }
+
+    val todayDate = remember {
+        runCatching {
+            dateFormat.parse(dateFormat.format(java.util.Date()))
+        }.getOrNull()
+    }
+
+    val nearestHoliday = remember(monthlyHolidays, todayDate) {
+        if (todayDate == null) {
+            null
+        } else {
+            monthlyHolidays
+                .mapNotNull { holiday ->
+                    runCatching {
+                        val holidayDate = dateFormat.parse(holiday.date)
+                        if (holidayDate == null) null else holiday to holidayDate
+                    }.getOrNull()
+                }
+                .filter { (_, holidayDate) ->
+                    !holidayDate.before(todayDate)
+                }
+                .minByOrNull { (_, holidayDate) ->
+                    holidayDate
+                }
+                ?.first
+        }
+    }
 
     Card(
         modifier = modifier.fillMaxWidth(),
