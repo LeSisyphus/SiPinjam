@@ -2,6 +2,7 @@ package com.example.sipinjam.screens.user
 
 import com.example.sipinjam.R
 import androidx.compose.ui.res.stringResource
+import com.example.sipinjam.ui.components.localizedStringResource
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -113,10 +114,10 @@ fun PeminjamanScreen(
     } ?: statusBarang.equals("Tersedia", ignoreCase = true)
 
     val statusLabel = when {
-        isBarangLoading -> stringResource(R.string.loading_upper)
+        isBarangLoading -> localizedStringResource(R.string.loading_upper)
         barang == null -> localizedStatusText(statusBarang).uppercase()
-        isBarangAvailable -> stringResource(R.string.status_tersedia_upper)
-        else -> stringResource(R.string.status_tidak_tersedia_upper)
+        isBarangAvailable -> localizedStringResource(R.string.status_tersedia_upper)
+        else -> localizedStringResource(R.string.status_tidak_tersedia_upper)
     }
 
     val canSubmit = !isLoading &&
@@ -154,7 +155,7 @@ fun PeminjamanScreen(
                     }
                 ) {
                     Text(
-                        text = stringResource(R.string.btn_ok),
+                        text = localizedStringResource(R.string.btn_ok),
                         color = SiPinjamBlue
                     )
                 }
@@ -166,7 +167,7 @@ fun PeminjamanScreen(
                     }
                 ) {
                     Text(
-                        text = stringResource(R.string.btn_batal),
+                        text = localizedStringResource(R.string.btn_batal),
                         color = TextSecondary
                     )
                 }
@@ -192,7 +193,7 @@ fun PeminjamanScreen(
                     }
                 ) {
                     Text(
-                        text = stringResource(R.string.btn_ok),
+                        text = localizedStringResource(R.string.btn_ok),
                         color = SiPinjamBlue
                     )
                 }
@@ -204,7 +205,7 @@ fun PeminjamanScreen(
                     }
                 ) {
                     Text(
-                        text = stringResource(R.string.btn_batal),
+                        text = localizedStringResource(R.string.btn_batal),
                         color = TextSecondary
                     )
                 }
@@ -227,7 +228,7 @@ fun PeminjamanScreen(
             },
             title = {
                 Text(
-                    text = stringResource(R.string.screen_borrow_success_title),
+                    text = localizedStringResource(R.string.screen_borrow_success_title),
                     fontWeight = FontWeight.Bold,
                     textAlign = TextAlign.Center,
                     color = TextPrimary
@@ -235,7 +236,7 @@ fun PeminjamanScreen(
             },
             text = {
                 Text(
-                    text = stringResource(R.string.screen_borrow_success_subtitle),
+                    text = localizedStringResource(R.string.screen_borrow_success_subtitle),
                     textAlign = TextAlign.Center,
                     color = TextSecondary,
                     fontSize = 14.sp,
@@ -253,7 +254,7 @@ fun PeminjamanScreen(
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Text(
-                        text = stringResource(R.string.btn_kembali_beranda),
+                        text = localizedStringResource(R.string.btn_kembali_beranda),
                         color = Color.White
                     )
                 }
@@ -279,13 +280,13 @@ fun PeminjamanScreen(
                     IconButton(onClick = onBackClick) {
                         Icon(
                             imageVector = Icons.Filled.ArrowBack,
-                            contentDescription = stringResource(R.string.desc_back),
+                            contentDescription = localizedStringResource(R.string.desc_back),
                             tint = TextPrimary
                         )
                     }
 
                     Text(
-                        text = stringResource(R.string.screen_borrow_item),
+                        text = localizedStringResource(R.string.screen_borrow_item),
                         color = TextPrimary,
                         fontSize = 17.sp,
                         fontWeight = FontWeight.SemiBold
@@ -342,7 +343,7 @@ fun PeminjamanScreen(
                             )
                         } else {
                             Text(
-                                text = stringResource(R.string.btn_kirim_permohonan),
+                                text = localizedStringResource(R.string.btn_kirim_permohonan),
                                 fontSize = 16.sp,
                                 fontWeight = FontWeight.SemiBold,
                                 color = Color.White
@@ -353,7 +354,7 @@ fun PeminjamanScreen(
                     Spacer(modifier = Modifier.height(10.dp))
 
                     Text(
-                        text = stringResource(R.string.screen_borrow_info),
+                        text = localizedStringResource(R.string.screen_borrow_info),
                         color = TextSecondary,
                         fontSize = 12.sp,
                         textAlign = TextAlign.Center,
@@ -461,7 +462,7 @@ fun PeminjamanScreen(
                         )
 
                         Text(
-                            text = stringResource(
+                            text = localizedStringResource(
                                 R.string.label_stock_max_borrow,
                                 (barang?.stok ?: "-").toString(),
                                 formatMaksimalPinjamLabel(barang?.maksimalPinjam)
@@ -483,7 +484,7 @@ fun PeminjamanScreen(
                         .padding(14.dp)
                 ) {
                     Text(
-                        text = stringResource(R.string.msg_item_unavailable),
+                        text = localizedStringResource(R.string.msg_item_unavailable),
                         color = StatusRed,
                         fontSize = 13.sp,
                         lineHeight = 19.sp
@@ -495,7 +496,7 @@ fun PeminjamanScreen(
                 verticalArrangement = Arrangement.spacedBy(6.dp)
             ) {
                 Text(
-                    text = stringResource(R.string.label_tanggal_pinjam),
+                    text = localizedStringResource(R.string.label_tanggal_pinjam),
                     color = TextPrimary,
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Medium
@@ -508,7 +509,7 @@ fun PeminjamanScreen(
                     modifier = Modifier.fillMaxWidth(),
                     placeholder = {
                         Text(
-                            text = stringResource(R.string.hint_tanggal_pinjam),
+                            text = localizedStringResource(R.string.hint_tanggal_pinjam),
                             color = TextSecondary.copy(alpha = 0.6f),
                             fontSize = 14.sp
                         )
@@ -521,7 +522,7 @@ fun PeminjamanScreen(
                         ) {
                             Icon(
                                 imageVector = Icons.Filled.CalendarMonth,
-                                contentDescription = stringResource(R.string.desc_select_borrow_date),
+                                contentDescription = localizedStringResource(R.string.desc_select_borrow_date),
                                 tint = SiPinjamBlue
                             )
                         }
@@ -545,7 +546,7 @@ fun PeminjamanScreen(
                 verticalArrangement = Arrangement.spacedBy(6.dp)
             ) {
                 Text(
-                    text = stringResource(R.string.label_tanggal_kembali),
+                    text = localizedStringResource(R.string.label_tanggal_kembali),
                     color = TextPrimary,
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Medium
@@ -558,7 +559,7 @@ fun PeminjamanScreen(
                     modifier = Modifier.fillMaxWidth(),
                     placeholder = {
                         Text(
-                            text = stringResource(R.string.hint_tanggal_kembali),
+                            text = localizedStringResource(R.string.hint_tanggal_kembali),
                             color = TextSecondary.copy(alpha = 0.6f),
                             fontSize = 14.sp
                         )
@@ -571,7 +572,7 @@ fun PeminjamanScreen(
                         ) {
                             Icon(
                                 imageVector = Icons.Filled.CalendarMonth,
-                                contentDescription = stringResource(R.string.desc_select_return_date),
+                                contentDescription = localizedStringResource(R.string.desc_select_return_date),
                                 tint = SiPinjamBlue
                             )
                         }
@@ -595,7 +596,7 @@ fun PeminjamanScreen(
                 verticalArrangement = Arrangement.spacedBy(6.dp)
             ) {
                 Text(
-                    text = stringResource(R.string.label_keperluan_alasan),
+                    text = localizedStringResource(R.string.label_keperluan_alasan),
                     color = TextPrimary,
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Medium
@@ -613,7 +614,7 @@ fun PeminjamanScreen(
                         .height(140.dp),
                     placeholder = {
                         Text(
-                            text = stringResource(R.string.hint_alasan_peminjaman),
+                            text = localizedStringResource(R.string.hint_alasan_peminjaman),
                             color = TextSecondary.copy(alpha = 0.6f),
                             fontSize = 14.sp
                         )

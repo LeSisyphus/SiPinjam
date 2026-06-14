@@ -2,6 +2,7 @@ package com.example.sipinjam.screens.user
 
 import com.example.sipinjam.R
 import androidx.compose.ui.res.stringResource
+import com.example.sipinjam.ui.components.localizedStringResource
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -138,14 +139,14 @@ fun PengembalianScreen(
             onDismissRequest = { showDialog = false },
             title = {
                 Text(
-                    text = stringResource(R.string.screen_return_confirm_title),
+                    text = localizedStringResource(R.string.screen_return_confirm_title),
                     fontWeight = FontWeight.Bold,
                     textAlign = TextAlign.Center
                 )
             },
             text = {
                 Text(
-                    text = stringResource(R.string.screen_return_confirm_subtitle),
+                    text = localizedStringResource(R.string.screen_return_confirm_subtitle),
                     textAlign = TextAlign.Center,
                     color = TextSecondary,
                     fontSize = 14.sp
@@ -169,12 +170,12 @@ fun PengembalianScreen(
                     colors = ButtonDefaults.buttonColors(containerColor = SiPinjamBlue),
                     shape = RoundedCornerShape(10.dp)
                 ) {
-                    Text(stringResource(R.string.btn_ya_kembalikan), color = Color.White)
+                    Text(localizedStringResource(R.string.btn_ya_kembalikan), color = Color.White)
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showDialog = false }) {
-                    Text(stringResource(R.string.btn_batal), color = TextSecondary)
+                    Text(localizedStringResource(R.string.btn_batal), color = TextSecondary)
                 }
             },
             shape = RoundedCornerShape(16.dp),
@@ -186,7 +187,7 @@ fun PengembalianScreen(
         containerColor = BackgroundGray,
         topBar = {
             SiPinjamTopBar(
-                title = stringResource(R.string.screen_return_item),
+                title = localizedStringResource(R.string.screen_return_item),
                 showBackButton = true,
                 onBackClick = onBackClick
             )
@@ -229,7 +230,7 @@ fun PengembalianScreen(
                             )
                         } else {
                             Text(
-                                text = stringResource(R.string.screen_return_confirmation_section),
+                                text = localizedStringResource(R.string.screen_return_confirmation_section),
                                 fontSize = 15.sp,
                                 fontWeight = FontWeight.Bold,
                                 color = Color.White,
@@ -280,7 +281,7 @@ fun PengembalianScreen(
                         Row(horizontalArrangement = Arrangement.spacedBy(24.dp)) {
                             Column {
                                 Text(
-                                    text = stringResource(R.string.label_pinjam),
+                                    text = localizedStringResource(R.string.label_pinjam),
                                     color = TextSecondary,
                                     fontSize = 11.sp,
                                     fontWeight = FontWeight.SemiBold,
@@ -296,7 +297,7 @@ fun PengembalianScreen(
 
                             Column {
                                 Text(
-                                    text = stringResource(R.string.label_jatuh_tempo),
+                                    text = localizedStringResource(R.string.label_jatuh_tempo),
                                     color = TextSecondary,
                                     fontSize = 11.sp,
                                     fontWeight = FontWeight.SemiBold,
@@ -316,7 +317,7 @@ fun PengembalianScreen(
 
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 Text(
-                    text = stringResource(R.string.label_foto_kondisi_barang),
+                    text = localizedStringResource(R.string.label_foto_kondisi_barang),
                     color = TextPrimary,
                     fontSize = 14.sp,
                     fontWeight = FontWeight.SemiBold
@@ -357,14 +358,14 @@ fun PengembalianScreen(
                             }
 
                             Text(
-                                text = stringResource(R.string.label_foto_kondisi_barang),
+                                text = localizedStringResource(R.string.label_foto_kondisi_barang),
                                 color = TextPrimary,
                                 fontSize = 14.sp,
                                 fontWeight = FontWeight.SemiBold
                             )
 
                             Text(
-                                text = stringResource(R.string.hint_foto_kondisi),
+                                text = localizedStringResource(R.string.hint_foto_kondisi),
                                 color = TextSecondary,
                                 fontSize = 12.sp
                             )
@@ -372,7 +373,7 @@ fun PengembalianScreen(
                     } else {
                         AsyncImage(
                             model = fotoUri,
-                            contentDescription = stringResource(R.string.desc_return_condition_photo),
+                            contentDescription = localizedStringResource(R.string.desc_return_condition_photo),
                             modifier = Modifier
                                 .fillMaxSize()
                                 .clip(RoundedCornerShape(14.dp)),
@@ -389,7 +390,7 @@ fun PengembalianScreen(
                                 .padding(horizontal = 12.dp, vertical = 6.dp)
                         ) {
                             Text(
-                                text = stringResource(R.string.btn_ganti_foto),
+                                text = localizedStringResource(R.string.btn_ganti_foto),
                                 color = Color.White,
                                 fontSize = 12.sp,
                                 fontWeight = FontWeight.Medium
@@ -401,7 +402,7 @@ fun PengembalianScreen(
 
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 Text(
-                    text = stringResource(R.string.label_catatan_kondisi),
+                    text = localizedStringResource(R.string.label_catatan_kondisi),
                     color = TextPrimary,
                     fontSize = 14.sp,
                     fontWeight = FontWeight.SemiBold
@@ -419,7 +420,7 @@ fun PengembalianScreen(
                         .height(120.dp),
                     placeholder = {
                         Text(
-                            text = stringResource(R.string.hint_catatan_kondisi),
+                            text = localizedStringResource(R.string.hint_catatan_kondisi),
                             color = TextSecondary.copy(alpha = 0.6f),
                             fontSize = 14.sp
                         )
@@ -455,7 +456,7 @@ fun PengembalianScreen(
                     modifier = Modifier.size(18.dp)
                 )
                 Text(
-                    text = stringResource(R.string.msg_return_photo_reminder),
+                    text = localizedStringResource(R.string.msg_return_photo_reminder),
                     color = StatusOrange,
                     fontSize = 13.sp,
                     lineHeight = 20.sp
@@ -466,7 +467,7 @@ fun PengembalianScreen(
 
             if (!catatanAdminText.isNullOrBlank()) {
                 Text(
-                    text = stringResource(
+                    text = localizedStringResource(
                         R.string.label_admin_note_value,
                         catatanAdminText
                     ),
@@ -503,7 +504,7 @@ private fun BarangImage(
             imageUrl.isNotBlank() -> {
                 AsyncImage(
                     model = imageUrl,
-                    contentDescription = stringResource(R.string.desc_item_photo),
+                    contentDescription = localizedStringResource(R.string.desc_item_photo),
                     modifier = Modifier.fillMaxSize(),
                     contentScale = ContentScale.Crop
                 )

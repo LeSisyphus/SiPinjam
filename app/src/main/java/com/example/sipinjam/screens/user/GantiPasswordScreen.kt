@@ -3,6 +3,7 @@ package com.example.sipinjam.screens.user
 import com.example.sipinjam.R
 import com.example.sipinjam.ui.components.localizedUiMessage
 import androidx.compose.ui.res.stringResource
+import com.example.sipinjam.ui.components.localizedStringResource
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -61,7 +62,7 @@ fun GantiPasswordScreen(
             },
             title = {
                 Text(
-                    text = stringResource(R.string.screen_password_changed_title),
+                    text = localizedStringResource(R.string.screen_password_changed_title),
                     fontWeight = FontWeight.Bold,
                     fontSize = 16.sp,
                     color = TextPrimary
@@ -69,7 +70,7 @@ fun GantiPasswordScreen(
             },
             text = {
                 Text(
-                    text = stringResource(R.string.screen_password_changed_subtitle),
+                    text = localizedStringResource(R.string.screen_password_changed_subtitle),
                     color = TextSecondary,
                     fontSize = 14.sp,
                     lineHeight = 21.sp
@@ -88,7 +89,7 @@ fun GantiPasswordScreen(
                     colors = ButtonDefaults.buttonColors(containerColor = SiPinjamBlue)
                 ) {
                     Text(
-                        text = stringResource(R.string.btn_oke),
+                        text = localizedStringResource(R.string.btn_oke),
                         fontWeight = FontWeight.SemiBold,
                         color = Color.White
                     )
@@ -113,12 +114,12 @@ fun GantiPasswordScreen(
                     IconButton(onClick = onBackClick) {
                         Icon(
                             imageVector = Icons.Filled.ArrowBack,
-                            contentDescription = stringResource(R.string.desc_back),
+                            contentDescription = localizedStringResource(R.string.desc_back),
                             tint = SiPinjamBlue
                         )
                     }
                     Text(
-                        text = stringResource(R.string.screen_profile_change_password),
+                        text = localizedStringResource(R.string.screen_profile_change_password),
                         color = TextPrimary,
                         fontSize = 17.sp,
                         fontWeight = FontWeight.SemiBold
@@ -162,14 +163,14 @@ fun GantiPasswordScreen(
                 }
                 Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
                     Text(
-                        text = stringResource(R.string.screen_password_change_instruction),
+                        text = localizedStringResource(R.string.screen_password_change_instruction),
                         color = TextPrimary,
                         fontSize = 13.sp,
                         lineHeight = 20.sp,
                         fontWeight = FontWeight.Medium
                     )
                     Text(
-                        text = stringResource(R.string.label_security_protocol),
+                        text = localizedStringResource(R.string.label_security_protocol),
                         color = TextSecondary,
                         fontSize = 10.sp,
                         fontWeight = FontWeight.SemiBold,
@@ -180,7 +181,7 @@ fun GantiPasswordScreen(
 
             // Password Saat Ini
             PasswordField(
-                label = stringResource(R.string.label_current_password),
+                label = localizedStringResource(R.string.label_current_password),
                 value = uiState.passwordLama,
                 visible = uiState.passwordLamaVisible,
                 placeholder = "••••••••",
@@ -190,20 +191,20 @@ fun GantiPasswordScreen(
 
             // Password Baru
             PasswordField(
-                label = stringResource(R.string.label_new_password),
+                label = localizedStringResource(R.string.label_new_password),
                 value = uiState.passwordBaru,
                 visible = uiState.passwordBaruVisible,
-                placeholder = stringResource(R.string.hint_minimum_8_characters),
+                placeholder = localizedStringResource(R.string.hint_minimum_8_characters),
                 onValueChange = { viewModel.onPasswordBaruChange(it) },
                 onToggleVisibility = { viewModel.onTogglePasswordBaru() }
             )
 
             // Konfirmasi Password Baru
             PasswordField(
-                label = stringResource(R.string.label_confirm_new_password),
+                label = localizedStringResource(R.string.label_confirm_new_password),
                 value = uiState.konfirmasiPassword,
                 visible = uiState.konfirmasiVisible,
-                placeholder = stringResource(R.string.hint_repeat_new_password),
+                placeholder = localizedStringResource(R.string.hint_repeat_new_password),
                 onValueChange = { viewModel.onKonfirmasiChange(it) },
                 onToggleVisibility = { viewModel.onToggleKonfirmasi() }
             )
@@ -237,7 +238,7 @@ fun GantiPasswordScreen(
                     )
                 } else {
                     Text(
-                        text = stringResource(R.string.btn_simpan_perubahan),
+                        text = localizedStringResource(R.string.btn_simpan_perubahan),
                         fontSize = 15.sp,
                         fontWeight = FontWeight.SemiBold,
                         color = Color.White
