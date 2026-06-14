@@ -321,4 +321,7 @@ Tindakan ini tidak dapat dibatalkan.</string>
     <string name="email_subject_reset_password">Permintaan Reset Password SiPinjam</string>
     <string name="error_uid_not_found">UID tidak ditemukan</string>
     <string name="error_firestore_user_not_found">Data user tidak ditemukan di Firestore</string>
+    <string name="error_upload_foto">Gagal upload foto:</string>
+    <string name="question_mark">\?</string>
+    <string name="hint_current_password_dots">••••••••</string>
 </resources>

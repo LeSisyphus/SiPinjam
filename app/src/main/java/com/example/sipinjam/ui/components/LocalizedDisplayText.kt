@@ -83,7 +83,7 @@ fun localizedUiMessage(message: String?): String {
     }
 
     val maxBorrowRegex = Regex("Durasi peminjaman maksimal\\s+(\\d+)\\s+hari", RegexOption.IGNORE_CASE)
-    val uploadPhotoPrefix = "Gagal upload foto:"
+    val uploadPhotoPrefix = stringResource(R.string.error_upload_foto)
 
     maxBorrowRegex.find(raw)?.let { match ->
         val maxDays = match.groupValues.getOrNull(1)?.toIntOrNull() ?: return@let

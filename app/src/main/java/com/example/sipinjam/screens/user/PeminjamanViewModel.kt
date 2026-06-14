@@ -175,7 +175,7 @@ class PeminjamanViewModel(
 
     private fun parseTanggal(tanggal: String): Date? {
         return try {
-            val formatter = SimpleDateFormat("d MMMM yyyy", Locale("id", "ID"))
+            val formatter = SimpleDateFormat("d MMMM yyyy", Locale.getDefault())
             formatter.isLenient = false
             formatter.parse(tanggal)
         } catch (e: Exception) {
@@ -184,7 +184,7 @@ class PeminjamanViewModel(
     }
 
     private fun tanggalHariIni(): Date {
-        val calendar = Calendar.getInstance(Locale("id", "ID"))
+        val calendar = Calendar.getInstance()
         calendar.set(Calendar.HOUR_OF_DAY, 0)
         calendar.set(Calendar.MINUTE, 0)
         calendar.set(Calendar.SECOND, 0)

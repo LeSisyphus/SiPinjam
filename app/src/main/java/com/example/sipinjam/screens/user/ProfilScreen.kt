@@ -117,7 +117,9 @@ fun ProfilScreen(
                             )
                         } else {
                             Text(
-                                text = uiState.user.nama.firstOrNull()?.uppercase() ?: "?",
+                                text = uiState.user.nama.firstOrNull()?.uppercase() ?: stringResource(
+                                    R.string.question_mark
+                                ),
                                 color = Color.White,
                                 fontSize = 32.sp,
                                 fontWeight = FontWeight.Bold

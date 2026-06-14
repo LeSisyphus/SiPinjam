@@ -101,7 +101,7 @@ class PengembalianViewModel(
             val fotoUrl = uploadResult.getOrDefault("")
             val tanggalKembali = SimpleDateFormat(
                 "d MMMM yyyy",
-                Locale("id", "ID")
+                Locale.getDefault()
             ).format(Date())
 
             val pengembalian = Pengembalian(

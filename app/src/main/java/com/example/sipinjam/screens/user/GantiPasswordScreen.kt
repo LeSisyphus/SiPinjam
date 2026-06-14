@@ -183,7 +183,7 @@ fun GantiPasswordScreen(
                 label = stringResource(R.string.label_current_password),
                 value = uiState.passwordLama,
                 visible = uiState.passwordLamaVisible,
-                placeholder = "••••••••",
+                placeholder = stringResource(R.string.hint_current_password_dots),
                 onValueChange = { viewModel.onPasswordLamaChange(it) },
                 onToggleVisibility = { viewModel.onTogglePasswordLama() }
             )

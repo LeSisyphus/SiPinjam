@@ -134,7 +134,7 @@ fun PeminjamanScreen(
 
     fun formatTanggal(millis: Long?): String {
         if (millis == null) return ""
-        val formatter = SimpleDateFormat("d MMMM yyyy", Locale("id", "ID"))
+        val formatter = SimpleDateFormat("d MMMM yyyy", Locale.getDefault())
         return formatter.format(Date(millis))
     }
 

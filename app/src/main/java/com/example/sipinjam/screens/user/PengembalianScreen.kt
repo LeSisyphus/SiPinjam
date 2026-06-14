@@ -79,8 +79,8 @@ fun PengembalianScreen(
     barangId: String = "",
     userId: String = "",
     namaBarang: String = "MacBook Pro M2",
-    tanggalPinjam: String = "12 Mei",
-    tanggalJatuhTempo: String = "14 Mei",
+    tanggalPinjam: String = "",
+    tanggalJatuhTempo: String = "",
     onBackClick: () -> Unit = {},
     onKirimPengembalian: () -> Unit = {},
     viewModel: PengembalianViewModel = viewModel(factory = rememberSiPinjamViewModelFactory())
