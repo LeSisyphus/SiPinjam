@@ -15,6 +15,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import com.example.sipinjam.utils.UiMessageKey
 
 data class DetailPengajuanUiState(
     val peminjaman: Peminjaman? = null,
@@ -42,7 +43,7 @@ class DetailPengajuanViewModel(
             _uiState.update {
                 it.copy(
                     isLoading = false,
-                    errorMessage = "ID peminjaman tidak valid"
+                    errorMessage = UiMessageKey.INVALID_BORROWING_ID
                 )
             }
             return
@@ -63,8 +64,7 @@ class DetailPengajuanViewModel(
                 _uiState.update {
                     it.copy(
                         isLoading = false,
-                        errorMessage = peminjamanResult.exceptionOrNull()?.message
-                            ?: "Gagal memuat detail peminjaman"
+                        errorMessage = UiMessageKey.LOAD_BORROWING_DETAIL_FAILED
                     )
                 }
                 return@launch
@@ -76,7 +76,7 @@ class DetailPengajuanViewModel(
                 _uiState.update {
                     it.copy(
                         isLoading = false,
-                        errorMessage = "Data peminjaman tidak ditemukan"
+                        errorMessage = UiMessageKey.BORROWING_NOT_FOUND
                     )
                 }
                 return@launch
@@ -121,8 +121,7 @@ class DetailPengajuanViewModel(
                 _uiState.update {
                     it.copy(
                         isActionLoading = false,
-                        errorMessage = result.exceptionOrNull()?.message
-                            ?: "Gagal menyetujui pengajuan"
+                        errorMessage = UiMessageKey.APPROVE_BORROWING_FAILED
                     )
                 }
             }
@@ -153,8 +152,7 @@ class DetailPengajuanViewModel(
                 _uiState.update {
                     it.copy(
                         isActionLoading = false,
-                        errorMessage = result.exceptionOrNull()?.message
-                            ?: "Gagal menolak pengajuan"
+                        errorMessage = UiMessageKey.REJECT_BORROWING_FAILED
                     )
                 }
             }

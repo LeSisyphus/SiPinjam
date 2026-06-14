@@ -52,6 +52,7 @@ import coil.compose.AsyncImage
 import com.example.sipinjam.ui.components.SiPinjamTopBar
 import com.example.sipinjam.ui.components.StatusChip
 import com.example.sipinjam.ui.components.UserBottomNavBar
+import com.example.sipinjam.ui.components.localizedUiMessage
 import com.example.sipinjam.ui.theme.BackgroundGray
 import com.example.sipinjam.ui.theme.CardWhite
 import com.example.sipinjam.ui.theme.DarkImageBg
@@ -160,7 +161,8 @@ fun RiwayatPeminjamanScreen(
                 filtered.isEmpty() -> {
                     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                         Text(
-                            text = errorMessage ?: stringResource(R.string.empty_history),
+                            text = localizedUiMessage(errorMessage)
+                                .ifBlank { stringResource(R.string.empty_history) },
                             color = TextSecondary,
                             fontSize = 14.sp
                         )

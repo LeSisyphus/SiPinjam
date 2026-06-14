@@ -17,6 +17,7 @@ import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 import java.util.concurrent.TimeUnit
+import com.example.sipinjam.utils.UiMessageKey
 
 class PeminjamanViewModel(
     private val getCurrentUserUseCase: GetCurrentUserUseCase,
@@ -41,7 +42,7 @@ class PeminjamanViewModel(
 
     fun loadBarang(barangId: String) {
         if (barangId.isBlank()) {
-            _errorMessage.value = "ID barang tidak valid"
+            _errorMessage.value = UiMessageKey.INVALID_ITEM_ID
             return
         }
 
@@ -52,7 +53,7 @@ class PeminjamanViewModel(
             val result = getBarangDetailUseCase(barangId)
 
             if (result == null) {
-                _errorMessage.value = "Data barang tidak ditemukan"
+                _errorMessage.value = UiMessageKey.ITEM_NOT_FOUND
             } else {
                 _barang.value = result
             }
@@ -73,41 +74,41 @@ class PeminjamanViewModel(
             _errorMessage.value = null
 
             if (barangId.isBlank()) {
-                gagal("ID barang tidak valid")
+                gagal(UiMessageKey.INVALID_ITEM_ID)
                 return@launch
             }
 
             if (tanggalPinjam.isBlank()) {
-                gagal("Tanggal pinjam wajib dipilih")
+                gagal(UiMessageKey.BORROW_DATE_REQUIRED)
                 return@launch
             }
 
             if (tanggalKembali.isBlank()) {
-                gagal("Tanggal kembali wajib dipilih")
+                gagal(UiMessageKey.RETURN_DATE_REQUIRED)
                 return@launch
             }
 
             if (keperluan.isBlank()) {
-                gagal("Keperluan peminjaman wajib diisi")
+                gagal(UiMessageKey.BORROW_REASON_REQUIRED)
                 return@launch
             }
 
             val currentUser = getCurrentUserUseCase()
             if (currentUser == null) {
-                gagal("User tidak ditemukan, silakan login ulang")
+                gagal(UiMessageKey.USER_NOT_FOUND_LOGIN_AGAIN)
                 return@launch
             }
 
             val barangTerbaru = getBarangDetailUseCase(barangId)
             if (barangTerbaru == null) {
-                gagal("Data barang tidak ditemukan")
+                gagal(UiMessageKey.ITEM_NOT_FOUND)
                 return@launch
             }
 
             _barang.value = barangTerbaru
 
             if (barangTerbaru.stok <= 0 || !barangTerbaru.tersedia) {
-                gagal("Barang tidak tersedia atau stok sudah habis")
+                gagal(UiMessageKey.ITEM_UNAVAILABLE_OR_OUT_OF_STOCK)
                 return@launch
             }
 
@@ -115,19 +116,19 @@ class PeminjamanViewModel(
             val tanggalKembaliDate = parseTanggal(tanggalKembali)
 
             if (tanggalPinjamDate == null || tanggalKembaliDate == null) {
-                gagal("Format tanggal tidak valid")
+                gagal(UiMessageKey.DATE_FORMAT_INVALID)
                 return@launch
             }
 
             val hariIni = tanggalHariIni()
 
             if (tanggalPinjamDate.before(hariIni)) {
-                gagal("Tanggal pinjam tidak boleh sebelum hari ini")
+                gagal(UiMessageKey.BORROW_DATE_PAST)
                 return@launch
             }
 
             if (tanggalKembaliDate.before(tanggalPinjamDate)) {
-                gagal("Tanggal kembali tidak boleh sebelum tanggal pinjam")
+                gagal(UiMessageKey.RETURN_DATE_BEFORE_BORROW_DATE)
                 return@launch
             }
 
@@ -139,7 +140,7 @@ class PeminjamanViewModel(
             val maksimalPinjam = parseMaksimalPinjam(barangTerbaru.maksimalPinjam)
 
             if (maksimalPinjam > 0 && durasiHari > maksimalPinjam) {
-                gagal("Durasi peminjaman maksimal $maksimalPinjam hari")
+                gagal(UiMessageKey.maxBorrowDuration(maksimalPinjam))
                 return@launch
             }
 
@@ -162,8 +163,7 @@ class PeminjamanViewModel(
             if (result.isSuccess) {
                 _sukses.value = true
             } else {
-                _errorMessage.value = result.exceptionOrNull()?.message
-                    ?: "Gagal mengirim permohonan"
+                _errorMessage.value = UiMessageKey.SEND_BORROW_REQUEST_FAILED
             }
         }
     }

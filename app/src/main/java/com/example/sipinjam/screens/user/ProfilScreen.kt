@@ -34,6 +34,7 @@ import coil.compose.AsyncImage
 import com.example.sipinjam.ui.components.AdminBottomNavBar
 import com.example.sipinjam.ui.components.SiPinjamTopBar
 import com.example.sipinjam.ui.components.UserBottomNavBar
+import com.example.sipinjam.ui.components.localizedUiMessage
 import com.example.sipinjam.ui.theme.*
 import com.example.sipinjam.di.rememberSiPinjamViewModelFactory
 
@@ -200,7 +201,7 @@ fun ProfilScreen(
 
                     if (uiState.errorMessage != null) {
                         Text(
-                            text = uiState.errorMessage!!,
+                            text = localizedUiMessage(uiState.errorMessage),
                             color = StatusRed,
                             fontSize = 13.sp
                         )

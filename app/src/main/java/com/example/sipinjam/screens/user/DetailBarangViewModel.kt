@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import com.example.sipinjam.utils.UiMessageKey
 
 data class DetailUiState(
     val barang: DetailBarang? = null,
@@ -50,7 +51,7 @@ class DetailBarangViewModel(
                     kondisi = barangDoc.kondisi,
                     jumlahTersedia = barangDoc.stok,
                     lokasi = barangDoc.lokasi,
-                    maksimalPinjam = "${barangDoc.maksimalPinjam} Hari",
+                    maksimalPinjam = barangDoc.maksimalPinjam.toString(),
                     deskripsi = barangDoc.deskripsi,
                     imageUrl = barangDoc.fotoUrl
                 )
@@ -66,7 +67,7 @@ class DetailBarangViewModel(
                 }
             } else {
                 _uiState.update {
-                    it.copy(isLoading = false, errorMessage = "Barang tidak ditemukan atau gagal dimuat.")
+                    it.copy(isLoading = false, errorMessage = UiMessageKey.ITEM_NOT_FOUND_OR_FAILED)
                 }
             }
         }

@@ -17,6 +17,7 @@ import com.example.sipinjam.domain.usecase.barang.GetBarangDetailUseCase
 import com.example.sipinjam.domain.usecase.barang.ObserveBarangListUseCase
 import com.example.sipinjam.domain.usecase.barang.UpdateBarangUseCase
 import com.example.sipinjam.domain.usecase.storage.UploadItemPhotoUseCase
+import com.example.sipinjam.utils.UiMessageKey
 
 data class KelolaBarangUiState(
     val daftarBarang: List<BarangAdmin> = emptyList(),
@@ -66,7 +67,7 @@ class KelolaBarangViewModel(
                     _uiState.update {
                         it.copy(
                             isLoading = false,
-                            errorMessage = error.localizedMessage ?: "Gagal memuat data barang"
+                            errorMessage = UiMessageKey.LOAD_ITEMS_FAILED
                         )
                     }
                 }
@@ -74,7 +75,7 @@ class KelolaBarangViewModel(
                     val listBarang = daftarBarang.map { barang ->
                         BarangAdmin(
                             id = barang.id,
-                            nama = barang.nama.ifBlank { "Tanpa Nama" },
+                            nama = barang.nama.ifBlank { "-" },
                             kategori = barang.kategori.ifBlank { "UMUM" },
                             stok = barang.stok,
                             tersedia = barang.tersedia,
@@ -115,11 +116,11 @@ class KelolaBarangViewModel(
                     it.copy(
                         isLoading = false,
                         isSuccess = berhasil,
-                        errorMessage = if (berhasil) null else "Gagal menambahkan barang"
+                        errorMessage = if (berhasil) null else UiMessageKey.ADD_ITEM_FAILED
                     )
                 }
             } catch (e: Exception) {
-                _uiState.update { it.copy(isLoading = false, errorMessage = e.localizedMessage) }
+                _uiState.update { it.copy(isLoading = false, errorMessage = UiMessageKey.GENERAL) }
             }
         }
     }
@@ -168,11 +169,11 @@ class KelolaBarangViewModel(
                         showEditDialog = !berhasil,
                         barangToEdit = if (berhasil) null else it.barangToEdit,
                         isEditSuccess = berhasil,
-                        errorMessage = if (berhasil) null else "Gagal mengedit barang"
+                        errorMessage = if (berhasil) null else UiMessageKey.EDIT_ITEM_FAILED
                     )
                 }
             } catch (e: Exception) {
-                _uiState.update { it.copy(isLoading = false, errorMessage = e.localizedMessage) }
+                _uiState.update { it.copy(isLoading = false, errorMessage = UiMessageKey.GENERAL) }
             }
         }
     }
@@ -198,11 +199,11 @@ class KelolaBarangViewModel(
                         showDeleteDialog = !berhasil,
                         barangToDelete = if (berhasil) null else it.barangToDelete,
                         isDeleteSuccess = berhasil,
-                        errorMessage = if (berhasil) null else "Gagal menghapus barang"
+                        errorMessage = if (berhasil) null else UiMessageKey.DELETE_ITEM_FAILED
                     )
                 }
             } catch (e: Exception) {
-                _uiState.update { it.copy(isLoading = false, errorMessage = e.localizedMessage) }
+                _uiState.update { it.copy(isLoading = false, errorMessage = UiMessageKey.GENERAL) }
             }
         }
     }

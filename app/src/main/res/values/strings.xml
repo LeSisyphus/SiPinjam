@@ -137,6 +137,8 @@
     <string name="msg_forgot_password">Lupa Password?</string>
     <string name="msg_item_unavailable">Barang ini sedang tidak tersedia atau stok sudah habis, sehingga tidak dapat diajukan untuk peminjaman.</string>
     <string name="msg_return_photo_reminder">Pastikan foto jelas dan barang dalam kondisi bersih.</string>
+    <string name="empty_returns_waiting_verification">Belum ada pengembalian menunggu verifikasi</string>
+
     <string name="empty_permohonan">Tidak ada permintaan masuk</string>
 
     <string name="filter_all">Semua</string>
@@ -197,18 +199,126 @@
     <string name="status_out_of_stock">Habis</string>
     <string name="dialog_delete_item_message">Apakah Anda yakin ingin menghapus "%1$s" dari sistem?
 Tindakan ini tidak dapat dibatalkan.</string>
-    <string name="notif_borrowing_approved_title">Peminjaman Disetujui! 🎉</string>
+    <string name="notif_borrowing_approved_title">Peminjaman Disetujui!</string>
     <string name="notif_borrowing_approved_message">Permintaan pinjam %1$s telah disetujui admin. Silakan ambil barang.</string>
-    <string name="notif_borrowing_rejected_title">Peminjaman Ditolak ❌</string>
+    <string name="notif_borrowing_rejected_title">Peminjaman Ditolak</string>
     <string name="notif_borrowing_rejected_message">Maaf, permintaan pinjam %1$s ditolak oleh admin.</string>
-    <string name="notif_return_success_title">Pengembalian Sukses 🟢</string>
+    <string name="notif_return_success_title">Pengembalian Sukses</string>
     <string name="notif_return_success_message">Terima kasih, barang %1$s telah sukses dikembalikan ke inventaris.</string>
 
     <string name="screen_home_available_items">Barang Tersedia</string>
+
+    <string name="empty_favorites">Belum ada barang favorit.</string>
 
     <string name="empty_history">Belum ada riwayat peminjaman</string>
 
     <string name="label_item_id">ID Barang: %1$s</string>
 
     <string name="admin_registered_item_count">%1$d barang terdaftar</string>
+
+    <!-- Localization helpers for stored values, labels, and UI messages -->
+    <string name="desc_select_borrow_date">Pilih tanggal pinjam</string>
+    <string name="desc_select_return_date">Pilih tanggal kembali</string>
+    <string name="desc_favorite">Favorit</string>
+    <string name="desc_borrower_photo">Foto peminjam</string>
+    <string name="desc_item_photo">Foto barang</string>
+    <string name="desc_return_condition_photo">Foto kondisi barang</string>
+
+    <string name="unit_item_count">%1$d Unit</string>
+    <string name="unit_days_count">%1$d hari</string>
+    <string name="label_stock_max_borrow">Stok: %1$s • Maks. pinjam: %2$s</string>
+    <string name="label_due_date_with_value">Jatuh tempo: %1$s</string>
+    <string name="label_returned_date">Dikembalikan: %1$s</string>
+    <string name="label_admin_note_value">Catatan Admin: %1$s</string>
+    <string name="label_request_already_status">Pengajuan ini sudah berstatus %1$s.</string>
+    <string name="label_admin_note">Catatan Admin</string>
+
+    <string name="condition_pristine">Mulus</string>
+    <string name="condition_good">Baik</string>
+    <string name="condition_minor_damage">Rusak Ringan</string>
+    <string name="condition_heavy_damage">Rusak Berat</string>
+
+    <string name="error_general">Terjadi kesalahan</string>
+    <string name="error_invalid_item_id">ID barang tidak valid</string>
+    <string name="error_invalid_borrowing_id">ID peminjaman tidak valid</string>
+    <string name="error_item_not_found">Data barang tidak ditemukan</string>
+    <string name="error_item_not_found_or_failed">Barang tidak ditemukan atau gagal dimuat.</string>
+    <string name="error_borrowing_not_found">Data peminjaman tidak ditemukan</string>
+    <string name="error_return_not_found">Data pengembalian tidak ditemukan</string>
+    <string name="error_return_invalid">Data pengembalian tidak valid</string>
+    <string name="error_return_already_processed">Pengembalian ini sudah diproses</string>
+    <string name="error_user_not_found_login_again">User tidak ditemukan, silakan login ulang</string>
+    <string name="error_user_not_logged_in">User belum login</string>
+    <string name="error_user_not_found">User tidak ditemukan</string>
+    <string name="error_borrow_date_required">Tanggal pinjam wajib dipilih</string>
+    <string name="error_return_date_required">Tanggal kembali wajib dipilih</string>
+    <string name="error_borrow_reason_required">Keperluan peminjaman wajib diisi</string>
+    <string name="error_date_format_invalid">Format tanggal tidak valid</string>
+    <string name="error_borrow_date_past">Tanggal pinjam tidak boleh sebelum hari ini</string>
+    <string name="error_return_date_before_borrow_date">Tanggal kembali tidak boleh sebelum tanggal pinjam</string>
+    <string name="error_item_unavailable_or_out_of_stock">Barang tidak tersedia atau stok sudah habis</string>
+    <string name="error_item_out_of_stock">Stok barang sudah habis</string>
+    <string name="error_max_borrow_duration">Durasi peminjaman maksimal %1$d hari</string>
+    <string name="error_send_borrow_request_failed">Gagal mengirim permohonan</string>
+    <string name="error_load_catalog_failed">Gagal memuat katalog barang</string>
+    <string name="error_load_favorites_failed">Gagal memuat favorit</string>
+    <string name="error_load_history_failed">Gagal memuat riwayat peminjaman</string>
+    <string name="error_load_items_failed">Gagal memuat data barang</string>
+    <string name="error_load_borrowings_failed">Gagal memuat data peminjaman</string>
+    <string name="error_load_returns_failed">Gagal memuat data pengembalian</string>
+    <string name="error_load_borrowing_detail_failed">Gagal memuat detail peminjaman</string>
+    <string name="error_add_item_failed">Gagal menambahkan barang</string>
+    <string name="error_edit_item_failed">Gagal mengedit barang</string>
+    <string name="error_delete_item_failed">Gagal menghapus barang</string>
+    <string name="error_upload_photo">Gagal upload foto: %1$s</string>
+    <string name="error_submit_return_failed">Gagal mengajukan pengembalian</string>
+    <string name="error_reject_return_failed">Gagal menolak pengembalian</string>
+    <string name="error_return_condition_required">Kondisi barang wajib dipilih</string>
+    <string name="error_admin_note_required_reject_return">Catatan admin wajib diisi saat menolak pengembalian</string>
+    <string name="error_empty_name">Nama tidak boleh kosong.</string>
+    <string name="error_empty_email_password">Email dan password tidak boleh kosong.</string>
+    <string name="error_empty_full_name">Nama lengkap tidak boleh kosong.</string>
+    <string name="error_empty_email">Email tidak boleh kosong.</string>
+    <string name="error_password_min_6">Password minimal 6 karakter.</string>
+    <string name="error_current_password_required">Password saat ini tidak boleh kosong.</string>
+    <string name="error_new_password_min_8">Password baru minimal 8 karakter.</string>
+    <string name="error_password_confirmation_mismatch">Konfirmasi password tidak cocok.</string>
+    <string name="error_save_profile_failed">Gagal menyimpan.</string>
+    <string name="error_url_not_found">URL tidak ditemukan</string>
+    <string name="success_profile_saved">Profil berhasil disimpan.</string>
+
+<string name="notif_channel_name">Status Peminjaman</string>
+    <string name="notif_channel_description">Notifikasi saat ada perubahan status peminjaman barang</string>
+    <string name="notif_return_approved_title">Pengembalian Disetujui</string>
+    <string name="notif_return_approved_message">Pengembalian barang Anda telah diverifikasi oleh admin.</string>
+    <string name="notif_return_rejected_title">Pengembalian Ditolak</string>
+    <string name="notif_return_rejected_message">Pengembalian barang Anda ditolak. Silakan cek catatan admin.</string>
+    <string name="notif_admin_new_borrow_title">Pengajuan Peminjaman Baru</string>
+    <string name="notif_admin_new_borrow_message">%1$s mengajukan peminjaman %2$s.</string>
+    <string name="notif_admin_new_return_title">Pengajuan Pengembalian Baru</string>
+    <string name="notif_admin_new_return_message">Ada pengembalian barang yang menunggu verifikasi admin.</string>
+    <string name="error_load_holiday_info_failed">Gagal memuat info hari libur</string>
+    <string name="error_load_holiday_cache_failed">Gagal memuat cache hari libur</string>
+    <string name="error_load_item_failed">Gagal memuat barang</string>
+    <string name="error_change_password_failed">Gagal mengganti password. Coba lagi.</string>
+    <string name="error_verify_return_failed">Gagal memverifikasi pengembalian</string>
+    <string name="error_approve_borrowing_failed">Gagal menyetujui pengajuan</string>
+    <string name="error_reject_borrowing_failed">Gagal menolak pengajuan</string>
+    <string name="error_try_again">Terjadi kesalahan, coba lagi.</string>
+    <string name="error_email_not_registered">Email tidak terdaftar.</string>
+    <string name="error_wrong_password">Password salah.</string>
+    <string name="error_current_password_wrong">Password saat ini salah.</string>
+    <string name="error_invalid_email_format">Format email tidak valid.</string>
+    <string name="error_too_many_attempts">Terlalu banyak percobaan. Coba lagi nanti.</string>
+    <string name="error_no_internet">Tidak ada koneksi internet.</string>
+    <string name="error_login_failed">Login gagal. Periksa email dan password.</string>
+    <string name="error_email_already_registered">Email sudah terdaftar.</string>
+    <string name="error_register_failed">Registrasi gagal. Coba lagi.</string>
+    <string name="label_admin_phone">Nomor Admin</string>
+    <string name="label_admin_email">Email Admin</string>
+    <string name="btn_contact">Hubungi</string>
+    <string name="btn_send_email">Kirim Email</string>
+    <string name="email_subject_reset_password">Permintaan Reset Password SiPinjam</string>
+    <string name="error_uid_not_found">UID tidak ditemukan</string>
+    <string name="error_firestore_user_not_found">Data user tidak ditemukan di Firestore</string>
 </resources>

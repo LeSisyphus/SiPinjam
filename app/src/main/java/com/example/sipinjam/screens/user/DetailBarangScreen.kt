@@ -29,6 +29,11 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import com.example.sipinjam.di.rememberSiPinjamViewModelFactory
 import com.example.sipinjam.ui.components.SiPinjamTopBar
+import com.example.sipinjam.ui.components.localizedCategoryText
+import com.example.sipinjam.ui.components.localizedItemConditionText
+import com.example.sipinjam.ui.components.localizedDayCount
+import com.example.sipinjam.ui.components.localizedStatusText
+import com.example.sipinjam.ui.components.localizedUiMessage
 import com.example.sipinjam.ui.theme.*
 
 data class DetailBarang(
@@ -100,7 +105,7 @@ fun DetailBarangScreen(
                         ) {
                             Icon(
                                 imageVector = if (uiState.isFavorit) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder,
-                                contentDescription = "Favorit",
+                                contentDescription = stringResource(R.string.desc_favorite),
                                 tint = if (uiState.isFavorit) StatusRed else TextSecondary,
                                 modifier = Modifier.size(22.dp)
                             )
@@ -148,7 +153,8 @@ fun DetailBarangScreen(
                 CircularProgressIndicator(color = SiPinjamBlue)
             } else if (uiState.errorMessage != null) {
                 Text(
-                    text = uiState.errorMessage ?: "Terjadi kesalahan",
+                    text = localizedUiMessage(uiState.errorMessage)
+                        .ifBlank { stringResource(R.string.error_general) },
                     color = Color.Red,
                     textAlign = TextAlign.Center,
                     modifier = Modifier.padding(20.dp)
@@ -201,7 +207,7 @@ fun DetailBarangScreen(
                                         .padding(horizontal = 10.dp, vertical = 4.dp)
                                 ) {
                                     Text(
-                                        text = barang.kategori,
+                                        text = localizedCategoryText(barang.kategori).uppercase(),
                                         color = Color.White,
                                         fontSize = 11.sp,
                                         fontWeight = FontWeight.Bold,
@@ -215,7 +221,7 @@ fun DetailBarangScreen(
                                         .padding(horizontal = 10.dp, vertical = 4.dp)
                                 ) {
                                     Text(
-                                        text = "${barang.totalUnit} Unit",
+                                        text = stringResource(R.string.unit_item_count, barang.totalUnit),
                                         color = TextSecondary,
                                         fontSize = 11.sp,
                                         fontWeight = FontWeight.Medium
@@ -238,7 +244,7 @@ fun DetailBarangScreen(
                                                 .background(if (barang.tersedia) StatusGreen else StatusOrange)
                                         )
                                         Text(
-                                            text = if (barang.tersedia) "Tersedia" else "Dipinjam",
+                                            text = if (barang.tersedia) stringResource(R.string.status_tersedia) else stringResource(R.string.status_dipinjam),
                                             color = if (barang.tersedia) StatusGreen else StatusOrange,
                                             fontSize = 11.sp,
                                             fontWeight = FontWeight.Medium
@@ -273,12 +279,12 @@ fun DetailBarangScreen(
                                     Row(modifier = Modifier.fillMaxWidth()) {
                                         SpekItem(
                                             label = stringResource(R.string.label_kondisi_barang),
-                                            value = barang.kondisi,
+                                            value = localizedItemConditionText(barang.kondisi),
                                             modifier = Modifier.weight(1f)
                                         )
                                         SpekItem(
                                             label = stringResource(R.string.label_jumlah_stok),
-                                            value = "${barang.jumlahTersedia} Unit",
+                                            value = stringResource(R.string.unit_item_count, barang.jumlahTersedia),
                                             modifier = Modifier.weight(1f)
                                         )
                                     }
@@ -291,7 +297,7 @@ fun DetailBarangScreen(
                                         )
                                         SpekItem(
                                             label = stringResource(R.string.label_maksimal_hari_pinjam),
-                                            value = barang.maksimalPinjam,
+                                            value = formatMaxPinjamLabel(barang.maksimalPinjam),
                                             modifier = Modifier.weight(1f)
                                         )
                                     }
@@ -354,6 +360,12 @@ private fun SpekItem(
         Spacer(Modifier.height(2.dp))
         Text(text = value, color = TextPrimary, fontSize = 14.sp, fontWeight = FontWeight.Bold)
     }
+}
+
+@Composable
+private fun formatMaxPinjamLabel(value: String): String {
+    val angka = value.filter { it.isDigit() }.toIntOrNull() ?: return value.ifBlank { "-" }
+    return localizedDayCount(angka)
 }
 
 @Preview(showBackground = true, widthDp = 390, heightDp = 844)

@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
+import com.example.sipinjam.utils.UiMessageKey
 
 data class RiwayatPeminjamanUiItem(
     val peminjaman: Peminjaman,
@@ -52,14 +53,14 @@ class RiwayatPeminjamanViewModel(
             val currentUser = getCurrentUserUseCase()
             if (currentUser == null) {
                 _isLoading.value = false
-                _errorMessage.value = "User tidak ditemukan, silakan login ulang"
+                _errorMessage.value = UiMessageKey.USER_NOT_FOUND_LOGIN_AGAIN
                 return@launch
             }
 
             observeRiwayatPeminjamanUseCase(currentUser.uid)
                 .catch { error ->
                     _isLoading.value = false
-                    _errorMessage.value = error.message ?: "Gagal memuat riwayat peminjaman"
+                    _errorMessage.value = UiMessageKey.LOAD_HISTORY_FAILED
                 }
                 .collect { list ->
                     val uiItems = mutableListOf<RiwayatPeminjamanUiItem>()
@@ -74,7 +75,7 @@ class RiwayatPeminjamanViewModel(
                                 barangId = peminjaman.barangId,
                                 userId = peminjaman.userId,
                                 namaBarang = barang?.nama?.takeIf { it.isNotBlank() }
-                                    ?: peminjaman.namaBarang.ifBlank { "Barang" },
+                                    ?: peminjaman.namaBarang.ifBlank { "-" },
                                 fotoBarangUrl = barang?.fotoUrl.orEmpty(),
                                 tanggalPinjam = peminjaman.tanggalPinjam,
                                 tanggalKembali = peminjaman.tanggalKembali,

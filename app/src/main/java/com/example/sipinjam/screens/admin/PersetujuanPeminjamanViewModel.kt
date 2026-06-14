@@ -17,6 +17,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
+import com.example.sipinjam.utils.UiMessageKey
 
 data class AdminPeminjamanUiItem(
     val peminjaman: Peminjaman,
@@ -72,7 +73,7 @@ class PersetujuanPeminjamanViewModel(
 
             observePermintaanPeminjamanUseCase()
                 .catch { error ->
-                    _errorMessage.value = error.message ?: "Gagal memuat data peminjaman"
+                    _errorMessage.value = UiMessageKey.LOAD_BORROWINGS_FAILED
                     _isLoading.value = false
                 }
                 .collect { list ->
@@ -95,7 +96,7 @@ class PersetujuanPeminjamanViewModel(
         viewModelScope.launch {
             observePengembalianUseCase()
                 .catch { error ->
-                    _errorMessage.value = error.message ?: "Gagal memuat data pengembalian"
+                    _errorMessage.value = UiMessageKey.LOAD_RETURNS_FAILED
                 }
                 .collect { list ->
                     val filtered = list
@@ -124,11 +125,11 @@ class PersetujuanPeminjamanViewModel(
             peminjaman = this,
             id = id,
             namaUser = user?.nama?.takeIf { it.isNotBlank() }
-                ?: namaUser.ifBlank { "Pengguna" },
+                ?: namaUser.ifBlank { "-" },
             roleUser = formatRole(user),
             fotoUserUrl = user?.fotoUrl.orEmpty(),
             namaBarang = barang?.nama?.takeIf { it.isNotBlank() }
-                ?: namaBarang.ifBlank { "Barang" },
+                ?: namaBarang.ifBlank { "-" },
             fotoBarangUrl = barang?.fotoUrl.orEmpty(),
             tanggalLabel = formatTanggalPinjam(tanggalPinjam, tanggalKembali)
         )
@@ -141,10 +142,10 @@ class PersetujuanPeminjamanViewModel(
         return AdminPengembalianUiItem(
             pengembalian = this,
             id = id,
-            namaUser = user?.nama?.takeIf { it.isNotBlank() } ?: "Pengguna",
+            namaUser = user?.nama?.takeIf { it.isNotBlank() } ?: "-",
             roleUser = formatRole(user),
             fotoUserUrl = user?.fotoUrl.orEmpty(),
-            namaBarang = barang?.nama?.takeIf { it.isNotBlank() } ?: "Barang",
+            namaBarang = barang?.nama?.takeIf { it.isNotBlank() } ?: "-",
             fotoBarangUrl = barang?.fotoUrl.orEmpty(),
             tanggalLabel = tanggalKembali.ifBlank { "-" },
             status = status.ifBlank { ReturnStatus.MENUNGGU_VERIFIKASI }

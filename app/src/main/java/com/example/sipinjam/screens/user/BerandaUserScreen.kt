@@ -48,6 +48,8 @@ import com.example.sipinjam.domain.model.Barang
 import com.example.sipinjam.domain.model.Holiday
 import com.example.sipinjam.domain.model.HolidayStatus
 import com.example.sipinjam.ui.components.SiPinjamTopBar
+import com.example.sipinjam.ui.components.localizedCategoryText
+import com.example.sipinjam.ui.components.localizedUiMessage
 import com.example.sipinjam.ui.components.UserBottomNavBar
 import com.example.sipinjam.ui.theme.BackgroundGray
 import com.example.sipinjam.ui.theme.CardWhite
@@ -375,7 +377,7 @@ private fun HolidayInfoCard(
                     }
                 }
                 errorMessage != null && todayStatus == null && monthlyHolidays.isEmpty() -> {
-                    Text(text = errorMessage, color = Color(0xFFD32F2F), fontSize = 13.sp)
+                    Text(text = localizedUiMessage(errorMessage), color = Color(0xFFD32F2F), fontSize = 13.sp)
                 }
                 else -> {
                     val todayText = if (todayStatus?.isHoliday == true) {
@@ -477,7 +479,7 @@ private fun BarangCard(barang: BarangTersedia, onClick: () -> Unit) {
                 }
                 Spacer(Modifier.height(6.dp))
                 Text(text = barang.nama, color = TextPrimary, fontSize = 13.sp, fontWeight = FontWeight.SemiBold, maxLines = 1)
-                Text(text = barang.kategori, color = TextSecondary, fontSize = 11.sp, maxLines = 1)
+                Text(text = localizedCategoryText(barang.kategori), color = TextSecondary, fontSize = 11.sp, maxLines = 1)
             }
         }
     }
@@ -514,7 +516,12 @@ private fun KembalikanCard(item: ItemDikembalikan, onClick: () -> Unit, modifier
         Spacer(Modifier.width(12.dp))
         Column(modifier = Modifier.weight(1f)) {
             Text(text = item.nama, color = TextPrimary, fontSize = 14.sp, fontWeight = FontWeight.SemiBold, maxLines = 1)
-            Text(text = "${item.lokasi} • Jatuh tempo: ${item.tanggalJatuhTempo}", color = TextSecondary, fontSize = 12.sp, maxLines = 1)
+            Text(
+                text = "${item.lokasi} • ${stringResource(R.string.label_due_date_with_value, item.tanggalJatuhTempo)}",
+                color = TextSecondary,
+                fontSize = 12.sp,
+                maxLines = 1
+            )
         }
         Box(
             modifier = Modifier

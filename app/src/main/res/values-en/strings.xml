@@ -137,6 +137,8 @@
     <string name="msg_forgot_password">Forgot Password?</string>
     <string name="msg_item_unavailable">This item is currently unavailable or out of stock, so it cannot be requested for borrowing.</string>
     <string name="msg_return_photo_reminder">Make sure the photo is clear and the item is clean.</string>
+    <string name="empty_returns_waiting_verification">No returns waiting for verification</string>
+
     <string name="empty_permohonan">No incoming requests</string>
 
     <string name="filter_all">All</string>
@@ -197,18 +199,126 @@
     <string name="status_out_of_stock">Out of Stock</string>
     <string name="dialog_delete_item_message">Are you sure you want to remove "%1$s" from the system?
 This action cannot be undone.</string>
-    <string name="notif_borrowing_approved_title">Borrowing Approved! 🎉</string>
+    <string name="notif_borrowing_approved_title">Borrowing Approved!</string>
     <string name="notif_borrowing_approved_message">Your request to borrow %1$s has been approved by admin. Please pick up the item.</string>
-    <string name="notif_borrowing_rejected_title">Borrowing Rejected ❌</string>
+    <string name="notif_borrowing_rejected_title">Borrowing Rejected</string>
     <string name="notif_borrowing_rejected_message">Sorry, your request to borrow %1$s was rejected by admin.</string>
-    <string name="notif_return_success_title">Return Successful 🟢</string>
+    <string name="notif_return_success_title">Return Successful </string>
     <string name="notif_return_success_message">Thank you, %1$s has been returned successfully to inventory.</string>
 
     <string name="screen_home_available_items">Available Items</string>
+
+    <string name="empty_favorites">No favorite items yet.</string>
 
     <string name="empty_history">No borrowing history yet</string>
 
     <string name="label_item_id">Item ID: %1$s</string>
 
     <string name="admin_registered_item_count">%1$d items registered</string>
+
+    <!-- Localization helpers for stored values, labels, and UI messages -->
+    <string name="desc_select_borrow_date">Select borrow date</string>
+    <string name="desc_select_return_date">Select return date</string>
+    <string name="desc_favorite">Favorite</string>
+    <string name="desc_borrower_photo">Borrower photo</string>
+    <string name="desc_item_photo">Item photo</string>
+    <string name="desc_return_condition_photo">Item condition photo</string>
+
+    <string name="unit_item_count">%1$d Units</string>
+    <string name="unit_days_count">%1$d days</string>
+    <string name="label_stock_max_borrow">Stock: %1$s • Max borrow: %2$s</string>
+    <string name="label_due_date_with_value">Due date: %1$s</string>
+    <string name="label_returned_date">Returned: %1$s</string>
+    <string name="label_admin_note_value">Admin Note: %1$s</string>
+    <string name="label_request_already_status">This request is already %1$s.</string>
+    <string name="label_admin_note">Admin note</string>
+
+    <string name="condition_pristine">Pristine</string>
+    <string name="condition_good">Good</string>
+    <string name="condition_minor_damage">Minor Damage</string>
+    <string name="condition_heavy_damage">Severe Damage</string>
+
+    <string name="error_general">Something went wrong</string>
+    <string name="error_invalid_item_id">Invalid item ID</string>
+    <string name="error_invalid_borrowing_id">Invalid borrowing ID</string>
+    <string name="error_item_not_found">Item data was not found</string>
+    <string name="error_item_not_found_or_failed">Item was not found or failed to load.</string>
+    <string name="error_borrowing_not_found">Borrowing data was not found</string>
+    <string name="error_return_not_found">Return data was not found</string>
+    <string name="error_return_invalid">Return data is invalid</string>
+    <string name="error_return_already_processed">This return has already been processed</string>
+    <string name="error_user_not_found_login_again">User was not found, please log in again</string>
+    <string name="error_user_not_logged_in">User is not logged in</string>
+    <string name="error_user_not_found">User was not found</string>
+    <string name="error_borrow_date_required">Borrow date is required</string>
+    <string name="error_return_date_required">Return date is required</string>
+    <string name="error_borrow_reason_required">Borrowing purpose is required</string>
+    <string name="error_date_format_invalid">Invalid date format</string>
+    <string name="error_borrow_date_past">Borrow date cannot be before today</string>
+    <string name="error_return_date_before_borrow_date">Return date cannot be before the borrow date</string>
+    <string name="error_item_unavailable_or_out_of_stock">The item is unavailable or out of stock</string>
+    <string name="error_item_out_of_stock">Item stock is empty</string>
+    <string name="error_max_borrow_duration">Maximum borrowing duration is %1$d days</string>
+    <string name="error_send_borrow_request_failed">Failed to send borrowing request</string>
+    <string name="error_load_catalog_failed">Failed to load item catalog</string>
+    <string name="error_load_favorites_failed">Failed to load favorites</string>
+    <string name="error_load_history_failed">Failed to load borrowing history</string>
+    <string name="error_load_items_failed">Failed to load item data</string>
+    <string name="error_load_borrowings_failed">Failed to load borrowing data</string>
+    <string name="error_load_returns_failed">Failed to load return data</string>
+    <string name="error_load_borrowing_detail_failed">Failed to load borrowing detail</string>
+    <string name="error_add_item_failed">Failed to add item</string>
+    <string name="error_edit_item_failed">Failed to edit item</string>
+    <string name="error_delete_item_failed">Failed to delete item</string>
+    <string name="error_upload_photo">Failed to upload photo: %1$s</string>
+    <string name="error_submit_return_failed">Failed to submit return request</string>
+    <string name="error_reject_return_failed">Failed to reject return</string>
+    <string name="error_return_condition_required">Item condition is required</string>
+    <string name="error_admin_note_required_reject_return">Admin note is required when rejecting a return</string>
+    <string name="error_empty_name">Name cannot be empty.</string>
+    <string name="error_empty_email_password">Email and password cannot be empty.</string>
+    <string name="error_empty_full_name">Full name cannot be empty.</string>
+    <string name="error_empty_email">Email cannot be empty.</string>
+    <string name="error_password_min_6">Password must be at least 6 characters.</string>
+    <string name="error_current_password_required">Current password cannot be empty.</string>
+    <string name="error_new_password_min_8">New password must be at least 8 characters.</string>
+    <string name="error_password_confirmation_mismatch">Password confirmation does not match.</string>
+    <string name="error_save_profile_failed">Failed to save.</string>
+    <string name="error_url_not_found">URL was not found</string>
+    <string name="success_profile_saved">Profile saved successfully.</string>
+
+<string name="notif_channel_name">Borrowing Status</string>
+    <string name="notif_channel_description">Notifications when item borrowing status changes</string>
+    <string name="notif_return_approved_title">Return Approved</string>
+    <string name="notif_return_approved_message">Your item return has been verified by admin.</string>
+    <string name="notif_return_rejected_title">Return Rejected</string>
+    <string name="notif_return_rejected_message">Your item return was rejected. Please check the admin note.</string>
+    <string name="notif_admin_new_borrow_title">New Borrowing Request</string>
+    <string name="notif_admin_new_borrow_message">%1$s submitted a request to borrow %2$s.</string>
+    <string name="notif_admin_new_return_title">New Return Request</string>
+    <string name="notif_admin_new_return_message">There is an item return waiting for admin verification.</string>
+    <string name="error_load_holiday_info_failed">Failed to load holiday information</string>
+    <string name="error_load_holiday_cache_failed">Failed to load holiday cache</string>
+    <string name="error_load_item_failed">Failed to load item</string>
+    <string name="error_change_password_failed">Failed to change password. Please try again.</string>
+    <string name="error_verify_return_failed">Failed to verify return</string>
+    <string name="error_approve_borrowing_failed">Failed to approve request</string>
+    <string name="error_reject_borrowing_failed">Failed to reject request</string>
+    <string name="error_try_again">Something went wrong. Please try again.</string>
+    <string name="error_email_not_registered">Email is not registered.</string>
+    <string name="error_wrong_password">Incorrect password.</string>
+    <string name="error_current_password_wrong">Current password is incorrect.</string>
+    <string name="error_invalid_email_format">Invalid email format.</string>
+    <string name="error_too_many_attempts">Too many attempts. Please try again later.</string>
+    <string name="error_no_internet">No internet connection.</string>
+    <string name="error_login_failed">Login failed. Please check your email and password.</string>
+    <string name="error_email_already_registered">Email is already registered.</string>
+    <string name="error_register_failed">Registration failed. Please try again.</string>
+    <string name="label_admin_phone">Admin Phone</string>
+    <string name="label_admin_email">Admin Email</string>
+    <string name="btn_contact">Contact</string>
+    <string name="btn_send_email">Send Email</string>
+    <string name="email_subject_reset_password">SiPinjam Password Reset Request</string>
+    <string name="error_uid_not_found">UID was not found</string>
+    <string name="error_firestore_user_not_found">User data was not found in Firestore</string>
 </resources>

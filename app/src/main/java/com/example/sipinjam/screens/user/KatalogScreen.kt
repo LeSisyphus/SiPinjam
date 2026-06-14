@@ -52,6 +52,8 @@ import coil.compose.AsyncImage
 import com.example.sipinjam.domain.model.Barang
 import com.example.sipinjam.ui.components.SiPinjamTopBar
 import com.example.sipinjam.ui.components.UserBottomNavBar
+import com.example.sipinjam.ui.components.localizedCategoryText
+import com.example.sipinjam.ui.components.localizedUiMessage
 import com.example.sipinjam.ui.theme.BackgroundGray
 import com.example.sipinjam.ui.theme.CardWhite
 import com.example.sipinjam.ui.theme.DarkImageBg
@@ -140,7 +142,7 @@ fun KatalogScreen(
 
                 uiState.errorMessage != null -> {
                     KatalogMessageCard(
-                        message = uiState.errorMessage.orEmpty(),
+                        message = localizedUiMessage(uiState.errorMessage),
                         isError = true,
                         modifier = Modifier.padding(horizontal = 24.dp)
                     )
@@ -377,7 +379,7 @@ private fun KatalogBarangCard(
                     .padding(horizontal = 12.dp, vertical = 10.dp)
             ) {
                 Text(
-                    text = barang.kategori.uppercase(),
+                    text = localizedCategoryText(barang.kategori).uppercase(),
                     color = SiPinjamBlue,
                     fontSize = 9.sp,
                     fontWeight = FontWeight.ExtraBold,

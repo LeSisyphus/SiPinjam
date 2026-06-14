@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import com.example.sipinjam.utils.UiMessageKey
 
 data class GantiPasswordUiState(
     val passwordLama: String = "",
@@ -60,15 +61,15 @@ class GantiPasswordViewModel(
         val state = _uiState.value
 
         if (state.passwordLama.isBlank()) {
-            _uiState.update { it.copy(errorMessage = "Password saat ini tidak boleh kosong.") }
+            _uiState.update { it.copy(errorMessage = UiMessageKey.CURRENT_PASSWORD_REQUIRED) }
             return
         }
         if (state.passwordBaru.length < 8) {
-            _uiState.update { it.copy(errorMessage = "Password baru minimal 8 karakter.") }
+            _uiState.update { it.copy(errorMessage = UiMessageKey.NEW_PASSWORD_MIN_8) }
             return
         }
         if (state.passwordBaru != state.konfirmasiPassword) {
-            _uiState.update { it.copy(errorMessage = "Konfirmasi password tidak cocok.") }
+            _uiState.update { it.copy(errorMessage = UiMessageKey.PASSWORD_CONFIRMATION_MISMATCH) }
             return
         }
 
@@ -95,11 +96,11 @@ class GantiPasswordViewModel(
 
     private fun parseError(message: String?): String {
         return when {
-            message == null                              -> "Terjadi kesalahan, coba lagi."
+            message == null                              -> UiMessageKey.TRY_AGAIN
             message.contains("invalid credential") ||
-                    message.contains("wrong-password")          -> "Password saat ini salah."
-            message.contains("network error")           -> "Tidak ada koneksi internet."
-            else                                        -> "Gagal mengganti password. Coba lagi."
+                    message.contains("wrong-password")          -> UiMessageKey.CURRENT_PASSWORD_WRONG
+            message.contains("network error")           -> UiMessageKey.NO_INTERNET
+            else                                        -> UiMessageKey.CHANGE_PASSWORD_FAILED
         }
     }
 }

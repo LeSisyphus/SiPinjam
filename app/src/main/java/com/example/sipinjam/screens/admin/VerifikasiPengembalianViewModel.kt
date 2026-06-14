@@ -17,6 +17,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import com.example.sipinjam.utils.UiMessageKey
 
 data class VerifikasiPengembalianDetailUiState(
     val namaPeminjam: String = "-",
@@ -81,12 +82,12 @@ class VerifikasiPengembalianViewModel(
                 _detailUiState.value = VerifikasiPengembalianDetailUiState(
                     namaPeminjam = user?.nama?.takeIf { it.isNotBlank() }
                         ?: peminjaman?.namaUser?.takeIf { it.isNotBlank() }
-                        ?: "Pengguna",
+                        ?: "-",
                     rolePeminjam = formatRole(user),
                     fotoPeminjamUrl = user?.fotoUrl.orEmpty(),
                     namaBarang = barang?.nama?.takeIf { it.isNotBlank() }
                         ?: peminjaman?.namaBarang?.takeIf { it.isNotBlank() }
-                        ?: "Barang",
+                        ?: "-",
                     fotoBarangUrl = barang?.fotoUrl.orEmpty(),
                     catatanPeminjam = data.catatan
                 )
@@ -99,7 +100,7 @@ class VerifikasiPengembalianViewModel(
             }
 
             result.onFailure { error ->
-                _errorMessage.value = error.message ?: "Gagal memuat data pengembalian"
+                _errorMessage.value = UiMessageKey.LOAD_RETURNS_FAILED
             }
 
             _isLoading.value = false
@@ -113,7 +114,7 @@ class VerifikasiPengembalianViewModel(
     ) {
         viewModelScope.launch {
             if (kondisi.isBlank()) {
-                _errorMessage.value = "Kondisi barang wajib dipilih"
+                _errorMessage.value = UiMessageKey.RETURN_CONDITION_REQUIRED
                 return@launch
             }
 
@@ -129,8 +130,7 @@ class VerifikasiPengembalianViewModel(
             if (result.isSuccess) {
                 _sukses.value = true
             } else {
-                _errorMessage.value = result.exceptionOrNull()?.message
-                    ?: "Gagal memverifikasi pengembalian"
+                _errorMessage.value = UiMessageKey.VERIFY_RETURN_FAILED
             }
 
             _isLoading.value = false
@@ -143,7 +143,7 @@ class VerifikasiPengembalianViewModel(
     ) {
         viewModelScope.launch {
             if (catatan.isBlank()) {
-                _errorMessage.value = "Catatan admin wajib diisi saat menolak pengembalian"
+                _errorMessage.value = UiMessageKey.ADMIN_NOTE_REQUIRED_REJECT_RETURN
                 return@launch
             }
 
@@ -159,8 +159,7 @@ class VerifikasiPengembalianViewModel(
                 _catatanTolak.value = catatan
                 _sukses.value = true
             } else {
-                _errorMessage.value = result.exceptionOrNull()?.message
-                    ?: "Gagal menolak pengembalian"
+                _errorMessage.value = UiMessageKey.REJECT_RETURN_FAILED
             }
 
             _isLoading.value = false

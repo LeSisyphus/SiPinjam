@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import com.example.sipinjam.utils.UiMessageKey
 
 data class KatalogUiState(
     val daftarBarang: List<Barang> = emptyList(),
@@ -42,7 +43,7 @@ class KatalogViewModel(
                     _uiState.update {
                         it.copy(
                             isLoading = false,
-                            errorMessage = exception.localizedMessage ?: "Gagal memuat katalog barang"
+                            errorMessage = UiMessageKey.LOAD_CATALOG_FAILED
                         )
                     }
                 }

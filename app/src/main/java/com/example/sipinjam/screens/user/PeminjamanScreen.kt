@@ -72,6 +72,10 @@ import com.example.sipinjam.ui.theme.StatusRed
 import com.example.sipinjam.ui.theme.StatusRedBg
 import com.example.sipinjam.ui.theme.TextPrimary
 import com.example.sipinjam.ui.theme.TextSecondary
+import com.example.sipinjam.ui.components.localizedCategoryText
+import com.example.sipinjam.ui.components.localizedDayCount
+import com.example.sipinjam.ui.components.localizedStatusText
+import com.example.sipinjam.ui.components.localizedUiMessage
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -110,7 +114,7 @@ fun PeminjamanScreen(
 
     val statusLabel = when {
         isBarangLoading -> stringResource(R.string.loading_upper)
-        barang == null -> statusBarang.uppercase()
+        barang == null -> localizedStatusText(statusBarang).uppercase()
         isBarangAvailable -> stringResource(R.string.status_tersedia_upper)
         else -> stringResource(R.string.status_tidak_tersedia_upper)
     }
@@ -275,7 +279,7 @@ fun PeminjamanScreen(
                     IconButton(onClick = onBackClick) {
                         Icon(
                             imageVector = Icons.Filled.ArrowBack,
-                            contentDescription = "Kembali",
+                            contentDescription = stringResource(R.string.desc_back),
                             tint = TextPrimary
                         )
                     }
@@ -301,7 +305,7 @@ fun PeminjamanScreen(
                 ) {
                     if (!errorMessage.isNullOrBlank()) {
                         Text(
-                            text = errorMessage.orEmpty(),
+                            text = localizedUiMessage(errorMessage),
                             color = StatusRed,
                             fontSize = 12.sp,
                             textAlign = TextAlign.Center,
@@ -416,10 +420,9 @@ fun PeminjamanScreen(
                                     .padding(horizontal = 8.dp, vertical = 3.dp)
                             ) {
                                 Text(
-                                    text = barang?.kategori
-                                        ?.uppercase()
-                                        ?.ifBlank { kategoriBarang }
-                                        ?: kategoriBarang,
+                                    text = localizedCategoryText(
+                                        barang?.kategori?.ifBlank { kategoriBarang } ?: kategoriBarang
+                                    ).uppercase(),
                                     color = Color.White,
                                     fontSize = 10.sp,
                                     fontWeight = FontWeight.Bold,
@@ -458,9 +461,11 @@ fun PeminjamanScreen(
                         )
 
                         Text(
-                            text = "Stok: ${barang?.stok ?: "-"} • Maks. pinjam: ${
+                            text = stringResource(
+                                R.string.label_stock_max_borrow,
+                                (barang?.stok ?: "-").toString(),
                                 formatMaksimalPinjamLabel(barang?.maksimalPinjam)
-                            }",
+                            ),
                             color = TextSecondary,
                             fontSize = 12.sp,
                             lineHeight = 16.sp
@@ -516,7 +521,7 @@ fun PeminjamanScreen(
                         ) {
                             Icon(
                                 imageVector = Icons.Filled.CalendarMonth,
-                                contentDescription = "Pilih tanggal pinjam",
+                                contentDescription = stringResource(R.string.desc_select_borrow_date),
                                 tint = SiPinjamBlue
                             )
                         }
@@ -566,7 +571,7 @@ fun PeminjamanScreen(
                         ) {
                             Icon(
                                 imageVector = Icons.Filled.CalendarMonth,
-                                contentDescription = "Pilih tanggal kembali",
+                                contentDescription = stringResource(R.string.desc_select_return_date),
                                 tint = SiPinjamBlue
                             )
                         }
@@ -642,6 +647,7 @@ fun PeminjamanScreen(
     }
 }
 
+@Composable
 private fun formatMaksimalPinjamLabel(value: String?): String {
     if (value.isNullOrBlank()) return "-"
 
@@ -650,7 +656,7 @@ private fun formatMaksimalPinjamLabel(value: String?): String {
     return if (angka.isBlank()) {
         value
     } else {
-        "$angka hari"
+        localizedDayCount(angka.toInt())
     }
 }
 

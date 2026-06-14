@@ -42,6 +42,8 @@ import com.example.sipinjam.di.rememberSiPinjamViewModelFactory
 import com.example.sipinjam.domain.model.FavoriteItem
 import com.example.sipinjam.ui.components.SiPinjamTopBar
 import com.example.sipinjam.ui.components.UserBottomNavBar
+import com.example.sipinjam.ui.components.localizedCategoryText
+import com.example.sipinjam.ui.components.localizedUiMessage
 import com.example.sipinjam.ui.theme.BackgroundGray
 import com.example.sipinjam.ui.theme.CardWhite
 import com.example.sipinjam.ui.theme.DarkImageBg
@@ -113,7 +115,7 @@ fun FavoritBarangScreen(
                             .padding(16.dp)
                     ) {
                         Text(
-                            text = uiState.errorMessage.orEmpty(),
+                            text = localizedUiMessage(uiState.errorMessage),
                             color = StatusRed,
                             fontSize = 13.sp
                         )
@@ -129,7 +131,7 @@ fun FavoritBarangScreen(
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        text = "Belum ada barang favorit.",
+                        text = stringResource(R.string.empty_favorites),
                         color = TextSecondary,
                         fontSize = 14.sp
                     )
@@ -206,7 +208,7 @@ private fun FavoritCard(
                 maxLines = 1
             )
             Text(
-                text = item.kategori.uppercase(),
+                text = localizedCategoryText(item.kategori).uppercase(),
                 color = SiPinjamBlue,
                 fontSize = 11.sp,
                 fontWeight = FontWeight.Bold,

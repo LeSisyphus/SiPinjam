@@ -18,6 +18,7 @@ import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import com.example.sipinjam.utils.UiMessageKey
 
 class PengembalianViewModel(
     private val getBarangDetailUseCase: GetBarangDetailUseCase,
@@ -92,7 +93,7 @@ class PengembalianViewModel(
             val uploadResult = uploadReturnPhotoUseCase(fotoUri, peminjamanId)
 
             if (uploadResult.isFailure) {
-                _errorMessage.value = "Gagal upload foto: ${uploadResult.exceptionOrNull()?.message}"
+                _errorMessage.value = UiMessageKey.uploadPhotoFailed(uploadResult.exceptionOrNull()?.message)
                 _isLoading.value = false
                 return@launch
             }
@@ -118,8 +119,7 @@ class PengembalianViewModel(
             val result = ajukanPengembalianUseCase(pengembalian)
 
             if (result.isFailure) {
-                _errorMessage.value = result.exceptionOrNull()?.message
-                    ?: "Gagal mengajukan pengembalian"
+                _errorMessage.value = UiMessageKey.SUBMIT_RETURN_FAILED
                 _isLoading.value = false
                 return@launch
             }

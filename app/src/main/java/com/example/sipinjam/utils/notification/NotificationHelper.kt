@@ -17,17 +17,16 @@ class NotificationHelper(private val context: Context) {
 
     companion object {
         const val CHANNEL_ID = "sipinjam_status_channel"
-        const val CHANNEL_NAME = "Status Peminjaman"
     }
 
     fun createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(
                 CHANNEL_ID,
-                CHANNEL_NAME,
+                context.getString(R.string.notif_channel_name),
                 NotificationManager.IMPORTANCE_HIGH
             ).apply {
-                description = "Notifikasi saat ada perubahan status peminjaman barang"
+                description = context.getString(R.string.notif_channel_description)
             }
             notificationManager.createNotificationChannel(channel)
         }

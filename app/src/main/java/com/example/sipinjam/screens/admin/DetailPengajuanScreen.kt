@@ -39,6 +39,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -54,6 +55,10 @@ import com.example.sipinjam.domain.model.Barang
 import com.example.sipinjam.domain.model.Peminjaman
 import com.example.sipinjam.domain.model.User
 import com.example.sipinjam.ui.components.SiPinjamTopBar
+import com.example.sipinjam.ui.components.localizedCategoryText
+import com.example.sipinjam.ui.components.localizedItemConditionText
+import com.example.sipinjam.ui.components.localizedStatusText
+import com.example.sipinjam.ui.components.localizedUiMessage
 import com.example.sipinjam.ui.theme.BackgroundGray
 import com.example.sipinjam.ui.theme.CardWhite
 import com.example.sipinjam.ui.theme.DarkImageBg
@@ -132,7 +137,8 @@ fun DetailPengajuanScreen(
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        text = uiState.errorMessage ?: stringResource(R.string.empty_request_not_found),
+                        text = localizedUiMessage(uiState.errorMessage)
+                            .ifBlank { stringResource(R.string.empty_request_not_found) },
                         color = TextSecondary,
                         fontSize = 14.sp
                     )
@@ -254,7 +260,7 @@ private fun InformasiBarangCard(peminjaman: Peminjaman, barang: Barang?) {
 
             DetailInfoRow(
                 label = stringResource(R.string.label_initial_condition),
-                value = barang?.kondisi?.ifBlank { "-" } ?: "-",
+                value = barang?.kondisi?.ifBlank { "-" }?.let { localizedItemConditionText(it) } ?: "-",
                 valueColor = StatusGreen
             )
 
@@ -276,7 +282,7 @@ private fun KategoriChip(kategori: String) {
             .padding(horizontal = 10.dp, vertical = 4.dp)
     ) {
         Text(
-            text = kategori.uppercase(),
+            text = localizedCategoryText(kategori).uppercase(),
             color = StatusBlue,
             fontSize = 11.sp,
             fontWeight = FontWeight.Medium
@@ -380,7 +386,7 @@ private fun DetailPengajuanBottomAction(
         ) {
             if (!errorMessage.isNullOrBlank()) {
                 Text(
-                    text = errorMessage,
+                    text = localizedUiMessage(errorMessage),
                     color = StatusRed,
                     fontSize = 12.sp,
                     lineHeight = 17.sp
@@ -389,7 +395,7 @@ private fun DetailPengajuanBottomAction(
 
             if (!canTakeAction) {
                 Text(
-                    text = "Pengajuan ini sudah berstatus $status.",
+                    text = stringResource(R.string.label_request_already_status, localizedStatusText(status)),
                     color = TextSecondary,
                     fontSize = 13.sp
                 )
@@ -464,16 +470,36 @@ private fun DetailPengajuanBottomAction(
     }
 }
 
-private fun hitungDurasiHari(tanggalPinjam: String, tanggalKembali: String): String {
+@Composable
+private fun hitungDurasiHari(
+    tanggalPinjam: String,
+    tanggalKembali: String
+): String {
+    val hari = remember(tanggalPinjam, tanggalKembali) {
+        hitungDurasiHariValue(tanggalPinjam, tanggalKembali)
+    }
+
+    return if (hari == null || hari <= 0) {
+        "-"
+    } else {
+        stringResource(R.string.unit_days_count, hari)
+    }
+}
+
+private fun hitungDurasiHariValue(
+    tanggalPinjam: String,
+    tanggalKembali: String
+): Int? {
     return try {
         val formatter = SimpleDateFormat("d MMMM yyyy", Locale("id", "ID"))
         val mulai = formatter.parse(tanggalPinjam)
         val selesai = formatter.parse(tanggalKembali)
-        if (mulai == null || selesai == null) return "-"
+
+        if (mulai == null || selesai == null) return null
+
         val diffMillis = selesai.time - mulai.time
-        val hari = TimeUnit.MILLISECONDS.toDays(diffMillis).toInt()
-        if (hari <= 0) "-" else "$hari Hari"
+        TimeUnit.MILLISECONDS.toDays(diffMillis).toInt()
     } catch (e: Exception) {
-        "-"
+        null
     }
 }

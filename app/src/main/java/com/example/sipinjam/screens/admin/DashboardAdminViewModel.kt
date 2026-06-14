@@ -16,6 +16,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import com.example.sipinjam.utils.UiMessageKey
 
 data class DashboardAdminUiState(
     val jumlahPermintaanMasuk: Int = 0,
@@ -48,7 +49,7 @@ class DashboardAdminViewModel(
                     _uiState.update {
                         it.copy(
                             isLoading = false,
-                            errorMessage = error.localizedMessage ?: "Gagal memuat data barang"
+                            errorMessage = UiMessageKey.LOAD_ITEMS_FAILED
                         )
                     }
                 }
@@ -74,7 +75,7 @@ class DashboardAdminViewModel(
                     _uiState.update {
                         it.copy(
                             isLoading = false,
-                            errorMessage = error.localizedMessage ?: "Gagal memuat data peminjaman"
+                            errorMessage = UiMessageKey.LOAD_BORROWINGS_FAILED
                         )
                     }
                 }
