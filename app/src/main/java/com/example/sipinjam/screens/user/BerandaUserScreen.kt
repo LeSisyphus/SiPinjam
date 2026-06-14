@@ -343,11 +343,6 @@ private fun HolidayInfoCard(
                         fontSize = 15.sp,
                         fontWeight = FontWeight.Bold
                     )
-                    Text(
-                        text = stringResource(R.string.label_holiday_source),
-                        color = TextSecondary,
-                        fontSize = 11.sp
-                    )
                 }
                 Text(
                     text = stringResource(R.string.btn_refresh),
