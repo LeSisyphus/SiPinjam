@@ -86,7 +86,7 @@
     <string name="hint_email_mahasiswa">nama@mhs.ulm.ac.id</string>
     <string name="hint_email_kampus">nama@kampus.ac.id</string>
     <string name="hint_nama">John Doe</string>
-    <string name="hint_search_katalog">Search equipment...</string>
+    <string name="hint_search_katalog">Cari perlengkapan...</string>
     <string name="hint_search_barang">Cari nama barang atau ID...</string>
     <string name="hint_tanggal_pinjam">cth: 1 Juni 2026</string>
     <string name="hint_tanggal_kembali">cth: 5 Juni 2026</string>
